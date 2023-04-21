@@ -18,10 +18,15 @@ code {
   --text-color: #101010;
   --lighter-text-color: #6d6d6d;
   --selection-background: #f0f0f0;
+  --date-label-background: #f2f2f2;
   --highlight: #b0b0eb;
   --button-disabled: #bebef0;
   --button-tint: #8282d1;
   --button-tint-hover: #7575CF;
+  --link-active: #498ff8;
+  --link-visited: #42638d;
+  --code-token: #f0f0f0;
+  --inline-code: #5041b4;
 }
 
 .center-screen {

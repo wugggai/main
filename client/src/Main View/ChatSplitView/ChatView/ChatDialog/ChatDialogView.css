@@ -1,15 +1,21 @@
 .chat-view .dialog-container {
     position: relative;
-    padding: 10px 20px;
+    padding: 10px 0px;
     box-sizing: border-box;
 }
 
 .chat-view .dialog {
     height: 100%;
-    padding: 10px;
     border-radius: 5px;
     box-sizing: border-box;
     border: 2px dashed var(--line);
+    /* display: flex; */
+    /* flex-direction: column;
+    justify-content: flex-end; */
+    padding: 20px 10px 10px;
+    overflow: scroll;
+    display: grid;
+    grid-template-rows: 1fr auto;
 }
 
 .vertical-split {
@@ -31,4 +37,32 @@
 
 .gutter.gutter-vertical:hover {
     box-shadow: none;
+}
+
+.chat-view .history-item {
+    position: relative;
+    padding: 15px;
+}
+
+.chat-view .date-label {
+    background-color: var(--date-label-background);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: var(--text-color);
+    text-align: center;
+    display: inline-block;
+}
+
+.chat-view .history-item .avatar {
+    /* position: absolute; */
+    /* top: 0; */
+    /* left: 20px; */
+    height: 40px;
+    margin-right: 20px;
+}
+
+.chat-view .history-item .message {
+    flex-grow: 2;
+    margin-right: 50px;
 }
