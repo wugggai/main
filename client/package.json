@@ -50,5 +50,6 @@
   },
   "devDependencies": {
     "@types/react-color": "^3.0.6"
-  }
+  },
+  "proxy": "http://localhost:5000"
 }
