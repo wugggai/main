@@ -1,0 +1,34 @@
+.chat-view .dialog-container {
+    position: relative;
+    padding: 10px 20px;
+    box-sizing: border-box;
+}
+
+.chat-view .dialog {
+    height: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    box-sizing: border-box;
+    border: 2px dashed var(--line);
+}
+
+.vertical-split {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.gutter.gutter-vertical {
+    cursor: row-resize;
+    width: 50px;
+    background-color: transparent;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+    background-repeat: no-repeat;
+    background-position: 50%;
+    margin: 0 auto;
+}
+
+.gutter.gutter-vertical:hover {
+    box-shadow: none;
+}

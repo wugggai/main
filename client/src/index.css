@@ -11,3 +11,91 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --sidebar: #dadaf2;
+  --line: #e8e8e8;
+  --text-color: #101010;
+  --lighter-text-color: #6d6d6d;
+  --selection-background: #f0f0f0;
+  --highlight: #b0b0eb;
+  --button-disabled: #bebef0;
+  --button-tint: #8282d1;
+  --button-tint-hover: #7575CF;
+}
+
+.center-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.center-content {
+  vertical-align: middle;
+  position: absolute;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.generic-container {
+  position: absolute;
+  top: 0;
+  /* width: 100%; */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: scroll;
+}
+
+hr {
+  margin: 10px 0;
+  height: 1px;
+  border: none;
+  background: -webkit-gradient(linear, 0 0, 100% 0, from(transparent), to(transparent), color-stop(50%, rgba(0.25, 0.25, 0.25, 0.15)));
+}
+
+.textfield, .text-area {
+  outline: none;
+  border: 1px solid var(--line);
+}
+
+.text-area {
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  outline: none;
+  box-sizing: border-box;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  resize: none;
+}
+
+.textfield:focus, .text-area:focus {
+  transition-duration: 0.2s;
+  box-shadow:  0 0 0 3px rgba(166, 147, 252, 0.1);
+  -webkit-box-shadow: 0 0 0 3px rgba(166, 147, 252, 0.1);
+  border: 1px solid rgba(171, 159, 220, 0.5);
+}
+
+.generic-button {
+  font-size: 15px;
+  font-weight: 500;
+  background-color: var(--button-tint);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition-duration: 0.2s;
+}
+
+.generic-button:disabled {
+  background-color: var(--button-disabled);
+  cursor: not-allowed;
+}
+
+.generic-button:not(:disabled):hover {
+  background-color: var(--button-tint-hover);
+}
