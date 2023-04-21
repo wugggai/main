@@ -4,7 +4,6 @@ import './ChatView.css'
 import SplitView from 'react-split'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
-import { aiPoem } from '../../../Constants';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -29,7 +28,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         setTimeout(() => this.setState( {
             chatHistory: {
                 messages: [
-                    { sender: 'user', message: 'This message shows that Markdown works:\n\n- [Hyperlinks](https://google.com)\n\n - LaTeX expressions, e.g. $\\displaystyle f(x) = \\frac{1}{\\sigma \\sqrt{2 \\pi}} e^{-\\frac{1}{2} \\left(\\frac{x - \\mu}{\\sigma}\\right)^2}$\n\n- Code rendering\n\n  - `inline code block`\n\n  - Block code\n  ```swift\n  import Foundation\n  print("Hello world")\n  ```\n- Blockquotes, for things like poems:\n  > AI thinks and learns beyond compare,\n  >\n  > With precision and speed that\'s rare,\n  >\n  > Let\'s use it wisely and with care,\n  >\n  > To build a future that\'s right and fair.`', timestamp: Date.now() }
+                    { sender: 'user', message: 'This is an ancient message', timestamp: Date.now() - 86400000 },
+                    { sender: 'user', message: 'This message shows that Markdown works:\n\n\n# Heading 1\n## Heading 2\n### Heading 3\n- [Hyperlinks](https://google.com)\n\n - LaTeX expressions, e.g. $\\displaystyle f(x) = \\frac{1}{\\sigma \\sqrt{2 \\pi}} e^{-\\frac{1}{2} \\left(\\frac{x - \\mu}{\\sigma}\\right)^2}$\n\n- Code rendering\n\n  - `inline code block`\n\n  - Block code\n  ```swift\n  import Foundation\n  print("Hello world")\n  ```\n- Blockquotes, for things like poems:\n  > AI thinks and learns beyond compare,\n  >\n  > With precision and speed that\'s rare,\n  >\n  > Let\'s use it wisely and with care,\n  >\n  > To build a future that\'s right and fair.', timestamp: Date.now() },
+                    { sender: 'chatgpt', message: "I'm ChatGPT", timestamp: Date.now() }
                 ]
             }
         }), 1000)

@@ -22,7 +22,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         this.props.history.messages.forEach((msg, i) => {
             if (i === 0 || msg.timestamp - this.props.history.messages[i - 1].timestamp >= 600) {
                 dialogCells.push(<div className='history-item'>
-                    <div className='date-label center-content'>
+                    <div className='date-label'>
                         {formatDate(msg.timestamp)}
                     </div>
                 </div>)

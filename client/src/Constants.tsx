@@ -188,23 +188,3 @@ export const SYNTAX_THEME = {
       "fontStyle": "italic"
     }
   };
-
-export let aiPoem = `In circuits and chips it dwells,
-An intelligence that swiftly excels,
-With algorithms as its core,
-And data as its fuel to explore.
-
-It thinks and learns beyond compare,
-With precision and speed that's rare,
-It helps us solve complex tasks,
-And unlocks knowledge in new ways.
-
-But let us never forget,
-That it is we who program and set,
-The rules and boundaries of its domain,
-Lest we lose control and face the pain.
-
-For AI, like any creation,
-Can bring both good and devastation,
-Let's use it wisely and with care,
-To build a future that's fair and rare.`
