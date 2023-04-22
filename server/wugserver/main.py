@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
 
+from . import database
 from .routers import users
+from wugserver.database import engine
+
+database.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 app.router.prefix = "/api"
