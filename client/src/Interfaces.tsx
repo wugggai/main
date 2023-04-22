@@ -5,20 +5,33 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
+export type AI = 'chatgpt' | 'gpt-4'
+
 export interface ChatMetadata {
-    ai_type: 'chatgpt' | 'gpt-4'
+    ai_type: AI
     title: string
     initial_message: string
     date: number // timestamp
     tags?: string[]
 }
 
+export interface ChatHistoryItem {
+    sender: 'user' | AI
+    message: string
+    timestamp: number
+}
+
+export interface ChatHistory {
+    messages: ChatHistoryItem[]
+}
+
+
 export function formatDate(date: string | Date | number | null): string {
     if (!date) {
         return "No Date"
     }
     const originalDate = dayjs(date)
-    let formatString = 'MMM D, h:mm A'
+    let formatString = 'MMMM D, h:mm A'
     if (originalDate.year() !== dayjs().year()) {
         formatString = 'MMM D, YYYY [at] h:mm A'
     }

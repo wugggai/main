@@ -1,6 +1,7 @@
 .chat-view {
     height: 100%;
-    width: 100%;
+    padding: 0px 20px;
+    width: calc(100% - 40px);
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -55,8 +56,10 @@
     width: calc(100% - 60px);
     min-height: 100px;
     flex-grow: 3;
+    padding-bottom: 10px;
+    max-width: 1000px;
 }
 
 .chat-view .chat-input-container {
-    margin: 10px 20px 20px 20px;
+    padding: 10px 0px;
 }

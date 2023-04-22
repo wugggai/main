@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react'
-import { ChatMetadata } from '../../../Interfaces';
+import { ChatHistory, ChatMetadata } from '../../../Interfaces';
 import './ChatView.css'
 import SplitView from 'react-split'
-import ChatDialog from './ChatDialog/ChatDialog';
+import ChatDialogView from './ChatDialog/ChatDialogView';
+import { Loading } from '../../../UI Components/Loading';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -11,6 +12,7 @@ interface ChatViewProps {
  
 interface ChatViewState {
     editedTitle?: string
+    chatHistory?: ChatHistory
 }
  
 class ChatView extends React.Component<ChatViewProps, ChatViewState> {
@@ -20,7 +22,24 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         super(props);
         this.state = {};
     }
-    render() { 
+
+    componentDidMount(): void {
+        // Load chat history from server
+        setTimeout(() => this.setState( {
+            chatHistory: {
+                messages: [
+                    { sender: 'user', message: 'This is an ancient message', timestamp: Date.now() - 86400000 },
+                    { sender: 'user', message: 'This message shows that Markdown works:\n\n\n# Heading 1\n## Heading 2\n### Heading 3\n- [Hyperlinks](https://google.com)\n\n - LaTeX expressions, e.g. $\\displaystyle f(x) = \\frac{1}{\\sigma \\sqrt{2 \\pi}} e^{-\\frac{1}{2} \\left(\\frac{x - \\mu}{\\sigma}\\right)^2}$\n\n- Code rendering\n\n  - `inline code block`\n\n  - Block code\n  ```swift\n  import Foundation\n  print("Hello world")\n  ```\n- Blockquotes, for things like poems:\n  > AI thinks and learns beyond compare,\n  >\n  > With precision and speed that\'s rare,\n  >\n  > Let\'s use it wisely and with care,\n  >\n  > To build a future that\'s right and fair.', timestamp: Date.now() },
+                    { sender: 'chatgpt', message: "I'm ChatGPT", timestamp: Date.now() }
+                ]
+            }
+        }), 1000)
+    }
+
+    render() {
+        if (this.state.chatHistory === undefined) {
+            return <Loading />
+        }
         return <div className='chat-view' onClick={() => this.setState({ editedTitle: undefined })}>
             <div className='heading'>
                 <div className='title'>
@@ -69,7 +88,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     snapOffset={0}
                     expandToMin
                     gutterSize={10}>
-                    <ChatDialog />
+                    <ChatDialogView history={this.state.chatHistory} />
                     <div className='chat-input-container'>
                         <textarea className='text-area' placeholder='Write something...' />
                     </div>
