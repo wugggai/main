@@ -12,7 +12,7 @@ class UserModel(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 
-def createUser(db: Session, user: UserCreate):
+def create_user(db: Session, user: UserCreate):
     fake_hashed_password = user.password + "notreallyhashed"
     db_user = UserModel(email=user.email, hashed_password=fake_hashed_password)
     db.add(db_user)
@@ -20,8 +20,8 @@ def createUser(db: Session, user: UserCreate):
     db.refresh(db_user)
     return db_user
 
-def getUserByEmail(db: Session, email: str):
+def get_user_by_email(db: Session, email: str):
     return db.query(UserModel).filter(UserModel.email == email).first()
 
-def getUsers(db: Session, skip: int = 0, limit: int = 100):
+def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(UserModel).offset(skip).limit(limit).all()

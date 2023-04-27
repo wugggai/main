@@ -1,20 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
-from wugserver.database import SessionLocal
 from wugserver.dependencies import get_db
 from wugserver.schema.user import *
-from wugserver.models.user import *
+from sqlalchemy.orm import Session
+from wugserver.models.db.user_model import *
 
 router = APIRouter()
 
 @router.post("/users/", response_model=User)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
     print(user)
-    db_user = getUserByEmail(db, email=user.email)
+    db_user = get_user_by_email(db, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return createUser(db=db, user=user)
+        raise HTTPException(status_code=409, detail="Email already registered")
+    return create_user(db=db, user=user)
 
 @router.get("/users/", response_model=list[User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = getUsers(db, skip=skip, limit=limit)
+def read_users_route(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = get_users(db, skip=skip, limit=limit)
     return users

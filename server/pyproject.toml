@@ -11,6 +11,8 @@ fastapi = "^0.95.1"
 uvicorn = "^0.21.1"
 sqlalchemy = "^2.0.10"
 pydantic = "^1.10.7"
+openai = "^0.27.4"
+uuid = "^1.30"
 
 [tool.poetry.scripts]
 start = "wugserver.main:start"
