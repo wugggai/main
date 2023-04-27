@@ -16,8 +16,12 @@ Install Poetry: https://python-poetry.org/docs/#installation
 ```
 cd server
 poetry install
-poetry run flask run
+poetry run start
 ```
+
+Note:  
+You'd want to put in the api key in code (for now).  
+localhost:5000/docs you can play with the endpoints.  
 
 Because Poetry defaults to run your python in a virtualenv, your text editor (VSCode) might not recognize it.  
 Try this: https://stackoverflow.com/questions/59882884/vscode-doesnt-show-poetry-virtualenvs-in-select-interpreter-option
