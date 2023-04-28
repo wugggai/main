@@ -13,7 +13,8 @@ from wugserver.database import engine
 database.Base.metadata.create_all(bind=engine)
 load_dotenv() # Load local .env file
 openai.api_key = os.environ.get('OPENAI_API_KEY') #put the api key here
-
+if openai.api_key:
+    print("Loaded API key from local environment")
 
 app = FastAPI()
 app.add_middleware(
