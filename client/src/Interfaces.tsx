@@ -10,7 +10,7 @@ export type AI = 'chatgpt' | 'gpt-4'
 export interface ChatMetadata {
     ai_type: AI
     title: string
-    initial_message: string
+    initial_message: string | null
     date: number // timestamp
     tags?: string[]
 }

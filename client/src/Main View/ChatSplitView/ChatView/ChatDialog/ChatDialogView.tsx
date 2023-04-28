@@ -18,7 +18,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     }
     render() {
 
-        let dialogCells: JSX.Element[] = [<div />] // Dummy item needed for content to align to bottom
+        let dialogCells: JSX.Element[] = [<div key={-1} />] // Dummy item needed for content to align to bottom
         this.props.history.messages.forEach((msg, i) => {
             if (i === 0 || msg.timestamp - this.props.history.messages[i - 1].timestamp >= 600) {
                 dialogCells.push(<div className='history-item'>
@@ -28,7 +28,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                 </div>)
             }
 
-            dialogCells.push(<div className='history-item' style={{ display: 'flex' }}>
+            dialogCells.push(<div className='history-item' style={{ display: 'flex' }} key={i}>
                 <img src={`/assets/${msg.sender}.png`} width={40} className='avatar' />
                 <div className='message'>
                     <MarkdownTextView rawText={msg.message}/>

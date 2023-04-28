@@ -30,12 +30,12 @@ function MarkdownTextView(props: { rawText?: string, disableCodeHighlighter?: bo
             const match = /language-(\w+)/.exec(className || '') || ['language-swift', 'swift']
             return !inline && match ? (
                 <SyntaxHighlighter
-                children={String(children).replace(/\n$/, '')}
-                // @ts-ignore
-                style={SYNTAX_THEME}
-                language={match[1]}
-                PreTag="div"
-                {...props}
+                    children={String(children).replace(/\n$/, '')}
+                    // @ts-ignore
+                    style={SYNTAX_THEME}
+                    language={match[1]}
+                    PreTag="div"
+                    {...props}
                 />
             ) : (
                 <span className='inline-code'>
