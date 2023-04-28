@@ -14,5 +14,5 @@ def initiate_interaction_route(interactionCreate: InteractionCreate, db: Session
     return create_interaction(db=db, creatorUserId=uuid.uuid4(), interactionCreate=interactionCreate)
 
 @router.get("/users/{userId}/interactions/", response_model=list[Interaction])
-def get_all_interactions_by_user(userId: uuid.UUID, db: Session = Depends(get_db)):
+def get_all_interactions_by_user(userId: int, db: Session = Depends(get_db)):
     return get_interactions_by_creator_user_id(db=db, creatorUserId=userId)

@@ -19,5 +19,5 @@ def create_message(interactionId: UUID, messageCreate: MessageCreate, db: Sessio
     return post_message_to_openai(db=db, interactionId=interactionId, messageCreate=messageCreate)
 
 @router.get("/interactions/{interactionId}/messages/", response_model=list[Message])
-def create_message(interactionId: UUID, db: Session = Depends(get_db)):
+def get_messages(interactionId: UUID, db: Session = Depends(get_db)):
     return get_interaction_messages(db=db, interactionId=interactionId)
