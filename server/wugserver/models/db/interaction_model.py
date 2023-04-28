@@ -24,3 +24,7 @@ def create_interaction(db: Session, creatorUserId: UUID, interactionCreate: Inte
 
 def get_interaction_by_id(db: Session, interactionId: UUID):
     return db.query(InteractionModel).filter(InteractionModel.id == interactionId).first()
+
+def get_interactions_by_creator_user_id(db: Session, creatorUserId: UUID):
+    # TODO: actually filter by user id
+    return db.query(InteractionModel).limit(10).all()

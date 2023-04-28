@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from wugserver.dependencies import get_db
 from wugserver.models.db.interaction_model import get_interaction_by_id
+from wugserver.models.db.message_model import get_interaction_messages
 from wugserver.models.external.openai_model import post_message_to_openai
 from wugserver.schema.message import Message, MessageCreate
 from wugserver.schema.user import *
@@ -16,3 +17,7 @@ def create_message(interactionId: UUID, messageCreate: MessageCreate, db: Sessio
     if interaction == None:
         raise HTTPException(status_code=404, detail="Interaction doesn't exist.")
     return post_message_to_openai(db=db, interactionId=interactionId, messageCreate=messageCreate)
+
+@router.get("/interactions/{interactionId}/messages/", response_model=list[Message])
+def create_message(interactionId: UUID, db: Session = Depends(get_db)):
+    return get_interaction_messages(db=db, interactionId=interactionId)
