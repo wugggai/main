@@ -4,7 +4,7 @@
     box-sizing: border-box;
 }
 
-.chat-view .dialog {
+.chat-view #chat-dialog {
     height: 100%;
     border-radius: 5px;
     box-sizing: border-box;

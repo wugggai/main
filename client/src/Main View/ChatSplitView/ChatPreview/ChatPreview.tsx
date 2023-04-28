@@ -22,9 +22,9 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
     render() {
         const rows = this.props.chatHistoryMetadata.map((metadata, i) => {
             return <div key={i} style={{backgroundColor: this.props.selectedIndex === i ? 'var(--selection-background)' : 'white'}} className='chat-preview-cell' onMouseDown={() => this.props.selectionChanged(i) }>
-                <img src="/assets/chatgpt.png" />
+                <img src="/assets/system.png" />
                 <div className='chat-preview-title'>{metadata.title}</div>
-                <div className='chat-preview-content'>{metadata.initial_message}</div>
+                <div className='chat-preview-content'>{metadata.first_message}</div>
                 <div className='chat-preview-date'>{formatDate(metadata.date)}</div>
             </div>
         })

@@ -10,14 +10,16 @@ export type AI = 'chatgpt' | 'gpt-4'
 export interface ChatMetadata {
     ai_type: AI
     title: string
-    initial_message: string | null
-    date: number // timestamp
+    first_message: string | null // Null is only possible for new interactions created locally
+    date: number
     tags?: string[]
+    id: string
 }
 
 export interface ChatHistoryItem {
-    sender: 'user' | AI
-    message: string
+    id: string
+    role: 'user' | 'system' | AI
+    content: string
     timestamp: number
 }
 

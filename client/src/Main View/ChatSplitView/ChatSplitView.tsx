@@ -28,8 +28,11 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     componentDidMount(): void {
-        axios.get(API_BASE + "/interactions").then(response => {
-            console.log(response)
+        // Temporarily assume user ID is 0 for internal testing
+        axios.get(API_BASE + "/users/0/interactions/").then(response => {
+            this.setState({
+                chatHistoryMetadata: response.data
+            })
         }).catch(err => {
             this.setState({ chatHistoryMetadata: [] })
         })
@@ -38,11 +41,13 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     newInteraction() {
         this.setState({
             newInteractionMetadata: {
+                id: 'tmp',
                 ai_type: 'chatgpt',
                 date: Date.now(),
-                initial_message: null,
+                first_message: null,
                 title: "Untitled Conversation"
-            }
+            },
+            selectedIndex: undefined
         })
     }
 
@@ -61,7 +66,12 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             const metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
             content = <ChatView chatMetadata={metadata} onChatInfoUpdated={() => this.forceUpdate()} isNewInteraction={false} onDeleteInteraction={() => this.moveInteractionToTrash(metadata)} />
         } else if (this.state.newInteractionMetadata !== undefined) {
-            content = <ChatView chatMetadata={this.state.newInteractionMetadata} onChatInfoUpdated={() => this.forceUpdate()} isNewInteraction onDeleteInteraction={this.moveInteractionToTrash} />
+            content = <ChatView chatMetadata={this.state.newInteractionMetadata} onChatInfoUpdated={() => {
+                this.setState({
+                    chatHistoryMetadata: [this.state.newInteractionMetadata!, ...this.state.chatHistoryMetadata!],
+                    selectedIndex: 0
+                })
+            }} isNewInteraction onDeleteInteraction={() => this.moveInteractionToTrash(undefined)} />
         } else {
             content = <div className='center-content'>No chat selected</div>
         }
