@@ -8,7 +8,6 @@ router = APIRouter()
 
 @router.post("/users/", response_model=User)
 def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
-    print(user)
     db_user = get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=409, detail="Email already registered")
