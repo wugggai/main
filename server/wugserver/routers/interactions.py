@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.post("/interactions/", response_model=Interaction)
 def initiate_interaction_route(interactionCreate: InteractionCreate, db: Session = Depends(get_db)):
-    return create_interaction(db=db, creatorUserId=uuid.uuid4(), interactionCreate=interactionCreate)
+    return create_interaction(db=db, creatorUserId=uuid.uuid4().__str__(), interactionCreate=interactionCreate)
 
 @router.get("/users/{userId}/interactions/", response_model=list[Interaction])
 def get_all_interactions_by_user(userId: int, db: Session = Depends(get_db)):
