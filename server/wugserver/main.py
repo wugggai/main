@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import openai
 import uvicorn
-
+from dotenv import load_dotenv
 from wugserver.routers import interactions, messages
 
 from . import database
@@ -11,7 +11,8 @@ from .routers import users
 from wugserver.database import engine
 
 database.Base.metadata.create_all(bind=engine)
-openai.api_key = "" #put the api key here
+load_dotenv() # Load local .env file
+openai.api_key = os.environ.get('OPENAI_API_KEY') #put the api key here
 
 
 app = FastAPI()
