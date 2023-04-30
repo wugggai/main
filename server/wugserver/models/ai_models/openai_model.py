@@ -2,7 +2,7 @@ from uuid import UUID
 import logging
 import openai
 from wugserver.models.ai_models.models import AIModel
-from wugserver.models.db.message_model import get_interaction_messages, MessageModel
+from wugserver.models.db.message_model import get_interaction_all_messages, MessageModel
 from wugserver.schema.message import Message, MessageCreate
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,7 @@ class OpenAIModels(AIModel):
   model_names = ['gpt-3.5-turbo']
 
   def post_message(db: Session, interactionId: UUID, messageCreateParams: MessageCreate):
-    currentMessages = get_interaction_messages(db=db, interactionId=interactionId)
+    currentMessages = get_interaction_all_messages(db=db, interactionId=interactionId)
     logging.info(f"historical messages: {currentMessages}")
     currentOffset = currentMessages[-1].offset if currentMessages else -1
     messages = [OpenAIModels.toOpenaiMessage(m) for m in currentMessages]
