@@ -12,11 +12,11 @@ class InteractionModel(Base):
     id = Column(Uuid, primary_key=True)
     creatorUserId = Column(Integer, index=True)
     title = Column(String)
-    created = Column(DateTime)
-    updated = Column(DateTime)
+    # created = Column(DateTime)
+    # updated = Column(DateTime)
 
 def create_interaction(db: Session, creatorUserId: UUID, interactionCreate: InteractionCreate):
-    interaction = InteractionModel(id=uuid4(), creatorUserId=creatorUserId, title=interactionCreate.title, created=datetime.datetime.now(), updated=datetime.datetime.now())
+    interaction = InteractionModel(id=uuid4(), creatorUserId=creatorUserId, title=interactionCreate.title)
     db.add(interaction)
     db.commit()
     db.refresh(interaction)

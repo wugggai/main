@@ -1,28 +1,24 @@
 import datetime
 from uuid import UUID, uuid4
 from wugserver.database import Base
-from sqlalchemy import Column, DateTime, Integer, String, Uuid
+from sqlalchemy import Column, DateTime, Index, Integer, String, text, Uuid
 from sqlalchemy.orm import Session
 
-from wugserver.schema.message_role import MessageRole
-
+# TODO: Message table should store userId
 class MessageModel(Base):
     __tablename__ = "messages"
 
     id = Column(Uuid, primary_key=True)
     interactionId = Column(Uuid, index=True)
-    role = Column(String)
-    content = Column(String)
+    source = Column(String)
+    message = Column(String)
     offset = Column(Integer)
-    timestamp = Column(DateTime)
+    timestamp = Column(DateTime, server_default=text('CURRENT_TIMESTAMP'))
 
-    def toOpenaiMessage(self):
-        return {"role": self.role, "content": self.content}
+Index("offset_composite_indext", MessageModel.interactionId, MessageModel.offset)
 
-
-
-def create_message(db: Session, interactionId: UUID, role: MessageRole, content: str, offset: Integer):
-    message = MessageModel(id=uuid4(), interactionId=interactionId, role=role, content=content, offset=offset, timestamp=datetime.datetime.now())
+def write_message_to_db(db: Session, interactionId: UUID, source: str, message: str, offset: Integer):
+    message = MessageModel(id=uuid4(), interactionId=interactionId, source=source, message=message, offset=offset, timestamp=datetime.datetime.now())
     db.add(message)
     db.commit()
     db.refresh(message)
