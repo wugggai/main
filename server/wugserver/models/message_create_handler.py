@@ -3,6 +3,7 @@ from uuid import UUID
 
 from wugserver.models.ai_models.openai_model import OpenAIModels
 from wugserver.models.db.message_model import write_message_to_db
+from wugserver.models.db.interaction_model import set_interaction_update_time
 from wugserver.schema.message import MessageCreate
 
 # List of available models are not yet exposed via API. 
@@ -30,15 +31,19 @@ def handleMessageCreateRequest(db: Session, interactionId: UUID, messageCreatePa
   int:    Interaction's current message offset
   """
 
-  model_class = supported_models_name_to_model_class.get(messageCreateParams.model)
-  if not model_class:
+  modelClass = supported_models_name_to_model_class.get(messageCreateParams.model)
+  if not modelClass:
     raise NotImplementedError(f"Model {messageCreateParams.model} is not supported. Supported models: {', '.join(list(supported_models_name_to_model_class.keys()))}")
   try:
-    modelResMsg, currOffset = model_class.post_message(db, interactionId, messageCreateParams)
+    modelResMsg, currOffset = modelClass.post_message(db, interactionId, messageCreateParams)
   except Exception as e:
     raise ConnectionError(f"Unable to interact with {messageCreateParams.model}: {e}")
 
   # write both user msg and model msg to DB after model successfully returns
   # TODO: source column should store the userId rather than "user"
   write_message_to_db(db=db, interactionId=interactionId, source="user", message=messageCreateParams.message, offset=currOffset + 1)
-  return write_message_to_db(db=db, interactionId=interactionId, source=messageCreateParams.model, message=modelResMsg, offset=currOffset + 2)
+  aiMessage = write_message_to_db(db=db, interactionId=interactionId, source=messageCreateParams.model, message=modelResMsg, offset=currOffset + 2)
+
+  # set the interaction's latest update time
+  set_interaction_update_time(db, interactionId)
+  return aiMessage

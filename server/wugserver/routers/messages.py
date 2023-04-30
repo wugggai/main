@@ -24,5 +24,5 @@ def create_message(interactionId: UUID, messageCreateParams: MessageCreate, db: 
         raise HTTPException(status_code=500, detail=f"Server Error: {e}")
 
 @router.get("/interactions/{interactionId}/messages/", response_model=list[Message])
-def get_messages(interactionId: UUID, db: Session = Depends(get_db)):
-    return get_interaction_messages(db=db, interactionId=interactionId)
+def get_messages(interactionId: UUID, offset: int = 0, limit: int = 15, from_latest: bool = True, db: Session = Depends(get_db)):
+    return get_interaction_messages(db=db, interactionId=interactionId, offset=offset, limit=limit, from_latest=from_latest)
