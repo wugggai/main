@@ -11,7 +11,7 @@ class MessageCreate(BaseModel):
 class Message(BaseModel):
     message: str
     id: UUID
-    interactionId: UUID
+    interaction_id: UUID
     source: str
     message: str
     offset: int

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from wugserver.models.ai_models.openai_model import OpenAIModels
+from wugserver.models.ai_models.echo_model import EchoModel
 from wugserver.models.db.message_model import write_message_to_db
 from wugserver.models.db.interaction_model import set_interaction_update_time
 from wugserver.schema.message import MessageCreate
@@ -9,7 +10,7 @@ from wugserver.schema.message import MessageCreate
 # List of available models are not yet exposed via API. 
 # Caller must pass the correct value string i.e. gpt-3.5-turbo to access the model
 supported_models_name_to_model_class = {}
-supported_models = [OpenAIModels]
+supported_models = [OpenAIModels, EchoModel]
 
 for model_cls in supported_models:
   supported_models_name_to_model_class.update({
@@ -17,33 +18,33 @@ for model_cls in supported_models:
   })
 
 
-def handleMessageCreateRequest(db: Session, interactionId: UUID, messageCreateParams: MessageCreate):
+def handleMessageCreateRequest(db: Session, interaction_id: UUID, message_create_params: MessageCreate):
   """
   handles all message creation requests
   passes message to appropriate model, writes messages to DB, and returns model's response
   Parameters:
-  db                  (Session):       database object to interact with; some models may not require
-  interactionId       (UUID):          identifier of Interaction resource, used to retrieve past messages
-  messageCreateParams (MessageCreate): parameters of message creation
+  db                    (Session):       database object to interact with; some models may not require
+  interaction_id        (UUID):          identifier of Interaction resource, used to retrieve past messages
+  message_create_params (MessageCreate): parameters of message creation
 
   Returns:
   string: AI model's response
   int:    Interaction's current message offset
   """
 
-  modelClass = supported_models_name_to_model_class.get(messageCreateParams.model)
-  if not modelClass:
-    raise NotImplementedError(f"Model {messageCreateParams.model} is not supported. Supported models: {', '.join(list(supported_models_name_to_model_class.keys()))}")
+  model_class = supported_models_name_to_model_class.get(message_create_params.model)
+  if not model_class:
+    raise NotImplementedError(f"Model {message_create_params.model} is not supported. Supported models: {', '.join(list(supported_models_name_to_model_class.keys()))}")
   try:
-    modelResMsg, currOffset = modelClass.post_message(db, interactionId, messageCreateParams)
+    model_res_msg, curr_offset = model_class.post_message(db, interaction_id, message_create_params)
   except Exception as e:
-    raise ConnectionError(f"Unable to interact with {messageCreateParams.model}: {e}")
+    raise ConnectionError(f"Unable to interact with {message_create_params.model}: {e}")
 
   # write both user msg and model msg to DB after model successfully returns
   # TODO: source column should store the userId rather than "user"
-  write_message_to_db(db=db, interactionId=interactionId, source="user", message=messageCreateParams.message, offset=currOffset + 1)
-  aiMessage = write_message_to_db(db=db, interactionId=interactionId, source=messageCreateParams.model, message=modelResMsg, offset=currOffset + 2)
+  write_message_to_db(db=db, interaction_id=interaction_id, source="user", message=message_create_params.message, offset=curr_offset + 1)
+  ai_message = write_message_to_db(db=db, interaction_id=interaction_id, source=message_create_params.model, message=model_res_msg, offset=curr_offset + 2)
 
   # set the interaction's latest update time
-  set_interaction_update_time(db, interactionId)
-  return aiMessage
+  set_interaction_update_time(db, interaction_id)
+  return ai_message
