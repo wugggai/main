@@ -5,7 +5,7 @@ from uuid import UUID
 from wugserver.schema.message import Message
 
 class InteractionCreate(BaseModel):
-    creatorUserId: UUID
+    creator_user_id: UUID
     title: str
 
 class Interaction(InteractionCreate):
