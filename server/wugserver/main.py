@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import openai
 import uvicorn
 from dotenv import load_dotenv
-from wugserver.routers import interactions, messages
+from wugserver.routers import interactions, messages, tags
 
 from . import database
 from .routers import users
@@ -33,6 +33,7 @@ app.router.prefix = "/api"
 app.include_router(users.router)
 app.include_router(interactions.router)
 app.include_router(messages.router)
+app.include_router(tags.router)
 
 def start():
     """Launched with `poetry run start` at root level"""
