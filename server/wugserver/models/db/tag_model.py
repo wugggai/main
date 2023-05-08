@@ -2,10 +2,12 @@ import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import Column, DateTime, Index, String, Uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, relationship, Session
 
 from wugserver.database import Base
+from wugserver.models.db.interaction_tag_association import interaction_tag_association_table
 from wugserver.schema.tag import Tag, TagCreate
+
 
 class TagModel(Base):
   __tablename__ = "tags"
@@ -14,6 +16,10 @@ class TagModel(Base):
   creator_user_id = Column(Uuid, index=True)
   name = Column(String)
   color = Column(String(7))
+  interactions: Mapped[list['wugserver.models.db.interaction_model.InteractionModel']] = relationship(
+    secondary=interaction_tag_association_table,
+    back_populates="tags",
+  )
   last_use = Column(DateTime)
 
 Index("last_use_composite_index", TagModel.creator_user_id, TagModel.last_use)
