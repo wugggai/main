@@ -4,7 +4,7 @@ from uuid import UUID
 from wugserver.models.ai_models.openai_model import OpenAIModels
 from wugserver.models.ai_models.echo_model import EchoModel
 from wugserver.models.db.message_model import create_message
-from wugserver.models.db.interaction_model import set_interaction_update_time
+from wugserver.models.db.interaction_model import set_interaction_update_time_and_commit
 from wugserver.schema.message import MessageCreate
 
 # List of available models are not yet exposed via API. 
@@ -46,5 +46,5 @@ def handleMessageCreateRequest(db: Session, interaction_id: UUID, message_create
   ai_message = create_message(db=db, interaction_id=interaction_id, source=message_create_params.model, message=model_res_msg, offset=curr_offset + 2)
 
   # set the interaction's latest update time
-  set_interaction_update_time(db, interaction_id)
+  set_interaction_update_time_and_commit(db, interaction_id)
   return ai_message
