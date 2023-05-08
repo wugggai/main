@@ -21,11 +21,8 @@ def get_interactions_route(creator_user_id: UUID, offset: int = 0, limit: int = 
   res = []
   for interaction in interactions:
     res.append(InteractionGetAllResponse(
-      id=interaction.id,
-      tag_ids=interaction.tag_ids,
-      title=interaction.title,
-      last_updated=interaction.last_updated,
-      last_message=get_interaction_last_message(db, interaction.id)
+      interaction=interaction,
+      last_message=get_interaction_last_message(db, interaction.id),
     ))
   return res
 

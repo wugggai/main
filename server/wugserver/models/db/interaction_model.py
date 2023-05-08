@@ -50,7 +50,6 @@ def get_interaction_by_id(db: Session, interaction_id: UUID):
     .get(interaction_id)
 
 def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int):
-  # TODO: actually filter by user id
   return db.query(InteractionModel) \
     .filter(InteractionModel.creator_user_id == creator_user_id) \
     .order_by(InteractionModel.last_updated.desc()) \
@@ -61,6 +60,7 @@ def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit
 def update_interaction(db: Session, interaction_id: UUID, interaction_update_params: InteractionUpdate):
   interaction = get_interaction_by_id(db, interaction_id)
   interaction.title = interaction_update_params.title
+  # TODO: should throw error if an invalid id passed
   interaction.tags = db.query(TagModel) \
     .filter(TagModel.id.in_(interaction_update_params.tag_ids)) \
     .all()
