@@ -3,7 +3,7 @@ from uuid import UUID
 
 from wugserver.models.ai_models.openai_model import OpenAIModels
 from wugserver.models.ai_models.echo_model import EchoModel
-from wugserver.models.db.message_model import write_message_to_db
+from wugserver.models.db.message_model import create_message
 from wugserver.models.db.interaction_model import set_interaction_update_time
 from wugserver.schema.message import MessageCreate
 
@@ -42,8 +42,8 @@ def handleMessageCreateRequest(db: Session, interaction_id: UUID, message_create
 
   # write both user msg and model msg to DB after model successfully returns
   # TODO: source column should store the userId rather than "user"
-  write_message_to_db(db=db, interaction_id=interaction_id, source="user", message=message_create_params.message, offset=curr_offset + 1)
-  ai_message = write_message_to_db(db=db, interaction_id=interaction_id, source=message_create_params.model, message=model_res_msg, offset=curr_offset + 2)
+  create_message(db=db, interaction_id=interaction_id, source="user", message=message_create_params.message, offset=curr_offset + 1)
+  ai_message = create_message(db=db, interaction_id=interaction_id, source=message_create_params.model, message=model_res_msg, offset=curr_offset + 2)
 
   # set the interaction's latest update time
   set_interaction_update_time(db, interaction_id)

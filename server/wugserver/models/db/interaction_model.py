@@ -30,15 +30,15 @@ def create_interaction(db: Session, interaction_create_params: InteractionCreate
 
 def set_interaction_update_time(db: Session, interaction_id: UUID):
   interaction = get_interaction_by_id(db, interaction_id)
-  if interaction:
-    interaction.last_updated=datetime.datetime.now()
-    db.commit()
-    db.refresh(interaction)
+  interaction.last_updated=datetime.datetime.now()
+  db.commit()
+  db.refresh(interaction)
   return interaction
 
 def get_interaction_by_id(db: Session, interaction_id: UUID):
   return db.query(InteractionModel) \
-    .filter(InteractionModel.id == interaction_id).first()
+    .filter(InteractionModel.id == interaction_id) \
+    .one()
 
 def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int):
   # TODO: actually filter by user id

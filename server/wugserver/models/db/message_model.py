@@ -1,5 +1,6 @@
 import datetime
 from uuid import UUID, uuid4
+
 from sqlalchemy import Column, DateTime, Index, Integer, String, text, Uuid
 from sqlalchemy.orm import Session
 
@@ -18,7 +19,7 @@ class MessageModel(Base):
 
 Index("offset_composite_index", MessageModel.interaction_id, MessageModel.offset)
 
-def write_message_to_db(db: Session, interaction_id: UUID, source: str, message: str, offset: Integer):
+def create_message(db: Session, interaction_id: UUID, source: str, message: str, offset: Integer):
   message = MessageModel(
     id=uuid4(),
     interaction_id=interaction_id,
@@ -53,7 +54,7 @@ def get_interaction_last_message(db: Session, interaction_id: UUID):
   return last_message_in_list[0] if last_message_in_list else None
 
 def get_interaction_all_messages(db: Session, interaction_id: UUID):
-  return get_interaction_messages(db, interaction_id, 0, 10000, False)
+  return get_interaction_messages(db, interaction_id, 0, 100000, False)
 
 def get_interaction_message_count(db: Session, interaction_id: UUID):
   return db.query(MessageModel) \
