@@ -9,8 +9,8 @@ class MessageCreate(BaseModel):
     model_config: dict
 
 class Message(BaseModel):
-    message: str
     id: UUID
+    message: str
     interaction_id: UUID
     source: str
     message: str
