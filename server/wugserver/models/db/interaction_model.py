@@ -12,7 +12,7 @@ class InteractionModel(Base):
   __tablename__ = "interactions"
 
   id = Column(Uuid, primary_key=True)
-  creator_user_id = Column(Uuid, index=True)
+  creator_user_id = Column(Integer, index=True)
   title = Column(String)
   tags: Mapped[list[TagModel]] = relationship(
     secondary=interaction_tag_association_table,

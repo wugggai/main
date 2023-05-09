@@ -9,11 +9,11 @@ from wugserver.models.db.user_model import *
 router = APIRouter()
 
 @router.post("/users/{user_id}/tags/", response_model=Tag)
-def create_tag_route(user_id: UUID, tag_create_params: TagCreate, db: Session = Depends(get_db)):
+def create_tag_route(user_id: int, tag_create_params: TagCreate, db: Session = Depends(get_db)):
   return create_tag(db=db, user_id=user_id, tag_create_params=tag_create_params)
 
 @router.get("/users/{user_id}/tags/", response_model=list[Tag])
-def get_tags_route(user_id: UUID, db: Session = Depends(get_db)):
+def get_tags_route(user_id: int, db: Session = Depends(get_db)):
   return get_tags_by_user_id(db=db, user_id=user_id)
 
 @router.put("tags/{tag_id}", response_model=Tag)
