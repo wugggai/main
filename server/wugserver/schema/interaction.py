@@ -7,7 +7,7 @@ from wugserver.schema.tag import Tag
 
 class InteractionCreate(BaseModel):
     title: Optional[str]
-    initialMessage: Optional[MessageCreate]
+    initial_message: Optional[MessageCreate]
 
 class Interaction(BaseModel):
     id: UUID
@@ -19,8 +19,9 @@ class Interaction(BaseModel):
         orm_mode = True
 
 class InteractionUpdate(BaseModel):
-    title: str
-    tag_ids: list[UUID]
+    title: Optional[str]
+    tag_ids: Optional[list[UUID]]
+    deleted: Optional[bool]
 
 class InteractionWithLatestMessage(BaseModel):
     interaction: Interaction

@@ -24,7 +24,7 @@ class TagModel(Base):
 
 Index("last_use_composite_index", TagModel.creator_user_id, TagModel.last_use)
 
-def create_tag(db: Session, user_id: UUID, tag_create_params: TagCreate):
+def create_tag(db: Session, user_id: int, tag_create_params: TagCreate):
   # Enforce 0 constraint on db level
   # As a result, one user may reuse same name/color for multiple tags
   tag = TagModel(

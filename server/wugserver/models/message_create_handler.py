@@ -18,7 +18,7 @@ for model_cls in supported_models:
   })
 
 
-def handleMessageCreateRequest(db: Session, interaction_id: UUID, message_create_params: MessageCreate):
+def handle_message_create_request(db: Session, interaction_id: UUID, message_create_params: MessageCreate):
   """
   handles all message creation requests
   passes message to appropriate model, writes messages to DB, and returns model's response
