@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from wugserver.dependencies import get_db
 from wugserver.models.db.interaction_model import get_interaction_by_id
 from wugserver.models.db.message_model import get_interaction_messages
-from wugserver.models.message_create_handler import handleMessageCreateRequest
+from wugserver.models.message_create_handler import handle_message_create_request
 from wugserver.schema.message import Message, MessageCreate
 from wugserver.schema.user import *
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ def create_message_route(interaction_id: UUID, message_create_params: MessageCre
         raise HTTPException(status_code=404, detail="Interaction doesn't exist.")
 
     try:
-        return handleMessageCreateRequest(db, interaction_id, message_create_params)
+        return handle_message_create_request(db, interaction_id, message_create_params)
     # TODO: fine-grained handling of Model API exceptions, DB exceptions, etc.
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server Error: {e}")

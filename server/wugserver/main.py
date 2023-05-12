@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import openai
 import uvicorn
-from dotenv import load_dotenv
 from wugserver.routers import interactions, messages, tags
 
 from . import database
@@ -14,7 +13,6 @@ from wugserver.database import engine
 logging.basicConfig(level=logging.INFO)
 
 database.Base.metadata.create_all(bind=engine)
-load_dotenv() # Load local .env file
 openai.api_key = os.environ.get('OPENAI_API_KEY') #put the api key here
 if openai.api_key:
     print("Loaded API key from local environment")

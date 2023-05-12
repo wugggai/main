@@ -1,6 +1,6 @@
 import datetime
 from wugserver.database import Base
-from sqlalchemy import Column, DateTime, Index, Integer, String, Uuid
+from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, Uuid
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, relationship, Session
 from uuid import UUID, uuid4
@@ -19,6 +19,7 @@ class InteractionModel(Base):
     back_populates="interactions",
   )
   last_updated = Column(DateTime)
+  deleted = Column(Boolean, default=False)
 
   @hybrid_property
   def tag_ids(self):
@@ -45,13 +46,31 @@ def set_interaction_update_time_and_commit(db: Session, interaction_id: UUID):
   db.refresh(interaction)
   return interaction
 
-def get_interaction_by_id(db: Session, interaction_id: UUID):
-  return db.query(InteractionModel) \
-    .get(interaction_id)
+def get_interaction_by_id(db: Session, interaction_id: UUID, include_deleted: bool = False) -> InteractionModel | None:
+  filters = [InteractionModel.id == interaction_id]
+  if not include_deleted:
+    filters.append(InteractionModel.deleted == False)
 
-def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int):
   return db.query(InteractionModel) \
-    .filter(InteractionModel.creator_user_id == creator_user_id) \
+    .filter(*filters) \
+    .one_or_none()
+
+def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int, include_deleted: bool = False):
+  filters = [InteractionModel.creator_user_id == creator_user_id]
+  if not include_deleted:
+    filters.append(InteractionModel.deleted == False)
+
+  return db.query(InteractionModel) \
+    .filter(*filters) \
+    .order_by(InteractionModel.last_updated.desc()) \
+    .limit(limit) \
+    .offset(offset) \
+    .all()
+
+def get_deleted_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int):
+  filters = [InteractionModel.creator_user_id == creator_user_id, InteractionModel.deleted == True]
+  return db.query(InteractionModel) \
+    .filter(*filters) \
     .order_by(InteractionModel.last_updated.desc()) \
     .limit(limit) \
     .offset(offset) \
@@ -59,9 +78,16 @@ def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit
 
 def update_interaction(db: Session, interaction_id: UUID, interaction_update_params: InteractionUpdate):
   interaction = get_interaction_by_id(db, interaction_id)
-  interaction.title = interaction_update_params.title
-  # TODO: should throw error if an invalid id passed
-  interaction.tags = db.query(TagModel) \
-    .filter(TagModel.id.in_(interaction_update_params.tag_ids)) \
-    .all()
-  return set_interaction_update_time_and_commit(db, interaction_id)
+  if interaction is not None:
+    if interaction_update_params.tag_ids is not None:
+      # TODO: should throw error if an invalid id passed
+      interaction.tags = db.query(TagModel) \
+        .filter(TagModel.id.in_(interaction_update_params.tag_ids)) \
+        .all()
+
+    if interaction_update_params.title is not None:
+      interaction.title = interaction_update_params.title
+    if interaction_update_params.deleted is not None:
+      interaction.deleted = interaction_update_params.deleted
+    return set_interaction_update_time_and_commit(db, interaction.id)
+  return None
