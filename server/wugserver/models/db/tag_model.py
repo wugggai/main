@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, relationship, Session
 
 from wugserver.database import Base
 from wugserver.models.db.interaction_tag_association import interaction_tag_association_table
-from wugserver.schema.tag import Tag, TagCreate
+from wugserver.schema.tag import TagCreate
 
 
 class TagModel(Base):
