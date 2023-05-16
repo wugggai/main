@@ -9,12 +9,10 @@ class UserModel(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   email = Column(String, unique=True, index=True)
-  hashed_password = Column(String)
   is_active = Column(Boolean, default=True)
 
 def create_user(db: Session, user: UserCreate):
-  fake_hashed_password = user.password + "notreallyhashed"
-  db_user = UserModel(email=user.email, hashed_password=fake_hashed_password)
+  db_user = UserModel(email=user.email)
   db.add(db_user)
   db.commit()
   db.refresh(db_user)
