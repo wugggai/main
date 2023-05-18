@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from wugserver.dependencies import get_db
 
-from wugserver.models.db.user_model import UserModel, get_user_by_email
+from wugserver.models.db.user_model import UserModel, create_db_user, get_user_by_email
 from wugserver.models.db.user_password_model import verify_user_password
+from wugserver.schema.user import UserCreate
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -32,8 +33,8 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-  
-async def get_current_user(
+
+def get_user_from_token(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme)
     ):
@@ -56,8 +57,14 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: UserModel = Depends(get_current_user)
+    current_user: UserModel = Depends(get_user_from_token)
 ):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+def register_user(db: Session, user: UserCreate):
+  db_user = create_db_user(db, user)
+  token = create_access_token(data={"auth": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+  print(f"http://localhost:5000/api/verification?token={token}")
+  return db_user

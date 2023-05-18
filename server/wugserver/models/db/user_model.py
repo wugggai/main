@@ -13,13 +13,14 @@ class UserModel(Base):
   is_active = Column(Boolean, default=False)
   deleted = Column(Boolean, default=False)
 
-def create_user(db: Session, user: UserCreate):
+def create_db_user(db: Session, user: UserCreate):
   db_user = UserModel(email=user.email)
   db.add(db_user)
   db.commit()
   db.refresh(db_user)
   if user.password:
     create_user_password(db, db_user.id, user.password)
+
   return db_user
 
 def get_user_by_email(db: Session, email: str):
