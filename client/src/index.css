@@ -27,6 +27,8 @@ code {
   --link-visited: #42638d;
   --code-token: #f0f0f0;
   --inline-code: #5041b4;
+  --theme-warning: #d72525;
+  --theme-warning-selected: #bc2222;
 }
 
 .center-screen {
@@ -103,4 +105,12 @@ hr {
 
 .generic-button:not(:disabled):hover {
   background-color: var(--button-tint-hover);
+}
+
+ a:link {
+  color: var(--link-active);
+}
+
+a:visited {
+  color: var(--link-visited);
 }

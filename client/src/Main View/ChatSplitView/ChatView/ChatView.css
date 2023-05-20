@@ -87,3 +87,56 @@
 #send-message-button:hover {
     background-color: var(--button-tint-hover);
 }
+
+.chat-view #add-tag-button {
+    display: inline-block;
+    position: relative;
+    width: 26px;
+    height: 26px;
+    border-radius: 14px;
+    background-color: var(--selection-background);
+}
+
+.dropdown-tags {
+    position: fixed;
+    overflow: auto;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+}
+
+.dropdown-tags div {
+    padding: 5px;
+    box-sizing: border-box;
+    cursor: default;
+    font-size: 14px;
+    user-select: none;
+}
+
+.dropdown-tags div:hover {
+    background-color: var(--selection-background);
+}
+
+.chat-view .inline-tag-item {
+    display: inline-block;
+    border-radius: 3px;
+    background-color: var(--selection-background);
+    padding: 5px 5px;
+    padding-right: 18px;
+    margin: 0px 2px;
+    cursor: default;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+}
+
+.chat-view .inline-tag-item > img {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 4px;
+    opacity: 0.9;
+}

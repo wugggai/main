@@ -1,22 +1,27 @@
 import React from 'react'
+import { Tag } from '../../Interfaces'
 
 interface TagProps {
-    tags: { name: string, color: string }[]
+    tags: Tag[]
+    onSelect: (index: number) => void
+    currentSelection: Set<string>
 }
 
 export function Tags(props: TagProps) {
     return <div className='tags'>
         {props.tags.map((tag, i) => {
-            return TagItem(tag.name, tag.color, i)
+            return TagItem(tag.name, tag.color, i, () => props.onSelect(i), props.currentSelection.has(tag.id))
         })}
     </div>
 }
 
-function TagItem(name: string, color: string, key: number) {
-    return <div className='tag-item' key={key}>
-        <div className='tag-box' style={{backgroundColor: color}}>
-            {name}
-        </div>
-        <div className='tag-end' style={{borderLeft: `15px solid ${color}`}}/>
+function TagItem(name: string, color: string, key: number, onSelect: () => void, isSelected: boolean) {
+    return <div className='tag-item' onClick={onSelect} key={key}>
+        <div className='tint' style={{opacity: isSelected ? 1 : 0}} />
+        <span className='tag-icon'>
+            <div className='tag-box' style={{backgroundColor: color}} />
+            <div className='tag-end' style={{borderLeft: `7px solid ${color}`}}/>
+        </span>
+        <span className='tag-name'>{name}</span>
     </div>
 }

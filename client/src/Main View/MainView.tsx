@@ -3,10 +3,13 @@ import SideBar from './SideBar/SideBar';
 import SplitView from 'react-split'
 import './MainView.css'
 import ChatPreview from './ChatSplitView/ChatPreview/ChatPreview';
-import { ChatMetadata } from '../Interfaces';
+import { ChatMetadata, Tag } from '../Interfaces';
 import { SpinnerCircularFixed } from 'spinners-react';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
 import { Loading } from '../UI Components/Loading';
+import axios from 'axios';
+import { API_BASE, TEST_USER_ID } from '../Constants';
+import Settings from '../Settings/Settings';
 
 interface MainViewProps {
     
@@ -15,13 +18,13 @@ interface MainViewProps {
 interface MainViewState {
     currentTabIndex: number
     chatHistory?: ChatMetadata[]
-    tagList?: { name: string, color: string }[]
-    selectedTag?: string
+    tagList?: Tag[]
+    selectedTagIds: Set<string>
 }
  
 class MainView extends React.Component<MainViewProps, MainViewState> {
 
-    splitSizes = [18, 82]
+    splitSizes = [17, 83]
 
     constructor(props: MainViewProps) {
         super(props);
@@ -29,18 +32,33 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         document.title = "Conversations"
         this.state = {
             currentTabIndex: 0,
-            tagList: [
-                {name: 'storytelling', color: "#e0fde0"},
-                {name: 'cooking', color: "#e0f0fd"}
-            ]
+            selectedTagIds: new Set()
         };
     }
 
+    componentDidMount(): void {
+        axios.get(API_BASE + `/users/${TEST_USER_ID}/tags`).then(response => {
+            console.log("tags:", response.data)
+            this.setState({
+                tagList: response.data
+            })
+        })
+    }
+
     render() { 
+        if (this.state.tagList === undefined) {
+            return <Loading />
+        }
         let contentView: JSX.Element = <Loading />
         switch (this.state.currentTabIndex) {
         case 0:
-            contentView = <ChatSplitView />
+            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} />
+            break
+        case 2:
+            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} />
+            break
+        case 3:
+            contentView = <Settings />
             break
         default:
             break
@@ -59,6 +77,16 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 onTabChange={(newTab) => this.setState({ currentTabIndex: newTab })}
                 onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
                 currentTags={this.state.tagList!}
+                selectedTagIds={this.state.selectedTagIds}
+                onTagSelected={i => {
+                    if (this.state.selectedTagIds.has(this.state.tagList![i].id)) {
+                        this.state.selectedTagIds.delete(this.state.tagList![i].id)
+                    } else {
+                        this.state.selectedTagIds.add(this.state.tagList![i].id)
+                    }
+                    this.forceUpdate()
+                    console.log("Selected tag index", i)
+                }}
             />
             <div style={{position: 'relative'}}>
                 {contentView}

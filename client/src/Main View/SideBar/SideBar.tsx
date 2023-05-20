@@ -3,13 +3,18 @@ import './SideBar.css'
 import SideBarItem from './SideBarItem'
 import { Tags } from './Tags'
 import { Color, TwitterPicker } from 'react-color'
+import { Tag } from '../../Interfaces'
+import axios from 'axios'
+import * as uuid from "uuid"
+import { API_BASE, TEST_USER_ID } from '../../Constants'
 
 interface SideBarProps {
     currentTabIndex: number
     onTabChange: (newTabIndex: number) => void
-    currentTags: { name: string, color: string }[]
-    onAddNewTag: (tag: {name: string, color: string}) => void
-    onTagSelected?: (name: string) => void
+    currentTags: Tag[]
+    onAddNewTag: (tag: Tag) => void
+    onTagSelected: (index: number) => void
+    selectedTagIds: Set<string>
 }
  
 interface SideBarState {
@@ -17,6 +22,7 @@ interface SideBarState {
     newTagPopoverAnchor?: { x: number, y: number }
     newTagColor?: string
     newTagName: string
+    isAddingTag: boolean
 }
  
 class SideBar extends React.Component<SideBarProps, SideBarState> {
@@ -24,13 +30,37 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
         super(props);
         this.state = {
             currentTabIndex: 0,
-            newTagName: ''
+            newTagName: '',
+            isAddingTag: false
         };
+        this.addTag = this.addTag.bind(this);
     }
+
+    addTag() {
+        this.setState({ isAddingTag: true })
+        let tagID = uuid.v4()
+        console.log(tagID)
+        axios.post(API_BASE + `/users/${TEST_USER_ID}/tags/`, {
+            name: this.state.newTagName,
+            color: this.state.newTagColor!
+        }).then(response => {
+            this.setState({
+                isAddingTag: false,
+                newTagName: '',
+                newTagColor: undefined,
+                newTagPopoverAnchor: undefined
+            })
+            let newTag = response.data as Tag
+            this.props.onAddNewTag(newTag)
+        })
+        // this.props.onAddNewTag({ name: this.state.newTagName, color: this.state.newTagColor!, uuid: '' })
+        // this.setState({ newTagName: '', newTagColor: undefined, newTagPopoverAnchor: undefined })
+    }
+
     render() {
         let newTagPopover = <Fragment />
         if (this.state.newTagPopoverAnchor) {
-                newTagPopover = <div className='new-tag-popover' style={{
+            newTagPopover = <div className='new-tag-popover' style={{
                 top: this.state.newTagPopoverAnchor.y + 20,
                 left: this.state.newTagPopoverAnchor.x - 140 + 12
             }} onClick={(e) => e.stopPropagation()}>
@@ -41,10 +71,7 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
                         paddingLeft: '12px'
                     },
                 }}}/>
-                <button className='generic-button' disabled={this.state.newTagName.length === 0 || this.state.newTagColor === undefined} onClick={(e) => {
-                    this.props.onAddNewTag({ name: this.state.newTagName, color: this.state.newTagColor! })
-                    this.setState({ newTagName: '', newTagColor: undefined, newTagPopoverAnchor: undefined })
-                }}>Add Tag</button>
+                <button className='generic-button' disabled={this.state.newTagName.length === 0 || this.state.newTagColor === undefined || this.state.isAddingTag} onClick={this.addTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
             </div>
         }
 
@@ -75,7 +102,7 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
                         this.setState({ newTagPopoverAnchor: undefined })
                 }}/>
             } />
-            <Tags tags={this.props.currentTags}/>
+            <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
             { newTagPopover }
 
             <div style={{position: 'absolute', bottom: '30px', width: '100%'}}>

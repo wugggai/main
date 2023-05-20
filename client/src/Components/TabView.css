@@ -1,0 +1,31 @@
+.tab-control {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--line);
+}
+
+.tab-item {
+    padding: 8px 10px;
+    border-bottom: 2px solid transparent;
+    transition-duration: 0.2s;
+    min-width: 70px;
+    text-align: center;
+    user-select: none;
+    cursor: default;
+    margin-bottom: -1px;
+}
+
+.tab-item + .tab-item {
+    margin-left: 15px;
+}
+
+.tab-item-selected {
+    background-color: var(--sidebar);
+    border-bottom: 2px solid var(--button-tint);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.view-container {
+    padding: 20px 5px;
+}

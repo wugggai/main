@@ -38,41 +38,57 @@
 }
 
 .sidebar .tags {
-    margin-left: 60px;
+    margin-left: 20px;
+    margin-right: 10px;
     position: relative;
 }
 
 .sidebar .tags .tag-item {
+    padding-left: 30px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    user-select: none;
     position: relative;
-    height: 30px;
-    margin-right: 30px;
-    overflow: hidden;
-    margin: 6px 0px;
 }
 
-.sidebar .tags .tag-item > .tag-box {
-    display: inline-block;
-    height: 30px;
-    vertical-align: top;
-    padding-right: 4px;
-    padding-left: 5px;
-    font-size: 13px;
-    user-select: none;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+.sidebar .tags .tag-item .tint {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    position: absolute;
+    left: 0px;
+    right: 10px;
+    height: 100%;
+    transition-duration: 0.2s;
+}
+
+.tag-item .tag-name {
+    font-size: 14px;
     color: var(--text-color);
-    max-width: calc(100% - 30px);
-    text-overflow: ellipsis;
-    line-height: 30px;
-    overflow: hidden;
-    white-space: nowrap;
+    z-index: 1;
+}
+
+.sidebar .tags .tag-icon {
+    margin-right: 10px;
+    display: inline-block;
+    height: 16px;
+    z-index: 1;
+}
+
+.sidebar .tags .tag-icon > .tag-box {
+    display: inline-block;
+    height: 16px;
+    border-top-left-radius: 1px;
+    border-bottom-left-radius: 1px;
+    color: var(--text-color);
+    width: 15px;
 }
 
 .sidebar .tags .tag-end {
     width: 0;
     height: 0;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
     display: inline-block;
 }
 

@@ -8,37 +8,60 @@ interface ChatPreviewProps {
     selectionChanged: (index?: number) => void
     selectedIndex?: number
     onCreateNewInteraction: () => void
+    filterByTags: Set<string>
 }
  
 interface ChatPreviewState {
-    
+    searchString: string
 }
  
 class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
     constructor(props: ChatPreviewProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            searchString: ''
+        };
+        console.log("Loaded conversations:", props.chatHistoryMetadata)
     }
+
     render() {
         const rows = this.props.chatHistoryMetadata.map((metadata, i) => {
+            if (this.props.filterByTags.size > 0 && !metadata.interaction.tag_ids.map(tag => this.props.filterByTags.has(tag)).includes(true)) {
+                return undefined
+            }
+
+            if (this.state.searchString !== '' && !metadata.interaction.title.includes(this.state.searchString)) {
+                return undefined
+            }
+
             return <div key={i} style={{backgroundColor: this.props.selectedIndex === i ? 'var(--selection-background)' : 'white'}} className='chat-preview-cell' onMouseDown={() => this.props.selectionChanged(i) }>
-                <img src="/assets/system.png" />
-                <div className='chat-preview-title'>{metadata.title}</div>
-                <div className='chat-preview-content'>{metadata.first_message}</div>
-                <div className='chat-preview-date'>{formatDate(metadata.date)}</div>
+                <img src="/assets/gpt-3.5-turbo.png" />
+                <div className='chat-preview-title'>{metadata.interaction.title}</div>
+                <div className='chat-preview-content'>{metadata.last_message?.message || <em>No message</em>}</div>
+                <div className='chat-preview-date'>{formatDate(metadata.interaction.last_updated)}</div>
             </div>
         })
 
+        const emptyMessage = <div style={{left: 0, right: 0, top: 150, maxHeight: 'calc(100% - 100px)'}}>
+            <div className='center-content'>
+                No conversations.
+            </div>
+        </div>
+
         return <div className='chat-preview'>
             <div style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0}} onMouseDown={() => this.props.selectionChanged(undefined)}/>
-            <SearchBar style={{position: 'absolute', top: '40px', left: '20px', right: '20px'}}/>
+            <SearchBar style={{position: 'absolute', top: '40px', left: '20px', right: '20px'}} onChange={(s) => this.setState({ searchString: s })}/>
             <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
                 <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
                 <span style={{verticalAlign: 'middle'}}>New Conversation</span>
             </button>
-            <div style={{position: 'absolute', top: '150px', left: 0, right: 0, maxHeight: 'calc(100% - 100px)'}}>
-                {rows}
-            </div>
+            {
+                this.props.chatHistoryMetadata.length > 0 ?
+                <div style={{position: 'absolute', top: '150px', left: 0, right: 0, maxHeight: 'calc(100% - 100px)'}}>
+                    {rows}
+                </div>
+                : emptyMessage
+            }
         </div>;
     }
 }
