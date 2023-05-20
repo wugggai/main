@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import openai
 import uvicorn
-from wugserver.routers import interactions, messages, tags
+from wugserver.routers import authentication, interactions, messages, tags
 
 from . import database
 from .routers import users
@@ -28,6 +28,7 @@ app.add_middleware(
 
 app.router.prefix = "/api"
 
+app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(interactions.router)
 app.include_router(messages.router)
