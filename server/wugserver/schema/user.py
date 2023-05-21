@@ -1,11 +1,12 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class UserBase(BaseModel):
     email: str
 
 
 class UserCreate(UserBase):
-    password: str
+    password: Optional[str]
 
 
 class User(UserBase):
