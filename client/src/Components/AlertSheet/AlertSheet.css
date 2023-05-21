@@ -17,7 +17,7 @@
 }
   
 .alert-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
   margin: 10px;
   text-align: center;
@@ -25,17 +25,18 @@
 }
 
 .alert-message {
-  margin: 5px;
+  margin: 5px 10px;
   font-size: 15px;
   margin-bottom: 20px;
+  text-align: center;
   color: var(--text-color);
 }
 
 .alert-button {
-  border-radius: 50px;
+  border-radius: 8px;
   font-weight: 500;
-  padding: 7px 16px;
-  min-width: 100px;
+  padding: 8px 16px;
+  min-width: 120px;
   font-size: 14px;
   border-style: none;
   background-color: white;
@@ -50,7 +51,7 @@
 
 .alert-button-group {
   display: flex;
-  margin-top: 15px;
+  margin-top: 20px;
   justify-content: space-evenly;
 }
 

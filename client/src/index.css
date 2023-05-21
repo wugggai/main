@@ -17,7 +17,7 @@ code {
   --line: #e8e8e8;
   --text-color: #101010;
   --lighter-text-color: #6d6d6d;
-  --selection-background: #f0f0f0;
+  --selection-background: #ededed;
   --date-label-background: #f2f2f2;
   --highlight: #b0b0eb;
   --button-disabled: #bebef0;
@@ -27,7 +27,7 @@ code {
   --link-visited: #42638d;
   --code-token: #f0f0f0;
   --inline-code: #5041b4;
-  --theme-warning: #d72525;
+  --theme-warning: #D93D3D;
   --theme-warning-selected: #bc2222;
 }
 

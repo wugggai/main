@@ -67,14 +67,18 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     moveInteractionToTrash() {
-        if (this.state.deletingChat) {
-            console.log("Moving to trash:", this.state.deletingChat)
+        if (this.state.deletingChat === undefined) {
+            return
         }
 
-        // This step should be done after server call
-        if (this.state.selectedIndex !== undefined)
-            this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
-        this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined, deletingChat: undefined })
+        axios.put(API_BASE + `/interactions/${this.state.deletingChat.interaction.id}`, {
+            deleted: true
+        }).then(response => {
+            if (this.state.selectedIndex !== undefined) {
+                this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
+            }
+            this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined, deletingChat: undefined })
+        })
     }
 
     render() {
@@ -116,7 +120,8 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             </SplitView>
             <AlertSheet
                 show={this.state.deletingChat !== undefined}
-                title='Move Conversation to Trash?'
+                title='Move This Conversation to Trash?'
+                message={this.state.deletingChat?.interaction.title}
                 onClickedOutside={() => this.setState({ deletingChat: undefined })}
                 buttons={[
                     {

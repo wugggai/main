@@ -36,7 +36,7 @@ def get_interactions_route(creator_user_id: int, offset: int = 0, limit: int = 1
 @router.get("/users/{creator_user_id}/interactions/deleted", response_model=list[InteractionWithLatestMessage])
 def get_deleted_interactions_route(creator_user_id: int, offset: int = 0, limit: int = 15, db: Session = Depends(get_db)):
   # TODO: wrap in 2 separate objects: an interaction and a message
-  interactions = get_deleted_interactions_by_creator_user_id(db=db, creator_user_id=creator_user_id, offset=offset, limit=limit, inclue_deleted=True)
+  interactions = get_deleted_interactions_by_creator_user_id(db=db, creator_user_id=creator_user_id, offset=offset, limit=limit )
   res = []
   for interaction in interactions:
     res.append(InteractionWithLatestMessage(

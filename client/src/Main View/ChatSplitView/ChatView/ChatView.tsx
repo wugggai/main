@@ -6,6 +6,8 @@ import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
 import axios from 'axios';
 import { API_BASE, TEST_USER_ID } from '../../../Constants';
+import Dropdown from 'rc-dropdown'
+import 'rc-dropdown/assets/index.css';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -21,6 +23,7 @@ interface ChatViewState {
     inputValue: string
     isWaitingForResponse: boolean
     addTagButtonPosition?: { x: number, y: number }
+    isUpdatingModel: boolean
 }
  
 class ChatView extends React.Component<ChatViewProps, ChatViewState> {
@@ -32,7 +35,8 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         super(props);
         this.state = {
             inputValue: '',
-            isWaitingForResponse: false
+            isWaitingForResponse: false,
+            isUpdatingModel: false
         };
         this.createInteraction = this.createInteraction.bind(this);
         if (this.props.isNewInteraction) {
@@ -53,6 +57,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
             this.loadHistory()
+            this.setState({ inputValue: '' })
         }
     }
 
@@ -70,6 +75,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 }, 5);
             })
         } else {
+            this.setState({ chatHistory: { messages: []} })
             setTimeout(() => {
                 const input = document.querySelector('#chat-input') as HTMLTextAreaElement
                 input.focus()
@@ -91,7 +97,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             this.setState({ isWaitingForResponse: true })
             axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages/`, {
                 message: this.state.inputValue,
-                model: 'echo',
+                model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
             }).then(response => {
                 console.log('received message response', response.data)
@@ -99,10 +105,12 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 this.setState({
                     inputValue: '',
                     isWaitingForResponse: false
+                }, () => {
+                    const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement
+                    chatDialog.scrollTop = chatDialog.scrollHeight
                 })
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
-                // TODO: scroll to bottom of chat
             })
         }
     }
@@ -110,7 +118,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
     createInteraction(withMessage: boolean) {
         axios.post(API_BASE + `/users/${TEST_USER_ID}/interactions/`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
-            initialMessage: withMessage ? {
+            initial_message: withMessage ? {
                 message: this.state.inputValue,
                 model_config: {},
                 model: 'echo' // TODO: adapt to actual LLM
@@ -176,6 +184,14 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         }
     }
 
+    setModel(name: string) {
+        this.props.chatMetadata.interaction.ai_type = name as AI
+        if (!this.props.isNewInteraction) {
+            this.setState({ isUpdatingModel: true })
+            setTimeout(() => this.setState({ isUpdatingModel: false }), 1000)
+        }
+    }
+
     render() {
         if (!this.props.isNewInteraction && this.state.chatHistory === undefined) {
             return <Loading />
@@ -188,7 +204,6 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 return
             }
             const button = document.querySelector(".chat-view #add-tag-button") as HTMLDivElement
-            console.log(button)
             const rect = button.getBoundingClientRect()
             this.setState({
                 addTagButtonPosition: rect
@@ -213,6 +228,14 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             {this.props.availableTags.map((value, i) => <div key={i} onClick={() => this.addTag(value)}>
                 {value.name}
             </div>)}
+        </div>
+
+        const chooseModelMenu = <div className='dropdown-models'>
+            {["echo", "gpt-3.5-turbo"].map( (modelName) => {
+                return <div key={modelName}>
+                    {modelName}
+                </div>
+            })}
         </div>
 
         return <div className='chat-view' onClick={() => this.setState({ addTagButtonPosition: undefined })}>
@@ -260,7 +283,18 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     {addTagButton}
                     {dropdownTags}
                 </div>
-                <div className='subtitle'>Model: {this.props.chatMetadata.interaction.ai_type}</div>
+                {<div className='subtitle'>
+                    <span>Model:</span>
+                    <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)}>
+                        <button className='select-model-button'>
+                            {this.props.chatMetadata.interaction.ai_type || "Choose Model"}
+                            <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
+                        </button>
+                    </Dropdown>
+                    {this.state.isUpdatingModel && <div style={{width: 28, height: 15, display: 'inline-block', verticalAlign: 'middle', position: 'relative'}}>
+                        <Loading size={15} />
+                    </div>}
+                </div>}
                 <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
             </div>
             <hr />
