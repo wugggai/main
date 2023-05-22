@@ -94,16 +94,16 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 timestamp: new Date().toISOString(),
                 offset: this.state.chatHistory.messages.length
             })
-            this.setState({ isWaitingForResponse: true })
+            const userInput = this.state.inputValue
+            this.setState({ inputValue: '', isWaitingForResponse: true })
             axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages/`, {
-                message: this.state.inputValue,
+                message: userInput,
                 model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
             }).then(response => {
                 console.log('received message response', response.data)
                 this.state.chatHistory?.messages.push(response.data)
                 this.setState({
-                    inputValue: '',
                     isWaitingForResponse: false
                 }, () => {
                     const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement

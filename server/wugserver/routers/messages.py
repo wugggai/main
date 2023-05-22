@@ -16,7 +16,6 @@ def create_message_route(interaction_id: UUID, message_create_params: MessageCre
     interaction = get_interaction_by_id(db=db, interaction_id=interaction_id)
     if interaction == None:
         raise HTTPException(status_code=404, detail="Interaction doesn't exist.")
-
     try:
         return handle_message_create_request(db, interaction_id, message_create_params)
     # TODO: fine-grained handling of Model API exceptions, DB exceptions, etc.

@@ -88,7 +88,7 @@
     /* overflow: scroll; */
 }
 
-#send-message-button:hover {
+#send-message-button:not(:disabled):hover {
     background-color: var(--button-tint-hover);
 }
 
