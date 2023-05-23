@@ -35,11 +35,11 @@ jobs:
       with:
         node-version: 18.16.0
 
-    - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'wug-test-deployment'
-          slot-name: 'Production'
-          startup-command: 'sh build_and_start.sh'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_67C215A1BEE5427393191C16B270E7CD }}
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      id: deploy-to-webapp
+      with:
+        app-name: 'wug-test-deployment'
+        slot-name: 'Production'
+        startup-command: 'sh build_and_start.sh'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_67C215A1BEE5427393191C16B270E7CD }}
