@@ -41,5 +41,4 @@ jobs:
       with:
         app-name: 'wug-test-deployment'
         slot-name: 'Production'
-        startup-command: 'sh build_and_start.sh'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_67C215A1BEE5427393191C16B270E7CD }}
