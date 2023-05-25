@@ -66,5 +66,5 @@ async def get_current_active_user(
 def register_user(db: Session, user: UserCreate):
   db_user = create_db_user(db, user)
   token = create_access_token(data={"auth": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-  print(f"http://localhost:5000/api/verification?token={token}")
+  print(f"https://localhost:5000/api/verification?token={token}")
   return db_user

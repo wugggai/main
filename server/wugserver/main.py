@@ -66,4 +66,4 @@ async def react_app(req: Request):
 
 def start():
     """Launched with `poetry run start` at root level"""
-    uvicorn.run("wugserver.main:app",port=5000, reload=True)
+    uvicorn.run("wugserver.main:app", host="0.0.0.0", port=5000, reload=True)
