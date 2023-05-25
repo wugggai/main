@@ -1,7 +1,9 @@
 import logging
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import openai
 import uvicorn
 from wugserver.routers import authentication, interactions, messages, tags
@@ -27,6 +29,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+templates = Jinja2Templates(directory="")
+static_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
+app.mount("/", StaticFiles(directory=static_directory, html=True), name="static")
+
 app.router.prefix = "/api"
 
 app.include_router(authentication.router)
@@ -35,10 +41,10 @@ app.include_router(interactions.router)
 app.include_router(messages.router)
 app.include_router(tags.router)
 
+@app.get("/")
+async def react_app(req: Request):
+    return templates.TemplateResponse('index.html', { 'request': req })
+
 def start():
     """Launched with `poetry run start` at root level"""
     uvicorn.run("wugserver.main:app",port=5000, reload=True)
-
-@app.get("/time")
-async def root():
-    return {"message": "Hello World"}
