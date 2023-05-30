@@ -8,21 +8,22 @@ from wugserver.models.db.user_model import *
 
 router = APIRouter()
 
-@router.post("/users/", response_model=User)
+@router.post("/users", response_model=User)
 def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=409, detail="Email already registered")
-    return register_user(db=db, user=user)
+  db_user = get_user_by_email(db, email=user.email)
+  if db_user:
+    raise HTTPException(status_code=409, detail="Email already registered")
+  return register_user(db=db, user=user)
 
-@router.get("/users/", response_model=list[User])
+# Let's consider the purpose of this function beyond testing,
+#   and build authorization rules properly before exposing such endpoint
+@router.get("/users", response_model=list[User])
 def read_users_route(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = get_users(db, skip=skip, limit=limit)
     return users
 
-
-@router.get("/users/me/", response_model=User)
+@router.get("/users/me", response_model=User)
 async def read_users_me(
-    current_user: UserModel = Depends(get_current_active_user),
+  current_user: UserModel = Depends(get_current_active_user),
 ):
-    return current_user
+  return current_user

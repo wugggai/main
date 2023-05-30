@@ -33,7 +33,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     componentDidMount(): void {
-        axios.get(API_BASE + `/users/${TEST_USER_ID}/interactions/` + (this.props.isTrash ? "deleted" : "")).then(response => {
+        axios.get(API_BASE + `/users/${TEST_USER_ID}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
             this.setState({
                 chatHistoryMetadata: response.data
             })

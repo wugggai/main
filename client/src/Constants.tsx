@@ -1,4 +1,4 @@
-export const API_BASE = "https://wug-staging.azurewebsites.net/api"
+export const API_BASE = "/api"
 export const TEST_USER_ID = "0" // only for alpha testing
 
 export const SYNTAX_THEME = {
