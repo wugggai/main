@@ -2,3 +2,4 @@
 **/*.db
 .env
 server/wugserver/build
+server/wugserver/static

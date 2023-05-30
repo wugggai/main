@@ -35,7 +35,14 @@ In the root directory:
 ```
 az login
 
-docker build -t wug-base-image .; docker tag wug-base-image wugdockers.azurecr.io/wug-base-image:latest; docker push wugdockers.azurecr.io/wug-base-image:latest
+docker build -t wug-base-image .
+
+# Test locally before pushing
+docker run -p 5000:5000 wug-base-image
+
+# Push
+docker tag wug-base-image wugdockers.azurecr.io/wug-base-image:latest
+docker push wugdockers.azurecr.io/wug-base-image:latest
 ```
 
 View deployment and application logs:
