@@ -8,14 +8,16 @@ import { SpinnerCircularFixed } from 'spinners-react';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
 import { Loading } from '../UI Components/Loading';
 import axios from 'axios';
-import { API_BASE, TEST_USER_ID } from '../Constants';
+import { API_BASE, SERVER, TEST_USER_ID } from '../Constants';
 import Settings from '../Settings/Settings';
+import Login from '../Login/Login';
 
 interface MainViewProps {
     
 }
  
 interface MainViewState {
+    showLoginScreen: boolean
     currentTabIndex: number
     chatHistory?: ChatMetadata[]
     tagList?: Tag[]
@@ -31,17 +33,22 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
+            showLoginScreen: false,
             currentTabIndex: 0,
             selectedTagIds: new Set()
         };
     }
 
     componentDidMount(): void {
-        axios.get(API_BASE + `/users/${TEST_USER_ID}/tags`).then(response => {
+        SERVER.get(`/users/${TEST_USER_ID}/tags`).then(response => {
             console.log("tags:", response.data)
             this.setState({
                 tagList: response.data
             })
+        }).catch(err => {
+            if (err.response?.status === 401) {
+                this.setState({ showLoginScreen: true })
+            }
         })
     }
 
@@ -63,36 +70,45 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         default:
             break
         }
+
+        const overlayStyles: React.CSSProperties = {
+            // filter: 'blur(10px)',
+            // pointerEvents: 'none'
+        }
         
-        return <SplitView className='center-screen split'
-            direction='horizontal'
-            minSize={[210, 500]}
-            maxSize={[310, Infinity]} sizes={this.splitSizes}
-            snapOffset={0} gutterSize={4}
-            style={{minHeight: '560px', minWidth: '800px'}}
-            onDrag={newSizes => this.splitSizes = newSizes }
-        >
-            <SideBar
-                currentTabIndex={this.state.currentTabIndex}
-                onTabChange={(newTab) => this.setState({ currentTabIndex: newTab })}
-                onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
-                currentTags={this.state.tagList!}
-                selectedTagIds={this.state.selectedTagIds}
-                onTagSelected={i => {
-                    if (this.state.selectedTagIds.has(this.state.tagList![i].id)) {
-                        this.state.selectedTagIds.delete(this.state.tagList![i].id)
-                    } else {
-                        this.state.selectedTagIds.add(this.state.tagList![i].id)
-                    }
-                    this.forceUpdate()
-                    console.log("Selected tag index", i)
-                }}
-            />
-            <div style={{position: 'relative'}}>
-                {contentView}
-            </div>
-            {/* {newTagPopover} */}
-        </SplitView>;
+        return <Fragment>
+            <SplitView className='center-screen split'
+                direction='horizontal'
+                minSize={[210, 500]}
+                maxSize={[310, Infinity]} sizes={this.splitSizes}
+                snapOffset={0} gutterSize={4}
+                style={{minHeight: '560px', minWidth: '800px', ...overlayStyles}}
+                onDrag={newSizes => this.splitSizes = newSizes }
+            >
+                <SideBar
+                    currentTabIndex={this.state.currentTabIndex}
+                    onTabChange={(newTab) => this.setState({ currentTabIndex: newTab })}
+                    onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
+                    currentTags={this.state.tagList!}
+                    selectedTagIds={this.state.selectedTagIds}
+                    onTagSelected={i => {
+                        if (this.state.selectedTagIds.has(this.state.tagList![i].id)) {
+                            this.state.selectedTagIds.delete(this.state.tagList![i].id)
+                        } else {
+                            this.state.selectedTagIds.add(this.state.tagList![i].id)
+                        }
+                        this.forceUpdate()
+                        console.log("Selected tag index", i)
+                    }}
+                />
+                <div style={{position: 'relative'}}>
+                    {contentView}
+                </div>
+                {/* {newTagPopover} */}
+            </SplitView>;
+
+            {this.state.showLoginScreen && <Login />}
+        </Fragment>
     }
 }
  

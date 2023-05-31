@@ -308,7 +308,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     snapOffset={0}
                     expandToMin
                     gutterSize={10}>
-                    <ChatDialogView history={this.state.chatHistory || {messages: []}} />
+                    <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} />
                     <div className='chat-input-container'>
                         <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} />
                         <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>

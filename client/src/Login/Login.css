@@ -1,0 +1,108 @@
+.login-screen {
+    background: #d4d1f0c6;
+    position: fixed;
+    z-index: 100;
+    top: 0px;
+}
+
+.login-screen .left {
+    position: absolute;
+    height: 100%;
+    width: min(50%, 100% - 380px);
+}
+
+.login-screen .left .container {
+    position: absolute;
+    width: min(100%, 450px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    padding: 30px;
+}
+
+.login-screen .left .container h1 {
+    margin-bottom: 10px;
+}
+
+.login-screen .left .container .subtitle {
+    font-weight: 500;
+}
+
+.login-screen .right {
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    right: 0;
+    top: 0;
+    min-width: 380px;
+}
+
+.login-screen .right h3 {
+    margin-bottom: 22px;
+}
+
+.login-screen .right .login-fields {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 300px;
+    padding: 10px;
+}
+
+.login-screen fieldset {
+    border: none;
+    padding: 0;
+    position: relative;
+}
+
+.login-screen fieldset label {
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+.login-screen .login-field {
+    border-radius: 5px;
+    width: 100%;
+    padding: 6px 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.login-screen #forgot-password {
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 12px;
+}
+
+.login-screen #forgot-password:hover {
+    text-decoration: underline;
+}
+
+.login-screen .login-button {
+    border-style: none;
+    background-color: white;
+    font-size: 15px;
+    border-radius: 25px;
+    padding: 12px 10px;
+    width: 200px;
+    /* margin: 0 auto; */
+    margin: 20px calc((100% - 200px) / 2) 10px;
+}
+
+.login-screen .signup-message {
+    text-align: center;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.login-screen .signup-message a {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.login-screen .terms {
+    font-size: 12px;
+    margin: 20px 0px;
+}
