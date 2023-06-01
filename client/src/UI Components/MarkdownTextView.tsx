@@ -27,7 +27,7 @@ function MarkdownTextView(props: { rawText?: string, disableCodeHighlighter?: bo
     return <ReactMarkdown children={props.rawText || 'No text to show.'} className="markdown-view" remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} 
     components={props.disableCodeHighlighter ? {} : {
         code({node, inline, className, children, ...props}) {
-            const match = /language-(\w+)/.exec(className || '') || ['language-swift', 'swift']
+            const match = /language-(\w+)/.exec(className || '') || ['language-python', 'python']
             return !inline && match ? (
                 <SyntaxHighlighter
                     children={String(children).replace(/\n$/, '')}

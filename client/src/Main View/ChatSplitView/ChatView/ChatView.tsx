@@ -15,6 +15,7 @@ interface ChatViewProps {
     onChatInfoUpdated: () => void
     onDeleteInteraction: () => void
     availableTags: Tag[]
+    isTrash: boolean
 }
  
 interface ChatViewState {
@@ -36,7 +37,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.state = {
             inputValue: '',
             isWaitingForResponse: false,
-            isUpdatingModel: false
+            isUpdatingModel: false,
         };
         this.createInteraction = this.createInteraction.bind(this);
         if (this.props.isNewInteraction) {
@@ -50,6 +51,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.removeTag = this.removeTag.bind(this);
         this.saveMetadata = this.saveMetadata.bind(this);
         this.loadHistory = this.loadHistory.bind(this);
+        this.recalculateInputHeight = this.recalculateInputHeight.bind(this);
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -58,6 +60,10 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
             this.loadHistory()
             this.setState({ inputValue: '' })
+            const chatInput = document.querySelector("#chat-input") as HTMLDivElement
+            chatInput.style.height = "50px"
+            const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
+            dialogView.style.paddingBottom = "80px"
         }
     }
 
@@ -86,7 +92,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
     sendMessage() {
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
-        } else {
+        } else if (this.state.inputValue) {
             this.state.chatHistory?.messages.push({
                 message: this.state.inputValue,
                 source: 'user',
@@ -121,7 +127,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             initial_message: withMessage ? {
                 message: this.state.inputValue,
                 model_config: {},
-                model: 'echo' // TODO: adapt to actual LLM
+                model: this.props.chatMetadata.interaction.ai_type
             } : undefined
         }).then(response => {
             const metadata = response.data as ChatMetadata
@@ -156,8 +162,10 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             } else if (this.state.chatHistory === undefined) {
                 this.setState({ chatHistory: {messages: []} })
             }
-            if (this.state.editedTitle)
+            if (this.state.editedTitle) {
                 this.props.chatMetadata.interaction.title = this.state.editedTitle
+                this.props.chatMetadata.last_message = metadata.last_message
+            }
             this.props.onChatInfoUpdated()
         })
     }
@@ -190,6 +198,16 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 1000)
         }
+    }
+
+    recalculateInputHeight() {
+        let box = document.querySelector("#chat-input") as HTMLTextAreaElement
+        box.style.height = '1px'
+        const newHeight = Math.max(this.props.isTrash ? 0 : 50, box.scrollHeight)
+        box.style.height = Math.min(500, newHeight) + "px"
+        box.style.overflow = newHeight < 500 ? 'hidden' : 'scroll'
+        const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
+        dialogView.style.paddingBottom = Math.min(500, newHeight) + 30 + "px"
     }
 
     render() {
@@ -298,25 +316,20 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
             </div>
             <hr />
-            <div className='dialog-split-container'>
-                <SplitView
-                    className='vertical-split'
-                    direction='vertical'
-                    sizes={this.chatSplitSizes}
-                    onDrag={newSizes => this.chatSplitSizes = newSizes}
-                    minSize={[200, 100]}
-                    snapOffset={0}
-                    expandToMin
-                    gutterSize={10}>
-                    <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} />
-                    <div className='chat-input-container'>
-                        <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} />
-                        <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
-                            <img src="/assets/send.svg" />
-                        </button>
-                    </div>
-                </SplitView>
-            </div>
+            <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} />
+            {!this.props.isTrash && <div className='chat-input-container'>
+                <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
+                onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        this.sendMessage()
+                    }
+                }}
+                onKeyUp={this.recalculateInputHeight} />
+                <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
+                    <img src="/assets/send.svg" width={20} className='center-content' />
+                </button>
+            </div>}
         </div>;
     }
 }

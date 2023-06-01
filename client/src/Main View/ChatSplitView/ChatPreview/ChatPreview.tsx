@@ -9,6 +9,7 @@ interface ChatPreviewProps {
     selectedIndex?: number
     onCreateNewInteraction: () => void
     filterByTags: Set<string>
+    isTrash: boolean
 }
  
 interface ChatPreviewState {
@@ -51,13 +52,15 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
         return <div className='chat-preview'>
             <div style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0}} onMouseDown={() => this.props.selectionChanged(undefined)}/>
             <SearchBar style={{position: 'absolute', top: '40px', left: '20px', right: '20px'}} onChange={(s) => this.setState({ searchString: s })}/>
-            <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
-                <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
-                <span style={{verticalAlign: 'middle'}}>New Conversation</span>
-            </button>
+            {!this.props.isTrash && 
+                <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
+                    <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
+                    <span style={{verticalAlign: 'middle'}}>New Conversation</span>
+                </button>
+            }
             {
                 this.props.chatHistoryMetadata.length > 0 ?
-                <div style={{position: 'absolute', top: '150px', left: 0, right: 0, maxHeight: 'calc(100% - 100px)'}}>
+                <div style={{position: 'absolute', top: this.props.isTrash ? '100px' : '150px', left: 0, right: 0, maxHeight: this.props.isTrash ? 'calc(100% - 100px)' : 'calc(100% - 150px)', overflow: 'scroll'}}>
                     {rows}
                 </div>
                 : emptyMessage

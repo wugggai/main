@@ -26,7 +26,7 @@ interface MainViewState {
  
 class MainView extends React.Component<MainViewProps, MainViewState> {
 
-    splitSizes = [17, 83]
+    splitSizes = [16, 84]
 
     constructor(props: MainViewProps) {
         super(props);

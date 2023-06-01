@@ -23,7 +23,7 @@ interface ChatViewState {
 }
  
 class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
-    splitSizes = [25, 75]
+    splitSizes = [28, 72]
 
     constructor(props: ChatViewProps) {
         super(props);
@@ -89,15 +89,15 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         let content: JSX.Element
         if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.map(id => this.props.selectedTagIds.has(id)).includes(true))) {
             let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
-            content = <ChatView chatMetadata={metadata} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
-                console.log('split view new data', this.state.chatHistoryMetadata)
+            content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.forceUpdate()
             }} isNewInteraction={false} onDeleteInteraction={() => this.setState({ deletingChat: metadata })} />
         } else if (this.state.newInteractionMetadata !== undefined) {
-            content = <ChatView chatMetadata={this.state.newInteractionMetadata} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
+            content = <ChatView chatMetadata={this.state.newInteractionMetadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.setState({
                     chatHistoryMetadata: [this.state.newInteractionMetadata!, ...this.state.chatHistoryMetadata!],
-                    selectedIndex: 0
+                    selectedIndex: 0,
+                    newInteractionMetadata: undefined
                 })
             }} isNewInteraction onDeleteInteraction={() => this.setState({ deletingChat: this.state.newInteractionMetadata })} />
         } else {
@@ -105,13 +105,14 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
 
         return <Fragment>
-            <SplitView className='split' minSize={[280, 400]} maxSize={[380, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes }>
+            <SplitView className='split' minSize={[280, 400]} maxSize={[450, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes }>
                 <ChatPreview
                     chatHistoryMetadata={this.state.chatHistoryMetadata}
                     selectionChanged={(i) => this.setState({ selectedIndex: i })}
                     selectedIndex={this.state.selectedIndex}
                     onCreateNewInteraction={this.newInteraction}
                     filterByTags={this.props.selectedTagIds}
+                    isTrash={this.props.isTrash}
                 />
                 
                 <div style={{position: 'relative'}}>

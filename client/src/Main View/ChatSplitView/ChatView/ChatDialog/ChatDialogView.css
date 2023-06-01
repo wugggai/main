@@ -1,21 +1,24 @@
 .chat-view .dialog-container {
-    position: relative;
-    padding: 10px 0px;
+    position: absolute;
+    top: 102px;
     box-sizing: border-box;
+    bottom: 0px;
 }
 
 .chat-view #chat-dialog {
     height: 100%;
     border-radius: 5px;
     box-sizing: border-box;
-    border: 2px dashed var(--line);
     /* display: flex; */
     /* flex-direction: column;
     justify-content: flex-end; */
     padding: 20px 10px 10px;
+    padding-bottom: 80px;
     overflow: scroll;
-    display: grid;
-    grid-template-rows: 1fr auto;
+    /* display: grid;
+    grid-template-rows: 1fr auto; */
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .vertical-split {
@@ -63,5 +66,4 @@
 
 .chat-view .history-item .message {
     margin-right: 50px;
-    margin-top: 2px;
 }
