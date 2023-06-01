@@ -91,14 +91,22 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                     onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
                     currentTags={this.state.tagList!}
                     selectedTagIds={this.state.selectedTagIds}
-                    onTagSelected={i => {
-                        if (this.state.selectedTagIds.has(this.state.tagList![i].id)) {
-                            this.state.selectedTagIds.delete(this.state.tagList![i].id)
+                    onTagSelected={(i, shifted) => {
+                        if (shifted) {
+                            if (this.state.selectedTagIds.has(this.state.tagList![i].id)) {
+                                this.state.selectedTagIds.delete(this.state.tagList![i].id)
+                            } else {
+                                this.state.selectedTagIds.add(this.state.tagList![i].id)
+                            }
                         } else {
-                            this.state.selectedTagIds.add(this.state.tagList![i].id)
+                            if (this.state.selectedTagIds.size === 1 && this.state.selectedTagIds.has(this.state.tagList![i].id)) {
+                                this.state.selectedTagIds.clear()
+                            } else {
+                                this.state.selectedTagIds.clear()
+                                this.state.selectedTagIds.add(this.state.tagList![i].id)
+                            }
                         }
                         this.forceUpdate()
-                        console.log("Selected tag index", i)
                     }}
                 />
                 <div style={{position: 'relative'}}>

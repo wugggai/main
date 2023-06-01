@@ -13,7 +13,7 @@ interface SideBarProps {
     onTabChange: (newTabIndex: number) => void
     currentTags: Tag[]
     onAddNewTag: (tag: Tag) => void
-    onTagSelected: (index: number) => void
+    onTagSelected: (index: number, shifted: boolean) => void
     selectedTagIds: Set<string>
 }
  
