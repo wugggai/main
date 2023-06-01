@@ -7,6 +7,7 @@ import { Loading } from '../../../../UI Components/Loading';
 interface ChatDialogProps {
     history: ChatHistory
     waitingForResponse: boolean
+    isTrash: boolean
 }
  
 interface ChatDialogState {
@@ -56,7 +57,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         })
 
         return <div className='dialog-container'>
-            <div id='chat-dialog'>
+            <div id='chat-dialog' style={{ paddingBottom: this.props.isTrash ? '20px' : '80px' }}>
                 {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex' }} key={-1}>
                     <img src={`/assets/gpt-3.5-turbo.png`} width={40} className='avatar' />
                     <div className='message'>

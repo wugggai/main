@@ -316,7 +316,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
             </div>
             <hr />
-            <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} />
+            <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} isTrash={this.props.isTrash} />
             {!this.props.isTrash && <div className='chat-input-container'>
                 <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
                 onKeyDown={e => {
