@@ -14,7 +14,8 @@ class UserModel(Base):
   deleted = Column(Boolean, default=False)
 
 def create_db_user(db: Session, user: UserCreate):
-  db_user = UserModel(email=user.email)
+  # TODO: is_active needs to be false, but until email verification is in place, we're setting it to true
+  db_user = UserModel(email=user.email, is_active=True)
   db.add(db_user)
   db.commit()
   db.refresh(db_user)

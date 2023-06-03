@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
+from wugserver.models.ai_models.models import AIModel
 
 from wugserver.models.ai_models.openai_model import OpenAIModels
 from wugserver.models.ai_models.echo_model import EchoModel
@@ -9,8 +10,8 @@ from wugserver.schema.message import MessageCreate
 
 # List of available models are not yet exposed via API. 
 # Caller must pass the correct value string i.e. gpt-3.5-turbo to access the model
-supported_models_name_to_model_class = {}
-supported_models = [OpenAIModels, EchoModel]
+supported_models_name_to_model_class: dict[str, AIModel] = {}
+supported_models: list[AIModel] = [OpenAIModels(), EchoModel()]
 
 for model_cls in supported_models:
   supported_models_name_to_model_class.update({
@@ -18,7 +19,7 @@ for model_cls in supported_models:
   })
 
 
-def handle_message_create_request(db: Session, interaction_id: UUID, message_create_params: MessageCreate):
+def handle_message_create_request(db: Session, interaction_id: UUID, message_create_params: MessageCreate, acting_user_id: int):
   """
   handles all message creation requests
   passes message to appropriate model, writes messages to DB, and returns model's response
@@ -36,9 +37,9 @@ def handle_message_create_request(db: Session, interaction_id: UUID, message_cre
   if not model_class:
     raise NotImplementedError(f"Model {message_create_params.model} is not supported. Supported models: {', '.join(list(supported_models_name_to_model_class.keys()))}")
   try:
-    model_res_msg, curr_offset = model_class.post_message(db, interaction_id, message_create_params)
+    model_res_msg, curr_offset = model_class.post_message(db, interaction_id, message_create_params, acting_user_id)
   except Exception as e:
-    raise ConnectionError(f"Unable to interact with {message_create_params.model}: {e}")
+    raise e
 
   # write both user msg and model msg to DB after model successfully returns
   # TODO: source column should store the userId rather than "user"
