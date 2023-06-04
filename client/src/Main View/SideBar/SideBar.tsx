@@ -40,7 +40,7 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
         this.setState({ isAddingTag: true })
         let tagID = uuid.v4()
         console.log(tagID)
-        axios.post(API_BASE + `/users/${TEST_USER_ID}/tags/`, {
+        axios.post(API_BASE + `/users/${TEST_USER_ID}/tags`, {
             name: this.state.newTagName,
             color: this.state.newTagColor!
         }).then(response => {

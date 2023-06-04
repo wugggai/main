@@ -11,7 +11,7 @@ from wugserver.models.db.user_model import *
 
 router = APIRouter()
 
-@router.post("/users/{creator_user_id}/interactions/", response_model=InteractionWithLatestMessage)
+@router.post("/users/{creator_user_id}/interactions", response_model=InteractionWithLatestMessage)
 def create_interaction_route(creator_user_id: int, interaction_create_params: InteractionCreate, db: Session = Depends(get_db)):
   interaction = create_interaction(db=db, creator_user_id=creator_user_id, interaction_create_params=interaction_create_params)
   optional_message_response = None
@@ -21,7 +21,7 @@ def create_interaction_route(creator_user_id: int, interaction_create_params: In
   
   return InteractionWithLatestMessage(interaction=interaction, last_message=optional_message_response)
 
-@router.get("/users/{creator_user_id}/interactions/", response_model=list[InteractionWithLatestMessage])
+@router.get("/users/{creator_user_id}/interactions", response_model=list[InteractionWithLatestMessage])
 def get_interactions_route(creator_user_id: int, offset: int = 0, limit: int = 15, db: Session = Depends(get_db)):
   # TODO: wrap in 2 separate objects: an interaction and a message
   interactions = get_interactions_by_creator_user_id(db=db, creator_user_id=creator_user_id, offset=offset, limit=limit)

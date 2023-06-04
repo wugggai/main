@@ -12,7 +12,8 @@ from wugserver.models.db.user_model import *
 
 router = APIRouter()
 
-@router.post("/interactions/{interaction_id}/messages/", response_model=Message)
+
+@router.post("/interactions/{interaction_id}/messages", response_model=Message)
 def create_message_route(interaction_id: UUID, message_create_params: MessageCreate, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
     interaction = get_interaction_by_id(db=db, interaction_id=interaction_id)
     if interaction == None:
@@ -23,6 +24,6 @@ def create_message_route(interaction_id: UUID, message_create_params: MessageCre
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server Error: {e}")
 
-@router.get("/interactions/{interaction_id}/messages/", response_model=list[Message])
+@router.get("/interactions/{interaction_id}/messages", response_model=list[Message])
 def get_messages_route(interaction_id: UUID, offset: int = 0, limit: int = 15, from_latest: bool = True, db: Session = Depends(get_db)):
     return get_interaction_messages(db=db, interaction_id=interaction_id, offset=offset, limit=limit, from_latest=from_latest)
