@@ -5,6 +5,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, tex
 from sqlalchemy.orm import Session
 
 from wugserver.database import Base
+from wugserver.models.db.interaction_model import InteractionModel
 
 # TODO: Message table should store userId
 class MessageModel(Base):
@@ -19,10 +20,10 @@ class MessageModel(Base):
 
 Index("offset_composite_index", MessageModel.interaction_id, MessageModel.offset)
 
-def create_message(db: Session, interaction_id: UUID, source: str, message: str, offset: Integer):
+def create_message(db: Session, interaction: InteractionModel, source: str, message: str, offset: Integer):
   message = MessageModel(
     id=uuid4(),
-    interaction_id=interaction_id,
+    interaction_id=interaction.id,
     source=source,
     message=message,
     offset=offset,
@@ -33,32 +34,30 @@ def create_message(db: Session, interaction_id: UUID, source: str, message: str,
   db.refresh(message)
   return message
 
-def get_interaction_messages(db: Session, interaction_id: UUID, offset:int, limit: int, from_latest: bool = True):
+def get_interaction_messages(db: Session, interaction: InteractionModel, offset:int, limit: int, from_latest: bool = True):
+  query = None
   if from_latest:
-    return db.query(MessageModel) \
-      .filter(MessageModel.interaction_id == interaction_id) \
-      .order_by(MessageModel.offset.desc()) \
-      .limit(limit) \
-      .offset(offset) \
-      .all()
+    query = db.query(MessageModel) \
+      .filter(MessageModel.interaction_id == interaction.id) \
+      .order_by(MessageModel.offset.desc())
   else:
-    return db.query(MessageModel) \
-      .filter(MessageModel.interaction_id == interaction_id) \
-      .order_by(MessageModel.offset.asc()) \
-      .limit(limit) \
+    query = db.query(MessageModel) \
+      .filter(MessageModel.interaction_id == interaction.id) \
+      .order_by(MessageModel.offset.asc())
+  return query.limit(limit) \
       .offset(offset) \
       .all()
 
-def get_interaction_last_message(db: Session, interaction_id: UUID):
-  last_message_in_list = get_interaction_messages(db, interaction_id, 0, 1, True)
+def get_interaction_last_message(db: Session, interaction: InteractionModel):
+  last_message_in_list = get_interaction_messages(db, interaction, 0, 1, True)
   return last_message_in_list[0] if last_message_in_list else None
 
-def get_interaction_all_messages(db: Session, interaction_id: UUID):
-  return get_interaction_messages(db, interaction_id, 0, 100000, False)
+def get_interaction_all_messages(db: Session, interaction: InteractionModel):
+  return get_interaction_messages(db, interaction.id, 0, 100000, False)
 
-def get_interaction_message_count(db: Session, interaction_id: UUID):
+def get_interaction_message_count(db: Session, interaction: InteractionModel):
   return db.query(MessageModel) \
-    .filter(MessageModel.interaction_id == interaction_id) \
+    .filter(MessageModel.interaction_id == interaction.id) \
     .count()
 
 def delete_interaction_messages(db: Session, interaction_id: UUID):

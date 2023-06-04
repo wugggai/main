@@ -12,18 +12,18 @@ from wugserver.types.providers import Provider
 router = APIRouter()
 
 @router.post("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
-def create_api_key_route(user_id: int, provider: Provider, api_key_create: ApiKeyCreate, db: Session = Depends(get_db)):
-    existing_key = get_user_api_key_for_provider(db, user_id, provider)
-    if existing_key:
-        raise HTTPException(status_code=409, detail="API Key already provided")
-    return create_api_key_record(db=db, user_id=user_id, provider=provider, api_key_create=api_key_create)
+def create_api_key_route(user_id: int, provider: Provider, api_key_create: ApiKeyCreate, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
+  existing_key = get_user_api_key_for_provider(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider)
+  if existing_key:
+    raise HTTPException(status_code=409, detail="API Key already provided")
+  return create_api_key_record(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider, api_key_create=api_key_create)
 
 @router.put("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
-def update_api_key_route(user_id: int, provider: Provider, api_key_create: ApiKeyCreate, db: Session = Depends(get_db)):
-    existing_key = get_user_api_key_for_provider(db, user_id, provider)
-    if not existing_key:
-        raise HTTPException(status_code=404, detail="API Key doesn't exist")
-    return update_api_key_record(db=db, user_id=user_id, provider=provider, api_key_create=api_key_create)
+def update_api_key_route(user_id: int, provider: Provider, api_key_create: ApiKeyCreate, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
+  existing_key = get_user_api_key_for_provider(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider)
+  if not existing_key:
+    raise HTTPException(status_code=404, detail="API Key doesn't exist")
+  return update_api_key_record(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider, api_key_create=api_key_create)
 
 @router.get("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
 def get_api_key_route(user_id: int, provider: Provider, db: Session = Depends(get_db)):
