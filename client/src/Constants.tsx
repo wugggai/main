@@ -1,7 +1,4 @@
-import axios from 'axios'
-
-export const API_BASE = "http://127.0.0.1:5000/api"
-export const SERVER = axios.create({ baseURL: API_BASE })
+export const API_BASE = "/api"
 export const TEST_USER_ID = "0" // only for alpha testing
 
 export const SYNTAX_THEME = {

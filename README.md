@@ -25,3 +25,27 @@ localhost:5000/docs you can play with the endpoints.
 
 Because Poetry defaults to run your python in a virtualenv, your text editor (VSCode) might not recognize it.  
 Try this: https://stackoverflow.com/questions/59882884/vscode-doesnt-show-poetry-virtualenvs-in-select-interpreter-option
+
+
+## Manual Deployment to Staging:
+Install Docker(23.0.5+): https://docs.docker.com/get-docker/. Start the docker daemon by opening Docker Desktop
+Install azure CLI: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+
+In the root directory:
+```
+az login
+
+docker build -t wug-base-image .
+
+# Test locally before pushing
+docker run -p 5000:5000 wug-base-image
+
+# Push
+docker tag wug-base-image wugdockers.azurecr.io/wug-base-image:latest
+docker push wugdockers.azurecr.io/wug-base-image:latest
+```
+
+View deployment and application logs:
+```
+az webapp log tail --name wug-staging --resource-group wug-staging
+```
