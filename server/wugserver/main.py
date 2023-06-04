@@ -4,21 +4,19 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-import openai
 import uvicorn
-from wugserver.routers import authentication, interactions, messages, tags
+from wugserver.routers import api_keys, authentication, interactions, messages, tags
 
 from . import database
 from .routers import users
 from wugserver.database import engine
-from dotenv import load_dotenv
 logging.basicConfig(level=logging.INFO)
 
 database.Base.metadata.create_all(bind=engine)
-load_dotenv() # Load local .env file
-openai.api_key = os.environ.get('OPENAI_API_KEY') #put the api key here
-if openai.api_key:
-    print("Loaded API key from local environment")
+# load_dotenv() # Load local .env file
+# openai.api_key = os.environ.get('OPENAI_API_KEY') #put the api key here
+# if openai.api_key:
+#     print("Loaded API key from local environment")
 
 app = FastAPI()
 app.add_middleware(
@@ -32,6 +30,7 @@ app.add_middleware(
 api_router_prefix = "/api"
 
 app.include_router(authentication.router, prefix=api_router_prefix)
+app.include_router(api_keys.router, prefix=api_router_prefix)
 app.include_router(users.router, prefix=api_router_prefix)
 app.include_router(interactions.router, prefix=api_router_prefix)
 app.include_router(messages.router, prefix=api_router_prefix)

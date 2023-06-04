@@ -17,7 +17,7 @@ def create_interaction_route(creator_user_id: int, interaction_create_params: In
   optional_message_response = None
   initial_message = interaction_create_params.initial_message
   if initial_message is not None:
-    optional_message_response = handle_message_create_request(db=db, interaction_id=interaction.id, message_create_params=initial_message)
+    optional_message_response = handle_message_create_request(db=db, interaction_id=interaction.id, message_create_params=initial_message, acting_user_id=creator_user_id)
   
   return InteractionWithLatestMessage(interaction=interaction, last_message=optional_message_response)
 
