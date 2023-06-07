@@ -6,7 +6,7 @@ import { Color, TwitterPicker } from 'react-color'
 import { Tag } from '../../Interfaces'
 import axios from 'axios'
 import * as uuid from "uuid"
-import { API_BASE, TEST_USER_ID } from '../../Constants'
+import { API_BASE, getUserId } from '../../Constants'
 
 interface SideBarProps {
     currentTabIndex: number
@@ -39,8 +39,8 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
     addTag() {
         this.setState({ isAddingTag: true })
         let tagID = uuid.v4()
-        console.log(tagID)
-        axios.post(API_BASE + `/users/${TEST_USER_ID}/tags`, {
+        const userId = getUserId()
+        axios.post(API_BASE + `/users/${userId}/tags`, {
             name: this.state.newTagName,
             color: this.state.newTagColor!
         }).then(response => {

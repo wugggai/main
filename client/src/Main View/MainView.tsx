@@ -8,9 +8,10 @@ import { SpinnerCircularFixed } from 'spinners-react';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
 import { Loading } from '../UI Components/Loading';
 import axios from 'axios';
-import { API_BASE, SERVER, TEST_USER_ID } from '../Constants';
+import { API_BASE, SERVER, getUserId } from '../Constants';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
+import Cookies from 'react-cookies'
 
 interface MainViewProps {
     
@@ -33,14 +34,19 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
-            showLoginScreen: false,
+            showLoginScreen: !Cookies.load('access_token'),
             currentTabIndex: 0,
             selectedTagIds: new Set()
         };
     }
 
     componentDidMount(): void {
-        SERVER.get(`/users/${TEST_USER_ID}/tags`).then(response => {
+        const userId = getUserId()
+        if (userId === undefined) {
+            this.setState({ tagList: [], showLoginScreen: true })
+            return
+        }
+        SERVER.get(`/users/${userId}/tags`).then(response => {
             console.log("tags:", response.data)
             this.setState({
                 tagList: response.data
@@ -72,8 +78,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         }
 
         const overlayStyles: React.CSSProperties = {
-            // filter: 'blur(10px)',
-            // pointerEvents: 'none'
+            filter: 'blur(10px)',
+            pointerEvents: 'none'
         }
         
         return <Fragment>
@@ -82,7 +88,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 minSize={[210, 500]}
                 maxSize={[310, Infinity]} sizes={this.splitSizes}
                 snapOffset={0} gutterSize={4}
-                style={{minHeight: '560px', minWidth: '800px', ...overlayStyles}}
+                style={{minHeight: '560px', minWidth: '800px', ...(this.state.showLoginScreen ? overlayStyles : {})}}
                 onDrag={newSizes => this.splitSizes = newSizes }
             >
                 <SideBar

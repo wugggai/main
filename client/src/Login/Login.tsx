@@ -39,7 +39,15 @@ class Login extends React.Component<LoginProps, LoginState> {
         }).then(response => {
             if (response.status === 200) {
                 Cookies.save('access_token', response.data.access_token, { expires: new Date(Date.now() + 30 * 86400 * 1000) })
-                console.log("successfully logged in")
+            
+                axios.get(API_BASE + "/users/me", {
+                    headers: { "Authorization": `Bearer ${response.data.access_token}` }
+                }).then(response => {
+                    Cookies.save("user_id", response.data.id, { expires: new Date(Date.now() + 30 * 86400 * 1000) })
+                    window.location.reload()
+                }).catch(err => {
+                    alert(err)
+                })
             }
         }).catch(err => {
             if (err.response?.status === 401) {
@@ -55,13 +63,18 @@ class Login extends React.Component<LoginProps, LoginState> {
             email: this.state.username,
             password: this.state.password
         }).then(response => {
-            if (response.status === 409) {
-                alert("This email address is already registered.")
-            } else {
-                this.setState({ showInstructions: true })
-            }
+            this.setState({
+                showInstructions: true,
+                username: '',
+                password: '',
+                confirmPassword: ''
+            })
             // Cookies.save("userId", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
             console.log(response.data)
+        }).catch(err => {
+            if (err.response?.status === 409) {
+                alert("This email address is already taken.")
+            }
         })
     }
 
@@ -89,7 +102,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             <fieldset>
                 <label htmlFor="email">Email</label>
                 <br />
-                <input type="email" name='email' placeholder='somename@domain.com' className='textfield login-field' />
+                <input type="email" name='email' placeholder='somename@domain.com' className='textfield login-field' value={this.state.username} onChange={e => this.setState({ username: e.target.value })} />
                 <div style={{height: '20px'}} />
                 <label htmlFor='password'>Password</label>
                 <br />
@@ -110,7 +123,10 @@ class Login extends React.Component<LoginProps, LoginState> {
 
         const instructionScreen = <div className='login-fields'>
             Please check your inbox to verify your account.
-            <a href="#" onClick={() => this.setState({ isSignUp: false, showInstructions: false, password: '', username: '' })}>Return to Login</a>
+            <br />
+            <div style={{textAlign: 'center'}}>
+                <a href="#" onClick={() => this.setState({ isSignUp: false, showInstructions: false, password: '', username: '' })}>Return to Login</a>
+            </div>
         </div>
 
         let rightScreen: JSX.Element

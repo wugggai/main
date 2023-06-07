@@ -5,9 +5,10 @@ import SplitView from 'react-split'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
 import axios from 'axios';
-import { API_BASE, TEST_USER_ID } from '../../../Constants';
+import { API_BASE, getUserId } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
+import Cookies from 'react-cookies'
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -102,11 +103,13 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             })
             const userInput = this.state.inputValue
             this.setState({ inputValue: '', isWaitingForResponse: true })
-            axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
+            axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages/`, {
                 message: userInput,
                 model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
-            }).then(response => {
+            },
+            { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
+            ).then(response => {
                 console.log('received message response', response.data)
                 this.state.chatHistory?.messages.push(response.data)
                 this.setState({
@@ -122,7 +125,12 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     createInteraction(withMessage: boolean) {
-        axios.post(API_BASE + `/users/${TEST_USER_ID}/interactions`, {
+        const userId = getUserId()
+        if (userId === undefined) {
+            alert("Not logged in")
+            return
+        }
+        axios.post(API_BASE + `/users/${userId}/interactions/`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
             initial_message: withMessage ? {
                 message: this.state.inputValue,
@@ -329,6 +337,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
                     <img src="/assets/send.svg" width={20} className='center-content' />
                 </button>
+                <div className='input-prompt'>Press Shift + Enter to start new line.</div>
             </div>}
         </div>;
     }

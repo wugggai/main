@@ -8,6 +8,10 @@
     height: 80px;
 }
 
+.settings-table td > * {
+    vertical-align: middle;
+}
+
 .settings-table input {
     width: 200px;
 }
@@ -17,7 +21,7 @@
     color: var(--lighter-text-color);
 }
 
-.settings-table button {
+.settings-table button, .settings-button {
     border: 1px solid var(--button-tint);
     color: var(--button-tint);
     padding: 7px 10px;
@@ -26,4 +30,9 @@
     font-size: 14px;
     border-radius: 6px;
     background-color: transparent;
+}
+
+.settings-button {
+    border: 1px solid var(--theme-warning);
+    color: var(--theme-warning);
 }

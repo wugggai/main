@@ -1,8 +1,8 @@
 import axios from 'axios'
+import Cookies from 'react-cookies'
 
 export const API_BASE = "/api"
 export const SERVER = axios.create({ baseURL: API_BASE })
-export const TEST_USER_ID = "0" // only for alpha testing
 
 export const SYNTAX_THEME = {
     "code[class*=\"language-\"]": {
@@ -194,3 +194,7 @@ export const SYNTAX_THEME = {
       "fontStyle": "italic"
     }
   };
+
+export function getUserId(): number | undefined {
+  return Cookies.load('user_id')
+}

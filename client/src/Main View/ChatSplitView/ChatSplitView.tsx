@@ -5,7 +5,7 @@ import ChatPreview from './ChatPreview/ChatPreview';
 import { Loading } from '../../UI Components/Loading';
 import ChatView from './ChatView/ChatView';
 import axios from 'axios';
-import { API_BASE, TEST_USER_ID } from '../../Constants';
+import { API_BASE, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
 
 interface ChatViewProps {
@@ -33,7 +33,11 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     componentDidMount(): void {
-        axios.get(API_BASE + `/users/${TEST_USER_ID}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
+        const userId = getUserId()
+        if (userId === undefined) {
+            return
+        }
+        axios.get(API_BASE + `/users/${userId}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
             this.setState({
                 chatHistoryMetadata: response.data
             })
@@ -56,7 +60,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     ai_type: 'echo', // todo: choose from popup button
                     id: '',
                     tag_ids: [],
-                    creator_user_id: TEST_USER_ID,
+                    creator_user_id: `${getUserId()}`,
                     last_updated: new Date().toISOString(),
                     title: this.state.newInteractionMetadata?.interaction.title ?? "Untitled Conversation"
                 },
