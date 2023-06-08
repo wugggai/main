@@ -48,7 +48,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
 
     componentDidUpdate(prevProps: Readonly<ChatViewProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
         if (prevProps.isTrash !== this.props.isTrash) {
-            this.setState({ chatHistoryMetadata: undefined })
+            this.setState({ chatHistoryMetadata: undefined, selectedIndex: undefined })
             this.componentDidMount()
         }
     }
@@ -75,6 +75,12 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             return
         }
 
+        // TODO
+        if (this.props.isTrash) {
+            console.log("Permanently delete")
+            return
+        }
+
         axios.put(API_BASE + `/interactions/${this.state.deletingChat.interaction.id}`, {
             deleted: true
         }).then(response => {
@@ -95,7 +101,9 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
             content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.forceUpdate()
-            }} isNewInteraction={false} onDeleteInteraction={() => this.setState({ deletingChat: metadata })} />
+            }} isNewInteraction={false} onDeleteInteraction={() => {
+                this.setState({ deletingChat: metadata })}
+            }/>
         } else if (this.state.newInteractionMetadata !== undefined) {
             content = <ChatView chatMetadata={this.state.newInteractionMetadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.setState({
@@ -103,7 +111,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     selectedIndex: 0,
                     newInteractionMetadata: undefined
                 })
-            }} isNewInteraction onDeleteInteraction={() => this.setState({ deletingChat: this.state.newInteractionMetadata })} />
+            }} isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })} />
         } else {
             content = <div className='center-content'>No chat selected</div>
         }
@@ -125,7 +133,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             </SplitView>
             <AlertSheet
                 show={this.state.deletingChat !== undefined}
-                title='Move This Conversation to Trash?'
+                title={this.props.isTrash ? 'Permanently Delete this Conversation?' : 'Move This Conversation to Trash?'}
                 message={this.state.deletingChat?.interaction.title}
                 onClickedOutside={() => this.setState({ deletingChat: undefined })}
                 buttons={[
@@ -135,7 +143,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                         onClick: () => this.setState({ deletingChat: undefined })
                     },
                     {
-                        title: "Move to Trash",
+                        title: this.props.isTrash ? "Delete" : "Move to Trash",
                         type: 'destructive',
                         onClick: () => this.moveInteractionToTrash()
                     }

@@ -61,10 +61,12 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
             this.loadHistory()
             this.setState({ inputValue: '' })
-            const chatInput = document.querySelector("#chat-input") as HTMLDivElement
-            chatInput.style.height = "50px"
-            const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-            dialogView.style.paddingBottom = "80px"
+            if (!this.props.isTrash) {
+                const chatInput = document.querySelector("#chat-input") as HTMLDivElement
+                chatInput.style.height = "50px"
+                const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
+                dialogView.style.paddingBottom = "80px"
+            }
         }
     }
 
@@ -311,9 +313,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 </div>
                 {<div className='subtitle'>
                     <span>Model:</span>
-                    <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)}>
+                    <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)} >
                         <button className='select-model-button'>
-                            {this.props.chatMetadata.interaction.ai_type || "Choose Model"}
+                            {this.props.chatMetadata.interaction.ai_type || this.props.chatMetadata.last_message?.source || "Choose Model"}
                             <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
                         </button>
                     </Dropdown>
