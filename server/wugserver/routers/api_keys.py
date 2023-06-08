@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from wugserver.dependencies import get_db
-from wugserver.models.db.api_key_model import create_api_key_record, get_user_api_key_for_provider, update_api_key_record
+from wugserver.models.db.api_key_model import create_api_key_record, get_all_user_api_keys, get_user_api_key_for_provider, update_api_key_record
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.schema.api_key import ApiKeyBase, ApiKeyCreate
 from wugserver.schema.user import *
@@ -31,3 +31,7 @@ def get_api_key_route(user_id: int, provider: Provider, db: Session = Depends(ge
     if not existing_key:
         raise HTTPException(status_code=404, detail="API Key doesn't exist")
     return existing_key
+
+@router.get("/users/{user_id}/apikey", response_model=list[ApiKeyBase])
+def get_api_key_route(user_id: int, db: Session = Depends(get_db)):
+    return get_all_user_api_keys(db, user_id)

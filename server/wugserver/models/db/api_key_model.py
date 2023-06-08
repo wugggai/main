@@ -30,3 +30,6 @@ def update_api_key_record(db: Session, user_id: int, provider: str, api_key_crea
 
 def get_user_api_key_for_provider(db: Session, user_id: int, provider: str):
   return db.query(ApiKeyModel).filter(ApiKeyModel.owner_user_id == user_id and ApiKeyModel.provider == provider).first()
+
+def get_all_user_api_keys(db: Session, user_id: int):
+  return db.query(ApiKeyModel).filter(ApiKeyModel.owner_user_id == user_id).all()
