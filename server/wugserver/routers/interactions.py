@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from wugserver.dependencies import get_db
-from wugserver.models.db.interaction_model import create_interaction, get_deleted_interactions_by_creator_user_id, get_interactions_by_creator_user_id, update_interaction
+from wugserver.models.db.interaction_model import create_interaction, delete_interaction, get_deleted_interactions_by_creator_user_id, get_interactions_by_creator_user_id, update_interaction
 from wugserver.models.db.message_model import get_interaction_last_message
 from wugserver.models.message_create_handler import handle_message_create_request
 from wugserver.schema.interaction import Interaction, InteractionCreate, InteractionWithLatestMessage, InteractionUpdate
@@ -51,4 +51,10 @@ def update_interaction_route(interaction_id: UUID, interaction_update_params: In
   if new_interaction is not None:
     return new_interaction
   raise HTTPException(status_code=404, detail="question not found")
+
+@router.delete("/interactions/{interaction_id}", status_code=200)
+def delete_interaction_route(interaction_id: UUID, db: Session = Depends(get_db)):
+  affected = delete_interaction(db, interaction_id)
+  if affected == 0:
+    raise HTTPException(status_code=404, detail="interaction not found")
 

@@ -1,7 +1,7 @@
 import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Column, DateTime, Index, Integer, String, text, Uuid
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, text, Uuid
 from sqlalchemy.orm import Session
 
 from wugserver.database import Base
@@ -11,7 +11,7 @@ class MessageModel(Base):
   __tablename__ = "messages"
 
   id = Column(Uuid, primary_key=True)
-  interaction_id = Column(Uuid, index=True)
+  interaction_id = Column(Uuid, ForeignKey("interactions.id", ondelete="CASCADE"), index=True)
   source = Column(String)
   message = Column(String)
   offset = Column(Integer)
@@ -60,3 +60,8 @@ def get_interaction_message_count(db: Session, interaction_id: UUID):
   return db.query(MessageModel) \
     .filter(MessageModel.interaction_id == interaction_id) \
     .count()
+
+def delete_interaction_messages(db: Session, interaction_id: UUID):
+  return db.query(MessageModel) \
+    .filter(MessageModel.interaction_id == interaction_id) \
+    .delete()

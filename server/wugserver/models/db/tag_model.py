@@ -1,7 +1,7 @@
 import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Column, DateTime, Index, Integer, String, Uuid
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, relationship, Session
 
 from wugserver.database import Base
@@ -13,7 +13,7 @@ class TagModel(Base):
   __tablename__ = "tags"
 
   id = Column(Uuid, primary_key=True)
-  creator_user_id = Column(Integer, index=True)
+  creator_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
   name = Column(String)
   color = Column(String(7))
   interactions: Mapped[list['wugserver.models.db.interaction_model.InteractionModel']] = relationship(

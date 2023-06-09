@@ -1,6 +1,6 @@
 import datetime
 from wugserver.database import Base
-from sqlalchemy import Boolean, Column, DateTime, Index, Integer, String, Uuid
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, relationship, Session
 from uuid import UUID, uuid4
@@ -12,7 +12,7 @@ class InteractionModel(Base):
   __tablename__ = "interactions"
 
   id = Column(Uuid, primary_key=True)
-  creator_user_id = Column(Integer, index=True)
+  creator_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
   title = Column(String)
   tags: Mapped[list[TagModel]] = relationship(
     secondary=interaction_tag_association_table,
@@ -91,3 +91,9 @@ def update_interaction(db: Session, interaction_id: UUID, interaction_update_par
       interaction.deleted = interaction_update_params.deleted
     return set_interaction_update_time_and_commit(db, interaction.id)
   return None
+
+def delete_interaction(db: Session, interaction_id: UUID):
+  to_delete = db.query(InteractionModel).filter(InteractionModel.id == interaction_id).delete()
+  db.flush()
+  db.commit()
+  return to_delete
