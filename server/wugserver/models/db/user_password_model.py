@@ -1,6 +1,6 @@
 
 from requests import Session
-from sqlalchemy import Column, Integer, String, Uuid
+from sqlalchemy import Column, ForeignKey, Integer, String, Uuid
 from wugserver.database import Base
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserPasswordModel(Base):
     __tablename__ = "user_password"
 
-    user_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     hashed_password = Column(String, nullable=False)
 
 def create_user_password(db: Session, user_id: Uuid, password: str):

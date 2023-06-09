@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Session
 from wugserver.database import Base
 from wugserver.models.db.user_password_model import create_user_password
@@ -9,7 +9,7 @@ from wugserver.schema.user import *
 class ApiKeyModel(Base):
   __tablename__ = "apikeys"
 
-  owner_user_id = Column(Integer, primary_key=True)
+  owner_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
   provider = Column(String, primary_key=True)
   api_key = Column(String)
   created = Column(DateTime, server_default=func.now())
