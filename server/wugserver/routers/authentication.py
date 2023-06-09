@@ -36,3 +36,11 @@ def email_verification(token: str, db: Session = Depends(get_db)):
     user.is_active = True
     db.commit()
     db.refresh(user)
+
+@router.get("/verification/token/{token}")
+def email_verification(token: str, db: Session = Depends(get_db)):
+  user = get_user_from_token(db, token)
+  if not user.is_active:
+    user.is_active = True
+    db.commit()
+    db.refresh(user)

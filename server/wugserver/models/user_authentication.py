@@ -8,6 +8,7 @@ from wugserver.dependencies import get_db
 
 from wugserver.models.db.user_model import UserModel, create_db_user, get_user_by_email
 from wugserver.models.db.user_password_model import verify_user_password
+from wugserver.models.external.sendgrid import send_verification_email
 from wugserver.schema.user import UserCreate
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -16,7 +17,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 def authenticate_user(db: Session, email: str, password: str):
-  print(email)
   user = get_user_by_email(db, email)
   if not user:
     return False
@@ -72,8 +72,8 @@ async def get_current_active_user(
     raise HTTPException(status_code=400, detail="Inactive user")
   return current_user
 
-def register_user(db: Session, user: UserCreate):
+def register_user(db: Session, user: UserCreate, requestDomain: str):
   db_user = create_db_user(db, user)
   token = create_access_token(data={"auth": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-  print(f"https://localhost:5000/api/verification?token={token}")
+  send_verification_email(user.email, token, requestDomain)
   return db_user
