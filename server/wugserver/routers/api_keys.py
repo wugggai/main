@@ -26,12 +26,12 @@ def update_api_key_route(user_id: int, provider: Provider, api_key_create: ApiKe
   return update_api_key_record(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider, api_key_create=api_key_create)
 
 @router.get("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
-def get_api_key_route(user_id: int, provider: Provider, db: Session = Depends(get_db)):
-    existing_key = get_user_api_key_for_provider(db, user_id, provider)
+def get_api_key_route(user_id: int, provider: Provider, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
+    existing_key = get_user_api_key_for_provider(db=db, current_user_id=current_user.id, user_id=user_id, provider=provider)
     if not existing_key:
         raise HTTPException(status_code=404, detail="API Key doesn't exist")
     return existing_key
 
 @router.get("/users/{user_id}/apikey", response_model=list[ApiKeyBase])
-def get_api_key_route(user_id: int, db: Session = Depends(get_db)):
-    return get_all_user_api_keys(db, user_id)
+def get_all_api_key_route(user_id: int, db: Session = Depends(get_db)):
+    return get_all_user_api_keys(db=db, user_id=user_id)
