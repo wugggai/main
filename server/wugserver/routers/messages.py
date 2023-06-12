@@ -26,7 +26,7 @@ def create_message_route(interaction_id: UUID, message_create_params: MessageCre
 
 @router.get("/interactions/{interaction_id}/messages", response_model=list[Message])
 def get_messages_route(interaction_id: UUID, offset: int = 0, limit: int = 15, from_latest: bool = True, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
-    interaction = get_interaction_by_id(db=db, current_user_id=current_user.id, interaction_id=interaction_id)
+    interaction = get_interaction_by_id(db=db, current_user_id=current_user.id, interaction_id=interaction_id, include_deleted=True)
     if interaction is None:
         raise HTTPException(status_code=404, detail="Interaction doesn't exist.")
-    return get_interaction_messages(db=db, current_user_id=current_user.id, interaction=interaction, offset=offset, limit=limit, from_latest=from_latest)
+    return get_interaction_messages(db=db, interaction=interaction, offset=offset, limit=limit, from_latest=from_latest)

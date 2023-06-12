@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from typing import Annotated, Union
-from fastapi import Depends, HTTPException, status 
+from fastapi import Cookie, Depends, HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
@@ -43,6 +43,8 @@ def get_user_from_token(
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"},
   )
+  if not token:
+    raise credentials_exception
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     email = payload.get("auth")
@@ -55,8 +57,16 @@ def get_user_from_token(
     raise credentials_exception
   return user
 
+def get_user_from_cookie(
+  db: Session = Depends(get_db),
+  access_token: str = Cookie(None),
+  ):
+  if access_token is not None:
+    return get_user_from_token(db=db, token=access_token)
+  return get_user_from_token(db=db)
+
 async def get_current_active_user(
-  current_user: UserModel = Depends(get_user_from_token)
+  current_user: UserModel = Depends(get_user_from_cookie)
 ):
   if not current_user.is_active:
     raise HTTPException(status_code=400, detail="Inactive user")
