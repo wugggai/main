@@ -15,7 +15,7 @@ class UserModel(Base):
 
 def create_db_user(db: Session, user: UserCreate):
   # TODO: is_active needs to be false, but until email verification is in place, we're setting it to true
-  db_user = UserModel(email=user.email, is_active=True)
+  db_user = UserModel(email=user.email, is_active=False)
   db.add(db_user)
   db.commit()
   db.refresh(db_user)

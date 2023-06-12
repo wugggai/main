@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from wugserver.dependencies import get_db
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.schema.user import *
@@ -9,11 +9,11 @@ from wugserver.models.db.user_model import *
 router = APIRouter()
 
 @router.post("/users", response_model=User)
-def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
+def create_user_route(user: UserCreate, request: Request, db: Session = Depends(get_db)):
   db_user = get_user_by_email(db, email=user.email)
   if db_user:
     raise HTTPException(status_code=409, detail="Email already registered")
-  return register_user(db=db, user=user)
+  return register_user(db=db, user=user, requestDomain=str(request.base_url))
 
 # Let's consider the purpose of this function beyond testing,
 #   and build authorization rules properly before exposing such endpoint
