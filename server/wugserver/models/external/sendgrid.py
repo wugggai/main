@@ -4,6 +4,8 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 
 sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
 
+# sends verification email
+# return: sendgrid API response
 def send_verification_email(email: str, token: str, requestDomain: str):
   verification_path = requestDomain + "api/verification/token/" + token
   from_email = Email("tommywei110@gmail.com")
@@ -15,5 +17,4 @@ def send_verification_email(email: str, token: str, requestDomain: str):
 
   mail_json = mail.get()
 
-  result = sg.client.mail.send.post(request_body=mail_json)
-  print("email sent with status" + result.status_code)
+  return sg.client.mail.send.post(request_body=mail_json)

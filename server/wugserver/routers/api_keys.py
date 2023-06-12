@@ -5,6 +5,7 @@ from wugserver.schema.api_key import ApiKeyBase, ApiKeyCreate
 from wugserver.schema.user import *
 from sqlalchemy.orm import Session
 from wugserver.models.db.user_model import *
+from wugserver.models.user_authentication import get_current_active_user
 from wugserver.types.providers import Provider
 
 router = APIRouter()
