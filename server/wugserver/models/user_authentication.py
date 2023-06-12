@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from typing import Annotated, Union
-from fastapi import Depends, HTTPException, status 
+from fastapi import Cookie, Depends, HTTPException, status
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
@@ -12,7 +12,7 @@ from wugserver.schema.user import UserCreate
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 def authenticate_user(db: Session, email: str, password: str):
@@ -43,6 +43,8 @@ def get_user_from_token(
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": "Bearer"},
   )
+  if not token:
+    raise credentials_exception
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     email = payload.get("auth")
@@ -55,8 +57,16 @@ def get_user_from_token(
     raise credentials_exception
   return user
 
+def get_user_from_cookie(
+  db: Session = Depends(get_db),
+  access_token: str = Cookie(None),
+  ):
+  if access_token is not None:
+    return get_user_from_token(db=db, token=access_token)
+  return get_user_from_token(db=db)
+
 async def get_current_active_user(
-  current_user: UserModel = Depends(get_user_from_token)
+  current_user: UserModel = Depends(get_user_from_cookie)
 ):
   if not current_user.is_active:
     raise HTTPException(status_code=400, detail="Inactive user")

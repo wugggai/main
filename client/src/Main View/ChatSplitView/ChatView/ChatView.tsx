@@ -105,7 +105,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             })
             const userInput = this.state.inputValue
             this.setState({ inputValue: '', isWaitingForResponse: true })
-            axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages/`, {
+            axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
                 message: userInput,
                 model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
@@ -132,7 +132,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             alert("Not logged in")
             return
         }
-        axios.post(API_BASE + `/users/${userId}/interactions/`, {
+        axios.post(API_BASE + `/users/${userId}/interactions`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
             initial_message: withMessage ? {
                 message: this.state.inputValue,
