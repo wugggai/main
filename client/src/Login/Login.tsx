@@ -79,6 +79,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     }
 
     render() { 
+        const enableButton = this.state.username && this.state.password && this.state.password == this.state.confirmPassword
         const loginScreen = <div className='login-fields'>
             <h3>Login</h3>
             <fieldset>
@@ -93,7 +94,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                     <a href='#' id="forgot-password">Forgot Password</a>
                 </div>
             </fieldset>
-            <button className='login-button' onClick={this.login}>Log In</button>
+            <button className='login-button generic-button' onClick={this.login}>Log In</button>
             <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({ isSignUp: true })}>Sign Up</a></div>
         </div>
 
@@ -114,7 +115,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                 <div className='terms'>
                     By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
                 </div>
-                <button className='login-button' onClick={this.signUp}>Sign Up</button>
+                <button className='login-button generic-button' disabled={!enableButton} onClick={this.signUp}>Sign Up</button>
                 <div style={{textAlign: 'center'}} className='signup-message'>
                     Or<a href='#' onClick={() => this.setState({ isSignUp: false })}>Return to Login</a>
                 </div>

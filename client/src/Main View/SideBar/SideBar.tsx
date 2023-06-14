@@ -38,7 +38,6 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
 
     addTag() {
         this.setState({ isAddingTag: true })
-        let tagID = uuid.v4()
         const userId = getUserId()
         axios.post(API_BASE + `/users/${userId}/tags`, {
             name: this.state.newTagName,
@@ -75,7 +74,7 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
             </div>
         }
 
-        const topTabs = ["Chats", "Favorites", "Trash"]
+        const topTabs = ["Chats", "Trash"]
         const bottomTabs = ["Settings", "Discord"]
         return <div className='sidebar' onClick={() => this.setState({ newTagPopoverAnchor: undefined })}>
             <div style={{height: '50px'}} />
@@ -95,9 +94,13 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
                 <img src="/assets/plus.png" id="add-tag-button" onClick={(e) => {
                     e.stopPropagation()
                     const target = e.target as HTMLImageElement
+                    console.log(e)
                     // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })
                     if (this.state.newTagPopoverAnchor === undefined)
-                        this.setState({ newTagPopoverAnchor: target })
+                        this.setState({ newTagPopoverAnchor: {
+                            x: e.pageX,
+                            y: e.pageY
+                        } })
                     else
                         this.setState({ newTagPopoverAnchor: undefined })
                 }}/>

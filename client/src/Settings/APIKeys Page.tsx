@@ -2,7 +2,7 @@ import React from 'react'
 import './AccountPage.css'
 import { Loading } from '../UI Components/Loading';
 import axios from 'axios'
-import { API_BASE, getUserId } from '../Constants';
+import { API_BASE, SERVER, getUserId } from '../Constants';
 
 interface APIKeysPageProps {
     
@@ -50,7 +50,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         }
 
         this.setState({ isUpdatingAPIKey: true })
-        axios.post(API_BASE + `/users/${userId}/apikey/providers/openai`, {
+        SERVER.post(`/users/${userId}/apikey/providers/openai`, {
             api_key: this.state.openaiAPIKey
         }).then(response => {
             this.setState({ isUpdatingAPIKey: undefined })

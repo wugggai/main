@@ -2,7 +2,10 @@ import axios from 'axios'
 import Cookies from 'react-cookies'
 
 export const API_BASE = "/api"
-export const SERVER = axios.create({ baseURL: API_BASE })
+export const SERVER = axios.create({
+  baseURL: API_BASE,
+  headers: { Authorization: `Bearer ${Cookies.load('access_token')}` }
+})
 
 export const SYNTAX_THEME = {
     "code[class*=\"language-\"]": {

@@ -53,7 +53,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             })
         }).catch(err => {
             if (err.response?.status === 401) {
-                this.setState({ showLoginScreen: true })
+                this.setState({ showLoginScreen: true, tagList: [] })
             }
         })
     }
@@ -67,10 +67,10 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         case 0:
             contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} />
             break
-        case 2:
+        case 1:
             contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} />
             break
-        case 3:
+        case 2:
             contentView = <Settings />
             break
         default:

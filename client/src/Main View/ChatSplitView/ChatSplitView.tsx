@@ -5,7 +5,7 @@ import ChatPreview from './ChatPreview/ChatPreview';
 import { Loading } from '../../UI Components/Loading';
 import ChatView from './ChatView/ChatView';
 import axios from 'axios';
-import { API_BASE, getUserId } from '../../Constants';
+import { API_BASE, SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
 
 interface ChatViewProps {
@@ -37,7 +37,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         if (userId === undefined) {
             return
         }
-        axios.get(API_BASE + `/users/${userId}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
+        SERVER.get(`/users/${userId}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
             this.setState({
                 chatHistoryMetadata: response.data
             })
@@ -71,17 +71,23 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     moveInteractionToTrash() {
-        if (this.state.deletingChat === undefined) {
+        if (this.state.deletingChat === undefined || this.state.selectedIndex === undefined) {
             return
         }
+
+        const index = this.state.selectedIndex
 
         // TODO
         if (this.props.isTrash) {
-            console.log("Permanently delete")
-            return
+            SERVER.delete(`/interactions/${this.state.deletingChat.interaction.id}`).then(response => {
+                if (response.status === 200) {
+                    this.state.chatHistoryMetadata!.splice(index, 1)
+                    this.setState({ selectedIndex: undefined, deletingChat: undefined })
+                }
+            })
         }
 
-        axios.put(API_BASE + `/interactions/${this.state.deletingChat.interaction.id}`, {
+        SERVER.put(`/interactions/${this.state.deletingChat.interaction.id}`, {
             deleted: true
         }).then(response => {
             if (this.state.selectedIndex !== undefined) {

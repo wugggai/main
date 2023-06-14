@@ -5,10 +5,11 @@ import SplitView from 'react-split'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
 import axios from 'axios';
-import { API_BASE, getUserId } from '../../../Constants';
+import { API_BASE, SERVER, getUserId } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
+import { TwitterPicker } from 'react-color';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -25,13 +26,16 @@ interface ChatViewState {
     inputValue: string
     isWaitingForResponse: boolean
     addTagButtonPosition?: { x: number, y: number }
+    newTagName?: string // Undefined means this menu is not showing
+    newTagColor: string
+    isAddingTag: boolean
     isUpdatingModel: boolean
 }
  
 class ChatView extends React.Component<ChatViewProps, ChatViewState> {
     chatSplitSizes = [70, 30]
     isInitialRender = true
-    tagMap: Record<string, Tag> = {}
+    tagMap: Record<string, Tag> = {} // Maps tag ids to Tag objects
 
     constructor(props: ChatViewProps) {
         super(props);
@@ -39,6 +43,8 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             inputValue: '',
             isWaitingForResponse: false,
             isUpdatingModel: false,
+            isAddingTag: false,
+            newTagColor: '#ffffff'
         };
         this.createInteraction = this.createInteraction.bind(this);
         if (this.props.isNewInteraction) {
@@ -53,6 +59,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.saveMetadata = this.saveMetadata.bind(this);
         this.loadHistory = this.loadHistory.bind(this);
         this.recalculateInputHeight = this.recalculateInputHeight.bind(this);
+        this.addNewTag = this.addNewTag.bind(this);
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -65,7 +72,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 const chatInput = document.querySelector("#chat-input") as HTMLDivElement
                 chatInput.style.height = "50px"
                 const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-                dialogView.style.paddingBottom = "80px"
+                dialogView.style.paddingBottom = "85px"
             }
         }
     }
@@ -76,7 +83,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
     loadHistory() {
         if (!this.props.isNewInteraction) {
-            axios.get(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages?from_latest=false`).then(response => {
+            SERVER.get(`/interactions/${this.props.chatMetadata.interaction.id}/messages?from_latest=false`).then(response => {
                 this.setState({ chatHistory: { messages: response.data } })
                 setTimeout(() => {
                     const input = document.querySelector('#chat-input') as HTMLTextAreaElement | undefined
@@ -105,7 +112,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             })
             const userInput = this.state.inputValue
             this.setState({ inputValue: '', isWaitingForResponse: true })
-            axios.post(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
+            SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
                 message: userInput,
                 model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
@@ -132,7 +139,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             alert("Not logged in")
             return
         }
-        axios.post(API_BASE + `/users/${userId}/interactions`, {
+        SERVER.post(API_BASE + `/users/${userId}/interactions`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
             initial_message: withMessage ? {
                 message: this.state.inputValue,
@@ -191,7 +198,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
     saveMetadata() {
         if (this.props.chatMetadata.interaction.id) {
-            axios.put(API_BASE + `/interactions/${this.props.chatMetadata.interaction.id}`, {
+            SERVER.put(`/interactions/${this.props.chatMetadata.interaction.id}`, {
                 title: this.props.chatMetadata.interaction.title,
                 tag_ids: this.props.chatMetadata.interaction.tag_ids
             }).then(response => {
@@ -217,7 +224,31 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         box.style.height = Math.min(500, newHeight) + "px"
         box.style.overflow = newHeight < 500 ? 'hidden' : 'scroll'
         const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-        dialogView.style.paddingBottom = Math.min(500, newHeight) + 30 + "px"
+        dialogView.style.paddingBottom = Math.min(500, newHeight) + 35 + "px"
+    }
+
+    addNewTag() {
+        if (this.props.availableTags.findIndex(v => v.name === this.state.newTagName) !== -1) {
+            alert(`Tag with name ${this.state.newTagName} is already defined.`)
+            return
+        }
+
+        this.setState({ isAddingTag: true })
+        const userId = getUserId()
+        SERVER.post(`/users/${userId}/tags`, {
+            name: this.state.newTagName,
+            color: this.state.newTagColor!
+        }).then(response => {
+            let newTag = response.data as Tag
+            this.tagMap[newTag.id] = newTag
+            this.props.availableTags.push(newTag)
+            this.addTag(newTag)
+            this.setState({
+                newTagName: undefined,
+                newTagColor: '#ffffff',
+                addTagButtonPosition: undefined
+            })
+        })
     }
 
     render() {
@@ -242,6 +273,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         </div>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {
+            if (this.tagMap[tagId] === undefined) {
+                console.log("WARNING:", tagId)
+            }
             return <div className='inline-tag-item' key={i}>
                 {this.tagMap[tagId].name}
                 <img src='/assets/cross.svg' width={8} onClick={() => this.removeTag(i)} />
@@ -253,9 +287,29 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             left: this.state.addTagButtonPosition?.x,
             top: (this.state.addTagButtonPosition?.y ?? 0) + 28
         }}>
-            {this.props.availableTags.map((value, i) => <div key={i} onClick={() => this.addTag(value)}>
-                {value.name}
-            </div>)}
+            {
+            this.state.newTagName === undefined ? 
+                [this.props.availableTags.map((value, i) => {
+                    return this.props.chatMetadata.interaction.tag_ids.indexOf(value.id) === -1 ? <div key={i} onClick={() => this.addTag(value)} className='tag-item'>
+                        {value.name}
+                    </div> : <Fragment />
+                }),
+                <div key={-1} className='tag-item' onClick={(e) => {
+                    this.setState({ newTagName: '' })
+                    e.stopPropagation()
+            }}>Add New Tag...</div>]
+            :
+            <div className='add-new-tag' onClick={e => e.stopPropagation()}>
+                <input type="text" placeholder='New Tag Name' className='textfield new-tag-textfield' value={this.state.newTagName} onChange={(e) => this.setState({ newTagName: e.target.value })} />
+                <TwitterPicker triangle='hide' className='tag-color-picker' color={this.state.newTagColor || 'fff'} onChange={(c) => this.setState({ newTagColor: c.hex })} styles={{default: {
+                    body: {
+                        padding: '8px',
+                        paddingLeft: '12px'
+                    },
+                }}}/>
+                <button className='generic-button' disabled={!this.state.newTagName || this.state.isAddingTag} onClick={this.addNewTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
+            </div>
+            }
         </div>
 
         const chooseModelMenu = <div className='dropdown-models'>
@@ -266,7 +320,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             })}
         </div>
 
-        return <div className='chat-view' onClick={() => this.setState({ addTagButtonPosition: undefined })}>
+        return <div className='chat-view' onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })}>
             <div className='heading'>
                 <div className='title'>
                     { this.state.editedTitle !== undefined ?
