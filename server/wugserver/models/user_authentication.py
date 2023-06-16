@@ -81,4 +81,4 @@ def register_user(db: Session, user: UserCreate, requestDomain: str):
     return db_user
 
   res_json = json.loads(res.body)
-  raise HTTPException(status_code=500, detail=f"Could not send verification email to {email}: {res_json['errors']}")
+  raise HTTPException(status_code=503, detail=f"Could not send verification email to {email}: {res_json['errors']}")

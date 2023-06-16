@@ -20,7 +20,8 @@ class MessageModel(Base):
 
 Index("offset_composite_index", MessageModel.interaction_id, MessageModel.offset)
 
-def create_message(db: Session, interaction: InteractionModel, source: str, message: str, offset: Integer):
+def create_message(db: Session, interaction: InteractionModel, source: str, message: str):
+  offset = get_interaction_message_count(db=db, interaction=interaction)
   message = MessageModel(
     id=uuid4(),
     interaction_id=interaction.id,
@@ -34,7 +35,7 @@ def create_message(db: Session, interaction: InteractionModel, source: str, mess
   db.refresh(message)
   return message
 
-def get_interaction_messages(db: Session, interaction: InteractionModel, offset:int, limit: int, from_latest: bool = True):
+def get_interaction_messages(db: Session, interaction: InteractionModel, offset: int, limit: int, from_latest: bool = True):
   query = None
   if from_latest:
     query = db.query(MessageModel) \
@@ -53,14 +54,14 @@ def get_interaction_last_message(db: Session, interaction: InteractionModel):
   return last_message_in_list[0] if last_message_in_list else None
 
 def get_interaction_all_messages(db: Session, interaction: InteractionModel):
-  return get_interaction_messages(db, interaction.id, 0, 100000, False)
+  return get_interaction_messages(db, interaction, 0, 100000, False)
 
 def get_interaction_message_count(db: Session, interaction: InteractionModel):
   return db.query(MessageModel) \
     .filter(MessageModel.interaction_id == interaction.id) \
     .count()
 
-def delete_interaction_messages(db: Session, interaction_id: UUID):
+def delete_interaction_messages(db: Session, interaction: InteractionModel):
   return db.query(MessageModel) \
-    .filter(MessageModel.interaction_id == interaction_id) \
+    .filter(MessageModel.interaction_id == interaction.id) \
     .delete()
