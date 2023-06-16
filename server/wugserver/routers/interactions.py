@@ -65,6 +65,4 @@ def update_interaction_route(interaction_id: UUID, interaction_update_params: In
 @router.delete("/interactions/{interaction_id}", status_code=200)
 def delete_interaction_route(interaction_id: UUID, db: Session = Depends(get_db)):
   interaction = authorized_get_interaction(db=db, current_user_id=current_user.id, interaction_id=interaction_id)
-  affected = delete_interaction(db=db, interaction=interaction)
-  if affected == 0:
-    raise HTTPException(status_code=404, detail="interaction not found")
+  delete_interaction(db=db, interaction=interaction)
