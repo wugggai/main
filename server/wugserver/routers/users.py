@@ -1,29 +1,35 @@
-from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request
 from wugserver.dependencies import get_db
 from wugserver.models.user_authentication import get_current_active_user, register_user
-from wugserver.schema.user import *
+from wugserver.models.user_model import UserModel
+from wugserver.models.user_password_model import UserPasswordModel
+from wugserver.schema.user import User, UserCreate
 from sqlalchemy.orm import Session
-from wugserver.models.db.user_model import *
+from wugserver.models.db.user_db_model import UserRecord
 
 router = APIRouter()
 
-@router.post("/users", response_model=User)
-def create_user_route(user: UserCreate, request: Request, db: Session = Depends(get_db)):
-  db_user = get_user_by_email(db, email=user.email)
-  if db_user:
-    raise HTTPException(status_code=409, detail="Email already registered")
-  return register_user(db=db, user=user, requestDomain=str(request.base_url))
 
-# Let's consider the purpose of this function beyond testing,
-#   and build authorization rules properly before exposing such endpoint
-@router.get("/users", response_model=list[User])
-def read_users_route(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = get_users(db, skip=skip, limit=limit)
-    return users
+@router.post("/users", response_model=User)
+def create_user_route(
+    user: UserCreate,
+    db: Session = Depends(get_db),
+    user_password_model: UserPasswordModel = Depends(UserPasswordModel),
+    user_model: UserModel = Depends(UserModel),
+):
+    db_user = user_model.get_user_by_email(email=user.email)
+    if db_user:
+        raise HTTPException(status_code=409, detail="Email already registered")
+    return register_user(
+        db=db,
+        user=user,
+        user_password_model=user_password_model,
+        user_model=user_model,
+    )
+
 
 @router.get("/users/me", response_model=User)
-async def read_users_me(
-  current_user: UserModel = Depends(get_current_active_user),
+def read_users_me(
+    current_user: UserRecord = Depends(get_current_active_user),
 ):
-  return current_user
+    return current_user

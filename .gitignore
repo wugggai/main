@@ -3,3 +3,4 @@
 .env
 server/wugserver/build
 server/wugserver/static
+.vscode

@@ -1,99 +1,149 @@
 import datetime
 from wugserver.database import Base
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Uuid,
+)
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, relationship, Session
 from typing import List
 from uuid import UUID, uuid4
-from wugserver.models.db.authorization import authorize_by_res_owner_id, authorize_get_interaction_from_db, \
-  pre_authorization_wrapper_helper
-from wugserver.models.db.interaction_tag_association import interaction_tag_association_table
+from wugserver.models.db.interaction_tag_association import (
+    interaction_tag_association_table,
+)
 from wugserver.models.db.tag_model import TagModel, set_tag_update_time_and_commit
 from wugserver.schema.interaction import InteractionCreate, InteractionUpdate
 
+
 class InteractionModel(Base):
-  __tablename__ = "interactions"
+    __tablename__ = "interactions"
 
-  id = Column(Uuid, primary_key=True)
-  creator_user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
-  title = Column(String)
-  tags: Mapped[list[TagModel]] = relationship(
-    secondary=interaction_tag_association_table,
-    back_populates="interactions",
-  )
-  last_updated = Column(DateTime)
-  deleted = Column(Boolean, default=False)
+    id = Column(Uuid, primary_key=True)
+    creator_user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    title = Column(String)
+    tags: Mapped[list[TagModel]] = relationship(
+        secondary=interaction_tag_association_table,
+        back_populates="interactions",
+    )
+    last_updated = Column(DateTime)
+    deleted = Column(Boolean, default=False)
 
-  @hybrid_property
-  def tag_ids(self):
-    return [tag.id for tag in self.tags]
+    @hybrid_property
+    def tag_ids(self):
+        return [tag.id for tag in self.tags]
 
-Index("last_updated_composite_index", InteractionModel.creator_user_id, InteractionModel.last_updated)
 
-def get_interaction_owner(db: Session, interaction: InteractionModel):
-  return interaction.creator_user_id
+Index(
+    "last_updated_composite_index",
+    InteractionModel.creator_user_id,
+    InteractionModel.last_updated,
+)
 
-def create_interaction(db: Session, creator_user_id: UUID, interaction_create_params: InteractionCreate):
-  interaction = InteractionModel(
-    id=uuid4(),
-    creator_user_id=creator_user_id,
-    title=interaction_create_params.title,
-    last_updated=datetime.datetime.now()
-  )
-  db.add(interaction)
-  db.commit()
-  db.refresh(interaction)
-  return interaction
+
+def get_interaction_owner(interaction: InteractionModel):
+    return interaction.creator_user_id
+
+
+def create_interaction(
+    db: Session, creator_user_id: UUID, interaction_create_params: InteractionCreate
+):
+    interaction = InteractionModel(
+        id=uuid4(),
+        creator_user_id=creator_user_id,
+        title=interaction_create_params.title,
+        last_updated=datetime.datetime.now(),
+    )
+    db.add(interaction)
+    db.commit()
+    db.refresh(interaction)
+    return interaction
+
 
 def set_interaction_update_time_and_commit(db: Session, interaction: InteractionModel):
-  interaction.last_updated=datetime.datetime.now()
-  db.commit()
-  db.refresh(interaction)
-  return interaction
+    interaction.last_updated = datetime.datetime.utcnow()
+    db.commit()
+    db.refresh(interaction)
+    return interaction
 
-def get_interaction_by_id(db: Session, interaction_id: UUID, include_deleted: bool = False) -> InteractionModel | None:
-  filters = [InteractionModel.id == interaction_id]
-  if not include_deleted:
-    filters.append(InteractionModel.deleted == False)
 
-  return db.query(InteractionModel) \
-    .filter(*filters) \
-    .one_or_none()
+def get_interaction_by_id(
+    db: Session, interaction_id: UUID, include_deleted: bool = False
+) -> InteractionModel | None:
+    filters = [InteractionModel.id == interaction_id]
+    if not include_deleted:
+        filters.append(InteractionModel.deleted == False)
 
-def get_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int, include_deleted: bool = False):
-  filters = [InteractionModel.creator_user_id == creator_user_id]
-  if not include_deleted:
-    filters.append(InteractionModel.deleted == False)
 
-  return db.query(InteractionModel) \
-    .filter(*filters) \
-    .order_by(InteractionModel.last_updated.desc()) \
-    .limit(limit) \
-    .offset(offset) \
-    .all()
+def get_interactions_by_creator_user_id(
+    db: Session,
+    creator_user_id: int,
+    limit: int,
+    offset: int,
+    include_deleted: bool = False,
+):
+    filters = [InteractionModel.creator_user_id == creator_user_id]
+    if not include_deleted:
+        filters.append(InteractionModel.deleted == False)
 
-def get_deleted_interactions_by_creator_user_id(db: Session, creator_user_id: int, limit: int, offset: int):
-  filters = [InteractionModel.creator_user_id == creator_user_id, InteractionModel.deleted == True]
-  return db.query(InteractionModel) \
-    .filter(*filters) \
-    .order_by(InteractionModel.last_updated.desc()) \
-    .limit(limit) \
-    .offset(offset) \
-    .all()
+    return (
+        db.query(InteractionModel)
+        .filter(*filters)
+        .order_by(InteractionModel.last_updated.desc())
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
 
-def update_interaction(db: Session, interaction: InteractionModel, tags: List[TagModel] | None, title: str | None, deleted: bool | None):
-  if tags is not None:
-    interaction.tags = tags
-    for tag in tags:
-      set_tag_update_time_and_commit(db=db, tag=tag)
-  if title is not None:
-    interaction.title = title
-  if deleted is not None:
-    interaction.deleted = deleted
-  return set_interaction_update_time_and_commit(db, interaction)
+
+def get_deleted_interactions_by_creator_user_id(
+    db: Session, creator_user_id: int, limit: int, offset: int
+):
+    filters = [
+        InteractionModel.creator_user_id == creator_user_id,
+        InteractionModel.deleted == True,
+    ]
+    return (
+        db.query(InteractionModel)
+        .filter(*filters)
+        .order_by(InteractionModel.last_updated.desc())
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+
+
+def update_interaction(
+    db: Session,
+    interaction: InteractionModel,
+    tags: List[TagModel] | None,
+    title: str | None,
+    deleted: bool | None,
+):
+    if tags is not None:
+        interaction.tags = tags
+        for tag in tags:
+            set_tag_update_time_and_commit(db=db, tag=tag)
+    if title is not None:
+        interaction.title = title
+    if deleted is not None:
+        interaction.deleted = deleted
+    return set_interaction_update_time_and_commit(db, interaction)
+
 
 def delete_interaction(db: Session, interaction_id: UUID):
-  to_delete = db.query(InteractionModel).filter(InteractionModel.id == interaction_id).delete()
-  db.flush()
-  db.commit()
-  return to_delete
+    to_delete = (
+        db.query(InteractionModel)
+        .filter(InteractionModel.id == interaction_id)
+        .delete()
+    )
+    db.flush()
+    db.commit()
+    return to_delete
