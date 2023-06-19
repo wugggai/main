@@ -26,7 +26,9 @@ class TagModel(Base):
 
 Index("last_use_composite_index", TagModel.creator_user_id, TagModel.last_use)
 
-@authorize_by_res_owner_id
+def get_tag_owner(db: Session, tag: TagModel):
+  return tag.creator_user_id
+
 def create_tag(db: Session, user_id: int, tag_create_params: TagCreate):
   # Enforce 0 constraint on db level
   # As a result, one user may reuse same name/color for multiple tags
@@ -42,37 +44,28 @@ def create_tag(db: Session, user_id: int, tag_create_params: TagCreate):
   db.refresh(tag)
   return tag
 
-@authorize_by_res_owner_id
 def get_tags_by_user_id(db: Session, user_id: int):
   return db.query(TagModel) \
     .filter(TagModel.creator_user_id == user_id) \
     .order_by(TagModel.last_use.desc()) \
     .all()
 
-@authorize_get_tag_from_db
 def get_tag_by_id(db: Session, tag_id: UUID):
   return db.query(TagModel) \
     .filter(TagModel.id == tag_id) \
-    .one()
+    .one_or_none()
 
-@authorize_get_tags_from_db
-def get_tags_by_ids(db: Session, tag_ids: List[UUID]):
-  return db.query(TagModel) \
-    .filter(TagModel.id.in_(tag_ids)) \
-    .all()
-
-def update_tag(db: Session, current_user_id: int, tag_id: UUID, tag_update_params: TagCreate):
-  tag = get_tag_by_id(db=db, current_user_id=current_user_id, tag_id=tag_id)
-  tag.name = tag_update_params.name
-  tag.color = tag_update_params.color
+def set_tag_update_time_and_commit(db: Session, tag: TagModel):
   tag.last_use = datetime.datetime.now()
   db.commit()
   db.refresh(tag)
   return tag
 
-def delete_tag(db: Session, current_user_id: int, tag_id: UUID):
-  # must use an authorized helper func
-  tag = get_tag_by_id(db=db, current_user_id=current_user_id, tag_id=tag_id)
-  if tag:
-    db.delete(tag)
-    db.commit()
+def update_tag(db: Session, tag: TagModel, tag_update_params: TagCreate):
+  tag.name = tag_update_params.name
+  tag.color = tag_update_params.color
+  return set_tag_update_time_and_commit(db=db, tag=tag)
+
+def delete_tag(db: Session, tag: TagModel):
+  db.delete(tag)
+  db.commit()
