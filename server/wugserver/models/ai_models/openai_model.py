@@ -11,7 +11,7 @@ from wugserver.models.db.api_key_model import ApiKeyModel, get_user_api_key_for_
 from wugserver.models.db.interaction_model import InteractionModel
 from wugserver.models.db.message_model import get_interaction_all_messages, MessageModel
 from wugserver.schema.message import Message, MessageCreate
-from wugserver.types.providers import Provider
+from wugserver.constants import Provider
 
 class OpenAIModels(AIModel):
 

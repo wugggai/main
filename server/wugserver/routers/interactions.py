@@ -63,6 +63,6 @@ def update_interaction_route(interaction_id: UUID, interaction_update_params: In
     title=interaction_update_params.title, deleted=interaction_update_params.deleted)
 
 @router.delete("/interactions/{interaction_id}", status_code=200)
-def delete_interaction_route(interaction_id: UUID, db: Session = Depends(get_db)):
+def delete_interaction_route(interaction_id: UUID, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_active_user)):
   interaction = authorized_get_interaction(db=db, current_user_id=current_user.id, interaction_id=interaction_id)
   delete_interaction(db=db, interaction=interaction)

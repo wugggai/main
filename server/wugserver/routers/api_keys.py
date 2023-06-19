@@ -7,7 +7,7 @@ from wugserver.models.user_authentication import get_current_active_user
 from wugserver.routers.authorization import authorize_by_matching_user_id
 from wugserver.schema.api_key import ApiKeyBase, ApiKeyCreate
 from wugserver.schema.user import *
-from wugserver.types.providers import Provider
+from wugserver.constants import Provider
 
 router = APIRouter()
 

@@ -5,7 +5,7 @@ from uuid import UUID
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.message_model import MessageModel
 from wugserver.schema.message import MessageCreate
-from wugserver.types.providers import Provider
+from wugserver.constants import Provider
 
 """
 A dummy model which accepts a single user message in text and repeats it

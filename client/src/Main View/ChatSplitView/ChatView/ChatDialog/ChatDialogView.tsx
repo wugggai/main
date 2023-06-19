@@ -48,8 +48,13 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                     </div>
                 </div>)
             }
+            // TODO: get the image with an API call once backend store's the user's profile pic
+            var iconAssetName = msg.source
+            if (iconAssetName.startsWith("user")) {
+                iconAssetName = "user"
+            }
             dialogCells.push(<div className='history-item' style={{ display: 'flex' }} key={i}>
-                <img src={`/assets/${msg.source}.png`} width={40} className='avatar' />
+                <img src={`/assets/${iconAssetName}.png`} width={40} className='avatar' />
                 <div className='message'>
                     <MarkdownTextView rawText={msg.message}/>
                 </div>
