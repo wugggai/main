@@ -126,8 +126,9 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             <SplitView className='split' minSize={[280, 400]} maxSize={[450, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes }>
                 <ChatPreview
                     chatHistoryMetadata={this.state.chatHistoryMetadata}
+                    newChatMetadata={this.state.newInteractionMetadata}
                     selectionChanged={(i) => this.setState({ selectedIndex: i })}
-                    selectedIndex={this.state.selectedIndex}
+                    selectedIndex={this.state.newInteractionMetadata ? 0 : this.state.selectedIndex}
                     onCreateNewInteraction={this.newInteraction}
                     filterByTags={this.props.selectedTagIds}
                     isTrash={this.props.isTrash}

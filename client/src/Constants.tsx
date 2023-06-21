@@ -7,6 +7,14 @@ export const SERVER = axios.create({
   headers: { Authorization: `Bearer ${Cookies.load('access_token')}` }
 })
 
+SERVER.interceptors.response.use(undefined, (error) => {
+  if (error.response?.status === 401) {
+    Cookies.remove('access_token')
+    Cookies.remove('user_id')
+    window.location.assign('/')
+  }
+})
+
 export const SYNTAX_THEME = {
     "code[class*=\"language-\"]": {
       "color": "black",

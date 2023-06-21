@@ -3,7 +3,7 @@ import './AccountPage.css'
 import { Loading } from '../UI Components/Loading';
 import axios from 'axios';
 import Cookies from 'react-cookies'
-import { API_BASE } from '../Constants';
+import { API_BASE, SERVER } from '../Constants';
 
 interface AccountPageProps {
     
@@ -46,7 +46,14 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     }
 
     changePassword() {
-        alert("Change password")
+        const userId = Cookies.load('user_id')
+        if (userId === undefined) {
+            return
+        }
+        this.setState({ passwordUpdating: true })
+        // SERVER.patch(`/users/${userId}/password`, undefined).then(response => {
+        //     this.setState({ passwordUpdating: undefined })
+        // })
     }
 
     logout() {

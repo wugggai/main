@@ -93,7 +93,13 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             >
                 <SideBar
                     currentTabIndex={this.state.currentTabIndex}
-                    onTabChange={(newTab) => this.setState({ currentTabIndex: newTab })}
+                    onTabChange={(newTab) => {
+                        if (this.state.currentTabIndex != newTab) {
+                            this.setState({ currentTabIndex: newTab })
+                        } else {
+                            this.setState({ selectedTagIds: new Set() })
+                        }
+                    }}
                     onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
                     currentTags={this.state.tagList!}
                     selectedTagIds={this.state.selectedTagIds}

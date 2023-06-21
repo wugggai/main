@@ -5,6 +5,7 @@ import './ChatPreview.css'
 
 interface ChatPreviewProps {
     chatHistoryMetadata: ChatMetadata[]
+    newChatMetadata?: ChatMetadata
     selectionChanged: (index?: number) => void
     selectedIndex?: number
     onCreateNewInteraction: () => void
@@ -26,12 +27,18 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
     }
 
     render() {
-        const rows = this.props.chatHistoryMetadata.map((metadata, i) => {
+        let combinedMetadata: ChatMetadata[] = []
+        if (this.props.newChatMetadata) {
+            combinedMetadata.push(this.props.newChatMetadata)
+        }
+        combinedMetadata.push(...this.props.chatHistoryMetadata)
+        
+        const rows = combinedMetadata.map((metadata, i) => {
             if (this.props.filterByTags.size > 0 && !metadata.interaction.tag_ids.map(tag => this.props.filterByTags.has(tag)).includes(true)) {
                 return undefined
             }
 
-            if (this.state.searchString !== '' && !metadata.interaction.title.includes(this.state.searchString)) {
+            if (this.state.searchString !== '' && !metadata.interaction.title.toLocaleLowerCase().includes(this.state.searchString.toLowerCase())) {
                 return undefined
             }
 
@@ -59,10 +66,10 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
                 </button>
             }
             {
-                this.props.chatHistoryMetadata.length > 0 ?
-                <div style={{position: 'absolute', top: this.props.isTrash ? '100px' : '150px', left: 0, right: 0, maxHeight: this.props.isTrash ? 'calc(100% - 100px)' : 'calc(100% - 150px)', overflow: 'scroll'}}>
+                rows.filter(r => r !== undefined).length > 0 ?
+                (<div style={{position: 'absolute', top: this.props.isTrash ? '100px' : '150px', left: 0, right: 0, maxHeight: this.props.isTrash ? 'calc(100% - 100px)' : 'calc(100% - 150px)', overflowY: 'scroll', overflowX: 'hidden'}}>
                     {rows}
-                </div>
+                </div>)
                 : emptyMessage
             }
         </div>;
