@@ -14,14 +14,16 @@ supported_models_name_to_model_class: dict[str, AIModel] = {}
 supported_models: List[AIModel] = [OpenAIModels(), EchoModel()]
 
 for model_cls in supported_models:
-  supported_models_name_to_model_class.update({
-    name: model_cls for name in model_cls.model_names
-  })
+    supported_models_name_to_model_class.update(
+        {name: model_cls for name in model_cls.model_names}
+    )
+
 
 def get_available_models_by_user_id(user_id: int) -> List[str]:
-  # TODO: fetch list of available models from providers, filter by user accessibility
-  # TODO: expose as API
-  return supported_models_name_to_model_class.keys()
+    # TODO: fetch list of available models from providers, filter by user accessibility
+    # TODO: expose as API
+    return supported_models_name_to_model_class.keys()
+
 
 def get_model_by_name(model_name: str) -> AIModel | None:
     return supported_models_name_to_model_class.get(model_name, None)

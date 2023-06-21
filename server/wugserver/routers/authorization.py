@@ -27,32 +27,46 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from wugserver.models.db.interaction_model import get_interaction_by_id, get_interaction_owner
+from wugserver.models.db.interaction_model import (
+    get_interaction_by_id,
+    get_interaction_owner,
+)
 from wugserver.models.db.tag_model import get_tag_by_id, get_tag_owner
 
 
 def authorize_by_matching_user_id(current_user_id: int, user_id: int):
-  if current_user_id != user_id:
-    raise HTTPException(status_code=403, detail=f'user is not {user_id}')
+    if current_user_id != user_id:
+        raise HTTPException(status_code=403, detail=f"user is not {user_id}")
 
-def authorized_get_interaction(db: Session, current_user_id: int, interaction_id: UUID, include_deleted: bool = True):
-  interaction = get_interaction_by_id(db=db, interaction_id=interaction_id, include_deleted=include_deleted)
-  # 403 is returned instead of 404 if a nonexisting resource is requested
-  # so that an unauthorized user cannot gain information from the call
-  if interaction is None:
-    raise HTTPException(status_code=403, detail=f'user cannot access interaction {interaction_id}')
-  authorize_by_matching_user_id(
-    current_user_id=current_user_id,
-    user_id=get_interaction_owner(db=db, interaction=interaction),
-  )
-  return interaction
+
+def authorized_get_interaction(
+    db: Session,
+    current_user_id: int,
+    interaction_id: UUID,
+    include_deleted: bool = True,
+):
+    interaction = get_interaction_by_id(
+        db=db, interaction_id=interaction_id, include_deleted=include_deleted
+    )
+    # 403 is returned instead of 404 if a nonexisting resource is requested
+    # so that an unauthorized user cannot gain information from the call
+    if interaction is None:
+        raise HTTPException(
+            status_code=403, detail=f"user cannot access interaction {interaction_id}"
+        )
+    authorize_by_matching_user_id(
+        current_user_id=current_user_id,
+        user_id=get_interaction_owner(interaction=interaction),
+    )
+    return interaction
+
 
 def authorized_get_tag(db: Session, current_user_id: int, tag_id: UUID):
-  tag = get_tag_by_id(db=db, tag_id=tag_id)
-  if tag is None:
-    raise HTTPException(status_code=403, detail=f'user cannot access tag {tag_id}')
-  authorize_by_matching_user_id(
-    current_user_id=current_user_id,
-    user_id=get_tag_owner(db=db, tag=tag),
-  )
-  return tag
+    tag = get_tag_by_id(db=db, tag_id=tag_id)
+    if tag is None:
+        raise HTTPException(status_code=403, detail=f"user cannot access tag {tag_id}")
+    authorize_by_matching_user_id(
+        current_user_id=current_user_id,
+        user_id=get_tag_owner(db=db, tag=tag),
+    )
+    return tag
