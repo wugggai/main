@@ -127,7 +127,15 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 <ChatPreview
                     chatHistoryMetadata={this.state.chatHistoryMetadata}
                     newChatMetadata={this.state.newInteractionMetadata}
-                    selectionChanged={(i) => this.setState({ selectedIndex: i })}
+                    selectionChanged={(i) => {
+                        if (i === undefined) {
+                            this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
+                        } else if (this.state.newInteractionMetadata && i !== 0) {
+                            this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
+                        } else {
+                            this.setState({ selectedIndex: i })
+                        }
+                    }}
                     selectedIndex={this.state.newInteractionMetadata ? 0 : this.state.selectedIndex}
                     onCreateNewInteraction={this.newInteraction}
                     filterByTags={this.props.selectedTagIds}

@@ -58,7 +58,7 @@ export function formatDate(date: string | Date | number | null): string {
         formatString = 'MMM D, YYYY [at] h:mm A'
     }
     
-    return originalDate.tz(dayjs.tz.guess()).format(formatString)
+    return originalDate.utc(true).tz(dayjs.tz.guess()).format(formatString)
 }
 
 export function formatTimeInterval(ms: number): string {

@@ -70,9 +70,13 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             this.setState({ inputValue: '' })
             if (!this.props.isTrash) {
                 const chatInput = document.querySelector("#chat-input") as HTMLDivElement
-                chatInput.style.height = "50px"
+                if (chatInput) {
+                    chatInput.style.height = "50px"
+                }
                 const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-                dialogView.style.paddingBottom = "85px"
+                if (dialogView) {
+                    dialogView.style.paddingBottom = "85px"
+                }
             }
         }
     }
