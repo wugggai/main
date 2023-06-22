@@ -80,6 +80,12 @@ def get_interaction_by_id(
     filters = [InteractionModel.id == interaction_id]
     if not include_deleted:
         filters.append(InteractionModel.deleted == False)
+    
+    return (
+        db.query(InteractionModel) \
+        .filter(*filters) \
+        .one_or_none()
+    )
 
 
 def get_interactions_by_creator_user_id(
