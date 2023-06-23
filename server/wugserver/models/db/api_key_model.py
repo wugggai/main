@@ -18,6 +18,7 @@ class ApiKeyModel(Base):
     created = Column(DateTime, default=datetime.datetime.utcnow())
 
 
+# TODO: For best user experience, validate the API key
 def create_api_key_record(
     db: Session, user_id: int, provider: str, api_key_create: ApiKeyCreate
 ):
@@ -54,3 +55,12 @@ def get_user_api_key_for_provider(db: Session, user_id: int, provider: str):
 
 def get_all_user_api_keys(db: Session, user_id: int):
     return db.query(ApiKeyModel).filter(ApiKeyModel.owner_user_id == user_id).all()
+
+
+def obfuscate_api_key(key: str):
+    if key is None:
+        return key
+    # API Keys are generally longer than 7 chars
+    if len(key) <= 7:
+        return key
+    return key[:5] + '*' * (len(key) - 7) + key[-2:]

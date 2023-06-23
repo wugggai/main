@@ -6,11 +6,6 @@ from sqlalchemy.orm import Mapped, relationship, Session
 from typing import List
 
 from wugserver.database import Base
-from wugserver.models.db.authorization import (
-    authorize_by_res_owner_id,
-    authorize_get_tag_from_db,
-    authorize_get_tags_from_db,
-)
 from wugserver.models.db.interaction_tag_association import (
     interaction_tag_association_table,
 )
