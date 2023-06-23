@@ -1,2 +1,6 @@
-disable=
-    C0114,
+[MESSAGES CONTROL]
+disable=C0114,C0115,C0116
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma.
+good-names=i, j, k, db

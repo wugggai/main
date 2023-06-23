@@ -1,15 +1,10 @@
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
 from typing import List
-from uuid import UUID
 
-import logging
 import openai
 
 from wugserver.models.ai_models.abstract_model import AIModel
-from wugserver.models.db.api_key_model import ApiKeyModel, get_user_api_key_for_provider
-from wugserver.models.db.interaction_model import InteractionModel
-from wugserver.models.db.message_model import get_interaction_all_messages, MessageModel
+from wugserver.models.db.api_key_model import ApiKeyModel
+from wugserver.models.db.message_db_model import MessageRecord
 from wugserver.schema.message import Message, MessageCreate
 from wugserver.constants import Provider
 
@@ -21,7 +16,7 @@ class OpenAIModels(AIModel):
     def post_message(
         self,
         api_key: ApiKeyModel,
-        interaction_context: List[MessageModel],
+        interaction_context: List[MessageRecord],
         message_create_params: MessageCreate,
     ):
         previous_messages = [

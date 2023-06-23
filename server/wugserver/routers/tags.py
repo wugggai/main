@@ -2,7 +2,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from wugserver.dependencies import get_db
-from wugserver.routers.authorization import authorize_by_matching_user_id, authorized_get_tag
+from wugserver.routers.authorization import (
+    authorize_by_matching_user_id,
+    authorized_get_tag,
+)
 from wugserver.schema.tag import Tag, TagCreate
 from wugserver.models.db.tag_model import (
     create_tag,
