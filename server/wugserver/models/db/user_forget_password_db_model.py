@@ -24,6 +24,7 @@ class UserForgetPasswordDbModel:
         db_record = self._get_record_from_user_id(user_id)
         if db_record:
             db_record.secret = secret
+            db_record.requested = datetime.datetime.utcnow()
         else:
             db_record = UserForgetPasswordRecord(user_id=user_id, secret=secret)
             self.db.add(db_record)

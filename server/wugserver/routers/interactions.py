@@ -1,5 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from wugserver.dependencies import get_db
 from wugserver.models.db.interaction_model import (
     create_interaction,
@@ -8,9 +9,9 @@ from wugserver.models.db.interaction_model import (
     get_interactions_by_creator_user_id,
     update_interaction,
 )
-from wugserver.models.db.message_model import get_interaction_last_message
 from wugserver.models.db.user_db_model import UserRecord
 from wugserver.models.message_create_handler import handle_message_create_request
+from wugserver.models.message_model import MessageModel
 from wugserver.models.user_authentication import get_current_active_user
 from wugserver.routers.authorization import (
     authorize_by_matching_user_id,
@@ -23,8 +24,6 @@ from wugserver.schema.interaction import (
     InteractionWithLatestMessage,
     InteractionUpdate,
 )
-from wugserver.schema.user import *
-from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -37,6 +36,7 @@ def create_interaction_route(
     interaction_create_params: InteractionCreate,
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
 ):
     authorize_by_matching_user_id(
         current_user_id=current_user.id, user_id=creator_user_id
@@ -54,6 +54,7 @@ def create_interaction_route(
             user_id=current_user.id,
             interaction=interaction,
             message_create_params=initial_message,
+            message_model=message_model,
         )
 
     return InteractionWithLatestMessage(
@@ -71,6 +72,7 @@ def get_interactions_route(
     limit: int = 15,
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
 ):
     authorize_by_matching_user_id(
         current_user_id=current_user.id, user_id=creator_user_id
@@ -83,8 +85,8 @@ def get_interactions_route(
         res.append(
             InteractionWithLatestMessage(
                 interaction=interaction,
-                last_message=get_interaction_last_message(
-                    db=db, interaction=interaction
+                last_message=message_model.get_interaction_last_message(
+                    interaction=interaction
                 ),
             )
         )
@@ -101,6 +103,7 @@ def get_deleted_interactions_route(
     limit: int = 15,
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
 ):
     authorize_by_matching_user_id(
         current_user_id=current_user.id, user_id=creator_user_id
@@ -113,8 +116,8 @@ def get_deleted_interactions_route(
         res.append(
             InteractionWithLatestMessage(
                 interaction=interaction,
-                last_message=get_interaction_last_message(
-                    db=db, interaction=interaction
+                last_message=message_model.get_interaction_last_message(
+                    interaction=interaction
                 ),
             )
         )
@@ -162,4 +165,4 @@ def delete_interaction_route(
     interaction = authorized_get_interaction(
         db=db, current_user_id=current_user.id, interaction_id=interaction_id
     )
-    delete_interaction(db=db, interaction=interaction)
+    delete_interaction(db=db, interaction_id=interaction.id)

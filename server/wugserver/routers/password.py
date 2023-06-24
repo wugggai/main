@@ -41,6 +41,4 @@ def post_user_forget_password(
     initiate_password_reset: InitiatePasswordReset,
     user_password_model: UserPasswordModel = Depends(UserPasswordModel),
 ):
-    user_password_model.initiate_password_reset(
-        initiate_password_reset.email
-    )
+    user_password_model.initiate_password_reset(initiate_password_reset.email)

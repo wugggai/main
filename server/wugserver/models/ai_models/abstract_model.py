@@ -2,8 +2,6 @@ from sqlalchemy.orm import Session
 from typing import Any
 
 from wugserver.models.db.api_key_model import get_user_api_key_for_provider
-from wugserver.models.db.interaction_model import InteractionModel
-from wugserver.models.db.message_model import get_interaction_all_messages
 from wugserver.schema.message import MessageCreate
 from wugserver.constants import Provider
 
@@ -34,8 +32,3 @@ class AIModel(object):
         return get_user_api_key_for_provider(
             db=db, user_id=user_id, provider=self.provider
         )
-
-    def get_interaction_context(
-        self, db: Session, interaction: InteractionModel
-    ) -> Any:
-        return get_interaction_all_messages(db=db, interaction=interaction)

@@ -82,7 +82,7 @@ async def get_user_from_cookie_or_auth_header(
 
 def get_current_active_user(
     current_user: UserRecord = Depends(get_user_from_cookie_or_auth_header),
-)-> UserRecord:
+) -> UserRecord:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -109,4 +109,7 @@ def register_user(
         return db_user
 
     res_json = json.loads(res.body)
-    raise HTTPException(status_code=503, detail=f"Could not send verification email to {email}: {res_json['errors']}")
+    raise HTTPException(
+        status_code=503,
+        detail=f"Could not send verification email to {email}: {res_json['errors']}",
+    )

@@ -71,9 +71,13 @@ class UserPasswordModel:
 
     def _assert_password_reset_valid(self, initiated: datetime):
         try:
+            something = int((datetime.utcnow() - initiated).total_seconds())
+            print(something)
             assert (
                 int((datetime.utcnow() - initiated).total_seconds())
                 < PASSWORD_RESET_EXPIRATION_DELTA_IN_SECONDS
             )
-        except:
-            raise HTTPException(status_code=400, detail="Password reset has expired")
+        except Exception as exc:
+            raise HTTPException(
+                status_code=400, detail="Password reset has expired"
+            ) from exc

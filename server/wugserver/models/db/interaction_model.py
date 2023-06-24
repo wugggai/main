@@ -21,7 +21,7 @@ from wugserver.models.db.tag_model import TagModel, set_tag_update_time_and_comm
 from wugserver.schema.interaction import InteractionCreate, InteractionUpdate
 
 
-class InteractionModel(Base):
+class InteractionRecord(Base):
     __tablename__ = "interactions"
 
     id = Column(Uuid, primary_key=True)
@@ -43,19 +43,19 @@ class InteractionModel(Base):
 
 Index(
     "last_updated_composite_index",
-    InteractionModel.creator_user_id,
-    InteractionModel.last_updated,
+    InteractionRecord.creator_user_id,
+    InteractionRecord.last_updated,
 )
 
 
-def get_interaction_owner(interaction: InteractionModel):
+def get_interaction_owner(interaction: InteractionRecord):
     return interaction.creator_user_id
 
 
 def create_interaction(
     db: Session, creator_user_id: UUID, interaction_create_params: InteractionCreate
 ):
-    interaction = InteractionModel(
+    interaction = InteractionRecord(
         id=uuid4(),
         creator_user_id=creator_user_id,
         title=interaction_create_params.title,
@@ -67,7 +67,7 @@ def create_interaction(
     return interaction
 
 
-def set_interaction_update_time_and_commit(db: Session, interaction: InteractionModel):
+def set_interaction_update_time_and_commit(db: Session, interaction: InteractionRecord):
     interaction.last_updated = datetime.datetime.utcnow()
     db.commit()
     db.refresh(interaction)
@@ -76,16 +76,12 @@ def set_interaction_update_time_and_commit(db: Session, interaction: Interaction
 
 def get_interaction_by_id(
     db: Session, interaction_id: UUID, include_deleted: bool = False
-) -> InteractionModel | None:
-    filters = [InteractionModel.id == interaction_id]
+) -> InteractionRecord | None:
+    filters = [InteractionRecord.id == interaction_id]
     if not include_deleted:
-        filters.append(InteractionModel.deleted == False)
-    
-    return (
-        db.query(InteractionModel) \
-        .filter(*filters) \
-        .one_or_none()
-    )
+        filters.append(InteractionRecord.deleted == False)
+
+    return db.query(InteractionRecord).filter(*filters).one_or_none()
 
 
 def get_interactions_by_creator_user_id(
@@ -95,14 +91,14 @@ def get_interactions_by_creator_user_id(
     offset: int,
     include_deleted: bool = False,
 ):
-    filters = [InteractionModel.creator_user_id == creator_user_id]
+    filters = [InteractionRecord.creator_user_id == creator_user_id]
     if not include_deleted:
-        filters.append(InteractionModel.deleted == False)
+        filters.append(InteractionRecord.deleted == False)
 
     return (
-        db.query(InteractionModel)
+        db.query(InteractionRecord)
         .filter(*filters)
-        .order_by(InteractionModel.last_updated.desc())
+        .order_by(InteractionRecord.last_updated.desc())
         .limit(limit)
         .offset(offset)
         .all()
@@ -113,13 +109,13 @@ def get_deleted_interactions_by_creator_user_id(
     db: Session, creator_user_id: int, limit: int, offset: int
 ):
     filters = [
-        InteractionModel.creator_user_id == creator_user_id,
-        InteractionModel.deleted == True,
+        InteractionRecord.creator_user_id == creator_user_id,
+        InteractionRecord.deleted == True,
     ]
     return (
-        db.query(InteractionModel)
+        db.query(InteractionRecord)
         .filter(*filters)
-        .order_by(InteractionModel.last_updated.desc())
+        .order_by(InteractionRecord.last_updated.desc())
         .limit(limit)
         .offset(offset)
         .all()
@@ -128,7 +124,7 @@ def get_deleted_interactions_by_creator_user_id(
 
 def update_interaction(
     db: Session,
-    interaction: InteractionModel,
+    interaction: InteractionRecord,
     tags: List[TagModel] | None,
     title: str | None,
     deleted: bool | None,
@@ -146,8 +142,8 @@ def update_interaction(
 
 def delete_interaction(db: Session, interaction_id: UUID):
     to_delete = (
-        db.query(InteractionModel)
-        .filter(InteractionModel.id == interaction_id)
+        db.query(InteractionRecord)
+        .filter(InteractionRecord.id == interaction_id)
         .delete()
     )
     db.flush()

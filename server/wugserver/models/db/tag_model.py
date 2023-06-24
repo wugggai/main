@@ -22,7 +22,7 @@ class TagModel(Base):
     name = Column(String)
     color = Column(String(7))
     interactions: Mapped[
-        list["wugserver.models.db.interaction_model.InteractionModel"]
+        list["wugserver.models.db.interaction_model.InteractionRecord"]
     ] = relationship(
         secondary=interaction_tag_association_table,
         back_populates="tags",
