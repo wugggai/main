@@ -18,6 +18,7 @@ class Message(BaseModel):
     message: str
     offset: int
     timestamp: datetime
+    favorite_by: list[int]
 
     class Config:
         orm_mode = True

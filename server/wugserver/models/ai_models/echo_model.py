@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from typing import List
 
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.message_db_model import MessageRecord
@@ -19,7 +18,7 @@ class EchoModel(AIModel):
     def post_message(
         self,
         api_key: str,
-        interaction_context: List[MessageRecord],
+        interaction_context: list[MessageRecord],
         message_create_params: MessageCreate,
     ):
         current_messages_count = len(interaction_context)

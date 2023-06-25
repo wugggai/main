@@ -3,7 +3,6 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, relationship, Session
-from typing import List
 
 from wugserver.database import Base
 from wugserver.models.db.interaction_tag_association import (
@@ -67,7 +66,7 @@ def get_tag_by_id(db: Session, tag_id: UUID):
 
 
 def set_tag_update_time_and_commit(db: Session, tag: TagModel):
-    tag.last_use = datetime.datetime.now()
+    tag.last_use = datetime.datetime.utcnow()
     db.commit()
     db.refresh(tag)
     return tag

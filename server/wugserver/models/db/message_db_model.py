@@ -3,10 +3,12 @@ from uuid import UUID, uuid4
 from fastapi import Depends
 
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, relationship, Session
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from wugserver.database import Base
 from wugserver.dependencies import get_db
+from wugserver.models.db.message_favorite_db_model import MessageFavoriteRecord
 
 
 # TODO: Message table should store userId
@@ -21,6 +23,13 @@ class MessageRecord(Base):
     message = Column(String)
     offset = Column(Integer)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow())
+    favorites: Mapped[list[MessageFavoriteRecord]] = relationship(
+        "MessageFavoriteRecord", back_populates="message"
+    )
+
+    @hybrid_property
+    def favorite_by(self):
+        return [favorite.user_id for favorite in self.favorites]
 
 
 Index("offset_composite_index", MessageRecord.interaction_id, MessageRecord.offset)
@@ -36,7 +45,7 @@ class MessageDbModel:
         offset: int,
         limit: int,
         from_latest: bool = True,
-    ):
+    ) -> list[MessageRecord]:
         query = None
         if from_latest:
             query = (
@@ -60,7 +69,7 @@ class MessageDbModel:
             source=source,
             message=message,
             offset=offset,
-            timestamp=datetime.datetime.now(),
+            timestamp=datetime.datetime.utcnow(),
         )
         self.db.add(message)
         self.db.commit()

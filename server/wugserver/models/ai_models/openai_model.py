@@ -1,5 +1,3 @@
-from typing import List
-
 import openai
 
 from wugserver.models.ai_models.abstract_model import AIModel
@@ -16,7 +14,7 @@ class OpenAIModels(AIModel):
     def post_message(
         self,
         api_key: ApiKeyModel,
-        interaction_context: List[MessageRecord],
+        interaction_context: list[MessageRecord],
         message_create_params: MessageCreate,
     ):
         previous_messages = [

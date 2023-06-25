@@ -63,4 +63,4 @@ def obfuscate_api_key(key: str):
     # API Keys are generally longer than 7 chars
     if len(key) <= 7:
         return key
-    return key[:5] + '*' * (len(key) - 7) + key[-2:]
+    return key[:5] + "*" * (len(key) - 7) + key[-2:]
