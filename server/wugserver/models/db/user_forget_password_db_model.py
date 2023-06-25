@@ -11,7 +11,7 @@ class UserForgetPasswordRecord(Base):
     __tablename__ = "user_forget_password"
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True)
-    secret = Column(String, primary_key=True)
+    secret = Column(String(16), primary_key=True)
     requested = Column(DateTime, default=datetime.datetime.utcnow())
 
 

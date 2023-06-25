@@ -28,7 +28,7 @@ class InteractionRecord(Base):
     creator_user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
-    title = Column(String)
+    title = Column(String(256))
     tags: Mapped[list[TagModel]] = relationship(
         secondary=interaction_tag_association_table,
         back_populates="interactions",

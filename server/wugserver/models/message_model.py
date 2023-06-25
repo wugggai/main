@@ -21,7 +21,7 @@ class MessageModel:
         )
 
     def create_message(self, interaction: InteractionRecord, source: str, message: str):
-        return self.message_db_model(interaction.id, source, message)
+        return self.message_db_model.create_message(interaction.id, source, message)
 
     def get_interaction_last_message(self, interaction: InteractionRecord):
         last_message_in_list = self.get_interaction_messages(interaction, 0, 1, True)

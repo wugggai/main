@@ -23,6 +23,8 @@ def current_environment():
     return Environment.dev
 
 
+ENV = current_environment()
+
 site_domain_by_env = {
     Environment.dev: "http://127.0.0.1:4000",
     Environment.staging: "https://wug-staging.azurewebsites.net",
@@ -31,4 +33,4 @@ site_domain_by_env = {
 
 
 def current_domain():
-    return site_domain_by_env.get(current_environment())
+    return site_domain_by_env.get(ENV)

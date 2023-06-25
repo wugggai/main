@@ -13,8 +13,8 @@ class ApiKeyModel(Base):
     owner_user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    provider = Column(String, primary_key=True)
-    api_key = Column(String)
+    provider = Column(String(32), primary_key=True)
+    api_key = Column(String(128))
     created = Column(DateTime, default=datetime.datetime.utcnow())
 
 

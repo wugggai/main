@@ -12,7 +12,7 @@ class UserPasswordRecord(Base):
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column(String(128), nullable=False)
 
 
 class UserPasswordDbModel:

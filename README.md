@@ -19,11 +19,11 @@ poetry install
 poetry run start
 ```
 
-Note:  
-You'd want to put in the api key in code (for now).  
-localhost:5000/docs you can play with the endpoints.  
+Note:
+Set SENDGRID_API_KEY as environment variable.
+localhost:4000/docs you can play with the endpoints.
 
-Because Poetry defaults to run your python in a virtualenv, your text editor (VSCode) might not recognize it.  
+Because Poetry defaults to run your python in a virtualenv, your text editor (VSCode) might not recognize it.
 Try this: https://stackoverflow.com/questions/59882884/vscode-doesnt-show-poetry-virtualenvs-in-select-interpreter-option
 
 

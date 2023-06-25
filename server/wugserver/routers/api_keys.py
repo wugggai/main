@@ -88,5 +88,5 @@ def get_all_api_key_route(
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
     all_api_keys = get_all_user_api_keys(db=db, user_id=user_id)
     for record in all_api_keys:
-        record.api_key = obfuscate_api_key(api_key)
+        record.api_key = obfuscate_api_key(record.api_key)
     return all_api_keys
