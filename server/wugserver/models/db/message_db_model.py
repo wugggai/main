@@ -19,8 +19,8 @@ class MessageRecord(Base):
     interaction_id = Column(
         Uuid, ForeignKey("interactions.id", ondelete="CASCADE"), index=True
     )
-    source = Column(String)
-    message = Column(String)
+    source = Column(String(64))
+    message = Column(Text)
     offset = Column(Integer)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow())
     favorites: Mapped[list[MessageFavoriteRecord]] = relationship(

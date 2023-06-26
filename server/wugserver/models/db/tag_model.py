@@ -18,7 +18,7 @@ class TagModel(Base):
     creator_user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
-    name = Column(String)
+    name = Column(String(32))
     color = Column(String(7))
     interactions: Mapped[
         list["wugserver.models.db.interaction_model.InteractionRecord"]
