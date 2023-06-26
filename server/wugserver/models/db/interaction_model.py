@@ -52,12 +52,15 @@ def get_interaction_owner(interaction: InteractionRecord):
 
 
 def create_interaction(
-    db: Session, creator_user_id: UUID, interaction_create_params: InteractionCreate
+    db: Session,
+    creator_user_id: UUID,
+    interaction_create_params: InteractionCreate,
+    auto_title: str,
 ):
     interaction = InteractionRecord(
         id=uuid4(),
         creator_user_id=creator_user_id,
-        title=interaction_create_params.title,
+        title=interaction_create_params.title or auto_title,
         last_updated=datetime.datetime.utcnow(),
     )
     db.add(interaction)
