@@ -41,13 +41,17 @@ def create_interaction_route(
     authorize_by_matching_user_id(
         current_user_id=current_user.id, user_id=creator_user_id
     )
+    initial_message = interaction_create_params.initial_message
+    auto_title = "Untitled Conversation"
+    if initial_message is not None:
+        auto_title = " ".join(initial_message.message.split()[:10])
     interaction = create_interaction(
         db=db,
         creator_user_id=creator_user_id,
         interaction_create_params=interaction_create_params,
+        auto_title=auto_title,
     )
     optional_message_response = None
-    initial_message = interaction_create_params.initial_message
     if initial_message is not None:
         optional_message_response = handle_message_create_request(
             db=db,

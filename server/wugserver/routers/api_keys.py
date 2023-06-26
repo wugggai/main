@@ -17,6 +17,7 @@ from wugserver.constants import Provider
 
 router = APIRouter()
 
+
 # NOTE: Endpoints must never return unobfuscated API Key
 #       Client should not need to implement obfuscation
 @router.post("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
