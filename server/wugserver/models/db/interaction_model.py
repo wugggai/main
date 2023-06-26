@@ -12,7 +12,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, relationship, Session
-from typing import List
 from uuid import UUID, uuid4
 from wugserver.models.db.interaction_tag_association import (
     interaction_tag_association_table,
@@ -59,7 +58,7 @@ def create_interaction(
         id=uuid4(),
         creator_user_id=creator_user_id,
         title=interaction_create_params.title,
-        last_updated=datetime.datetime.now(),
+        last_updated=datetime.datetime.utcnow(),
     )
     db.add(interaction)
     db.commit()
@@ -125,7 +124,7 @@ def get_deleted_interactions_by_creator_user_id(
 def update_interaction(
     db: Session,
     interaction: InteractionRecord,
-    tags: List[TagModel] | None,
+    tags: list[TagModel] | None,
     title: str | None,
     deleted: bool | None,
 ):

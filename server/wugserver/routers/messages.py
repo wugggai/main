@@ -5,7 +5,10 @@ from wugserver.models.db.user_db_model import UserRecord
 from wugserver.models.message_model import MessageModel
 from wugserver.models.user_authentication import get_current_active_user
 from wugserver.models.message_create_handler import handle_message_create_request
-from wugserver.routers.authorization import authorized_get_interaction
+from wugserver.routers.authorization import (
+    authorize_by_matching_user_id,
+    authorized_get_interaction,
+)
 from wugserver.schema.message import Message, MessageCreate
 from sqlalchemy.orm import Session
 
@@ -51,3 +54,35 @@ def get_messages_route(
         limit=limit,
         from_latest=from_latest,
     )
+
+
+@router.post("/users/{user_id}/messages/{message_id}/favorite")
+def create_favorite_message_route(
+    user_id: int,
+    message_id: UUID,
+    current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
+):
+    authorize_by_matching_user_id(current_user.id, user_id)
+    return message_model.create_favorite_message_for_user(current_user.id, message_id)
+
+
+@router.delete("/users/{user_id}/messages/{message_id}/favorite")
+def delete_favorite_message_route(
+    user_id: int,
+    message_id: UUID,
+    current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
+):
+    authorize_by_matching_user_id(current_user.id, user_id)
+    return message_model.delete_favorite_message_for_user(current_user.id, message_id)
+
+
+@router.get("/users/{user_id}/messages/favorite", response_model=list[Message])
+def get_favorite_message_route(
+    user_id: int,
+    current_user: UserRecord = Depends(get_current_active_user),
+    message_model: MessageModel = Depends(MessageModel),
+):
+    authorize_by_matching_user_id(current_user.id, user_id)
+    return message_model.get_favorite_messages_for_user(current_user.id)
