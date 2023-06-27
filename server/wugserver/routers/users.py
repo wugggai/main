@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from wugserver.dependencies import get_db
+from wugserver.models.ai_models.ai_models import get_user_available_models
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.models.user_model import UserModel
 from wugserver.models.user_password_model import UserPasswordModel
+from wugserver.routers.authorization import authorize_by_matching_user_id
+from wugserver.schema.model_list import ModelList
 from wugserver.schema.user import User, UserCreate
 from sqlalchemy.orm import Session
 from wugserver.models.db.user_db_model import UserRecord
@@ -33,3 +36,13 @@ def read_users_me(
     current_user: UserRecord = Depends(get_current_active_user),
 ):
     return current_user
+
+
+@router.get("/users/{user_id}/models/list", response_model=ModelList)
+def get_users_available_models(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserRecord = Depends(get_current_active_user),
+):
+    authorize_by_matching_user_id(current_user.id, user_id)
+    return ModelList(model_names=get_user_available_models(db, current_user.id))

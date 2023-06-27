@@ -12,7 +12,7 @@ Internal testing only
 
 
 class EchoModel(AIModel):
-    model_names = ["echo"]
+    supported_model_names = ["echo"]
     provider = Provider.none
 
     def post_message(
