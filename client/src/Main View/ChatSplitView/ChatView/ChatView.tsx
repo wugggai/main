@@ -143,7 +143,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             alert("Not logged in")
             return
         }
-        SERVER.post(API_BASE + `/users/${userId}/interactions`, {
+        SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
             initial_message: withMessage ? {
                 message: this.state.inputValue,
