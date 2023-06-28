@@ -2,7 +2,7 @@ import datetime
 from uuid import UUID, uuid4
 from fastapi import Depends
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, relationship, Session
 from sqlalchemy.ext.hybrid import hybrid_property
 
