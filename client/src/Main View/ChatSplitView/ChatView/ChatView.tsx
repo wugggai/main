@@ -107,13 +107,27 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
         } else if (this.state.inputValue) {
-            this.state.chatHistory?.messages.push({
-                message: this.state.inputValue,
-                source: 'user',
-                id: 'tmp',
-                timestamp: new Date().toISOString(),
-                offset: this.state.chatHistory.messages.length
-            })
+            if (this.state.chatHistory) {
+                this.state.chatHistory.messages.push({
+                    message: this.state.inputValue,
+                    source: 'user',
+                    id: 'tmp',
+                    timestamp: new Date().toISOString(),
+                    offset: this.state.chatHistory.messages.length
+                })
+            } else {
+                this.setState({
+                    chatHistory: {
+                        messages: [{
+                            message: this.state.inputValue,
+                            source: 'user',
+                            id: 'tmp',
+                            timestamp: new Date().toISOString(),
+                            offset: 0
+                        }]
+                    }
+                })
+            }
             const userInput = this.state.inputValue
             this.setState({ inputValue: '', isWaitingForResponse: true })
             SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {

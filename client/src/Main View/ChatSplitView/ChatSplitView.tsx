@@ -132,7 +132,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                             this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
                         } else if (this.state.newInteractionMetadata && i !== 0) {
                             this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
-                        } else {
+                        } else if (i !== this.state.selectedIndex) {
                             this.setState({ selectedIndex: i })
                         }
                     }}
