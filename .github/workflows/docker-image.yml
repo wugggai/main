@@ -32,4 +32,4 @@ jobs:
       with:
         push: true
         tags: wugdockers.azurecr.io/wug-base-image:latest
-        file: aspnet-core-dotnet-core/Dockerfile
+        file: Dockerfile
