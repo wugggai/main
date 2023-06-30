@@ -8,7 +8,7 @@ from wugserver.constants import Provider
 
 
 class OpenAIModels(AIModel):
-    model_names = ["gpt-3.5-turbo"]
+    supported_model_names = ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]
     provider = Provider.openai
 
     def post_message(
@@ -26,9 +26,10 @@ class OpenAIModels(AIModel):
 
         # As of 4/29/2023 GPT3.5 doesn't accept parameters. Disregard messageCreateParams.model_config
         try:
-            openai.api_key = api_key.api_key
             response = openai.ChatCompletion.create(
-                model=message_create_params.model, messages=previous_messages
+                api_key=api_key.api_key,
+                model=message_create_params.model,
+                messages=previous_messages,
             )
             return response["choices"][0]["message"]["content"]
         # As of 6/15/2023, OpenAI documentation does not specify possible errors returned by the API
@@ -41,7 +42,21 @@ class OpenAIModels(AIModel):
     def to_openai_message(message: Message):
         return {
             "role": "assistant"
-            if message.source in OpenAIModels.model_names
+            if message.source in OpenAIModels.supported_model_names
             else "user",
             "content": message.message,
         }
+
+    def get_user_models_list(key: str):
+        try:
+            response = openai.Model.list(api_key=key)
+            print(response)
+            api_supported_models = [model["id"] for model in response["data"]]
+            return [
+                model
+                for model in OpenAIModels.supported_model_names
+                if model in api_supported_models
+            ]
+        # As of 6/15/2023, OpenAI documentation does not specify possible errors returned by the API
+        except Exception as e:
+            raise e

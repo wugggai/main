@@ -8,7 +8,7 @@ from wugserver.constants import Provider
 
 class AIModel(object):
     provider: Provider
-    model_names: list[str]
+    supported_model_names: list[str]
 
     def post_message(
         self,
