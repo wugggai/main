@@ -28,7 +28,18 @@ class AIModel(object):
         """
         pass
 
-    def get_user_api_key(self, db: Session, user_id: int):
+    def get_provider(self) -> Provider:
+        return self.provider
+
+    def get_user_api_key(self, db: Session, user_id: int) -> str:
         return get_user_api_key_for_provider(
             db=db, user_id=user_id, provider=self.provider
         )
+
+    @classmethod
+    def get_user_models_list(cls, key: str) -> list[str]:
+        return []
+
+    @classmethod
+    def requires_context(cls) -> bool:
+        return False

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from wugserver.models.ai_models.ai_models import get_model_by_name
+from wugserver.models.ai_model_model import get_model_by_name
 from wugserver.models.db.interaction_model import (
     InteractionRecord,
     set_interaction_update_time_and_commit,
@@ -43,9 +43,11 @@ def handle_message_create_request(
             detail=f"No API key provided for {message_create_params.model}",
         )
 
-    interaction_context = message_model.get_interaction_all_messages(
-        interaction=interaction
-    )
+    interaction_context = []
+    if requested_model.requires_context():
+        interaction_context = message_model.get_interaction_all_messages(
+            interaction=interaction
+        )
     try:
         model_res_msg = requested_model.post_message(
             api_key=api_key,

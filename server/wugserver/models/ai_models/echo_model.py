@@ -33,3 +33,7 @@ class EchoModel(AIModel):
     # EchoModel does not require an API key
     def get_user_api_key(self, db: Session, user_id: int):
         return "key"
+
+    @classmethod
+    def requires_context(cls) -> bool:
+        return True

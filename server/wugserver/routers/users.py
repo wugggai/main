@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from wugserver.dependencies import get_db
-from wugserver.models.ai_models.ai_models import get_user_available_models
+from wugserver.models.ai_model_model import get_user_available_models
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.models.user_model import UserModel
 from wugserver.models.user_password_model import UserPasswordModel
