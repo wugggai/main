@@ -7,7 +7,7 @@ from wugserver.models.db.interaction_model import (
     set_interaction_update_time_and_commit,
 )
 from wugserver.models.message_model import MessageModel
-from wugserver.schema.message import MessageCreate
+from wugserver.schema.message import MessageCreate, MultiMediaContent
 
 
 def handle_message_create_request(
@@ -49,7 +49,7 @@ def handle_message_create_request(
             interaction=interaction
         )
     try:
-        model_res_msg = requested_model.post_message(
+        model_res_msg: list[MultiMediaContent] = requested_model.post_message(
             api_key=api_key,
             interaction_context=interaction_context,
             message_create_params=message_create_params,

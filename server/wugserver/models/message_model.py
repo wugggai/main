@@ -4,6 +4,7 @@ from sqlalchemy import UUID
 from wugserver.models.db.message_db_model import MessageDbModel, MessageRecord
 from wugserver.models.db.interaction_model import InteractionRecord
 from wugserver.models.db.message_favorite_db_model import MessageFavoriteDbModel
+from wugserver.schema.message import Message, MultiMediaContent
 
 
 class MessageModel:
@@ -23,13 +24,49 @@ class MessageModel:
         offset: int,
         limit: int,
         from_latest: bool = True,
-    ) -> list[MessageRecord]:
-        return self.message_db_model.get_interaction_messages(
+    ) -> list[Message]:
+        raw_messages_records = self.message_db_model.get_interaction_messages(
             interaction.id, offset, limit, from_latest
         )
+        return [
+            Message(
+                id=raw_message.id,
+                interaction_id=raw_message.interaction_id,
+                source=raw_message.source,
+                offset=raw_mesaage.offset,
+                timestamp=raw_message.timestamp,
+                favorited_by=raw_mesaage.favorite_by,
+                message=[
+                    MultiMediaContent(
+                        type=content_record.type,
+                        content=content_record.content,
+                    )
+                    for content_record in sorted(raw_message.message, key=lambda r: r.order)
+                ],
+            )
+            for raw_message in raw_messages_records
+        ]
 
-    def create_message(self, interaction: InteractionRecord, source: str, message: str):
-        return self.message_db_model.create_message(interaction.id, source, message)
+    def create_message(
+        self,
+        interaction: InteractionRecord,
+        source: str,
+        message: list[MultiMediaContent],
+    ):
+        message_content_records = [
+            self.message_db_model.create_message_content_record(
+                type=record.type,
+                content=record.content,
+                order=index,
+            )
+            for index, record in enumerate(message)
+        ]
+
+        return self.message_db_model.create_message(
+            interaction_id=interaction.id,
+            source=source,
+            message_content=message_content_records,
+        )
 
     def get_interaction_last_message(self, interaction: InteractionRecord):
         last_message_in_list = self.get_interaction_messages(interaction, 0, 1, True)

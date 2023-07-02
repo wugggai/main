@@ -12,5 +12,10 @@ interaction_tag_association_table = Table(
         ForeignKey("interactions.id", ondelete="CASCADE"),
         primary_key=True,
     ),
-    Column("tag", Uuid, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
+    Column(
+        "tag",
+        Uuid,
+        ForeignKey("tags.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )

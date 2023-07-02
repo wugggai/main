@@ -3,19 +3,22 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 
 
-# TODO: messageCreate should capture the userId too
+class MultiMediaContent(BaseModel):
+    type: str
+    content: str
+
+
 class MessageCreate(BaseModel):
-    message: str
+    message: list[MultiMediaContent]
     model: str = Field(default="echo")
     model_config: dict
 
 
 class Message(BaseModel):
     id: UUID
-    message: str
+    message: list[MultiMediaContent]
     interaction_id: UUID
     source: str
-    message: str
     offset: int
     timestamp: datetime
     favorite_by: list[int]

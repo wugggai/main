@@ -11,7 +11,7 @@ from wugserver.models.db.interaction_tag_association import (
 from wugserver.schema.tag import TagCreate
 
 
-class TagModel(Base):
+class TagRecord(Base):
     __tablename__ = "tags"
 
     id = Column(Uuid, primary_key=True)
@@ -29,17 +29,17 @@ class TagModel(Base):
     last_use = Column(DateTime)
 
 
-Index("last_use_composite_index", TagModel.creator_user_id, TagModel.last_use)
+Index("last_use_composite_index", TagRecord.creator_user_id, TagRecord.last_use)
 
 
-def get_tag_owner(db: Session, tag: TagModel):
+def get_tag_owner(db: Session, tag: TagRecord):
     return tag.creator_user_id
 
 
 def create_tag(db: Session, user_id: int, tag_create_params: TagCreate):
     # Enforce 0 constraint on db level
     # As a result, one user may reuse same name/color for multiple tags
-    tag = TagModel(
+    tag = TagRecord(
         id=uuid4(),
         creator_user_id=user_id,
         name=tag_create_params.name,
@@ -54,30 +54,30 @@ def create_tag(db: Session, user_id: int, tag_create_params: TagCreate):
 
 def get_tags_by_user_id(db: Session, user_id: int):
     return (
-        db.query(TagModel)
-        .filter(TagModel.creator_user_id == user_id)
-        .order_by(TagModel.last_use.desc())
+        db.query(TagRecord)
+        .filter(TagRecord.creator_user_id == user_id)
+        .order_by(TagRecord.last_use.desc())
         .all()
     )
 
 
 def get_tag_by_id(db: Session, tag_id: UUID):
-    return db.query(TagModel).filter(TagModel.id == tag_id).one_or_none()
+    return db.query(TagRecord).filter(TagRecord.id == tag_id).one_or_none()
 
 
-def set_tag_update_time_and_commit(db: Session, tag: TagModel):
+def set_tag_update_time_and_commit(db: Session, tag: TagRecord):
     tag.last_use = datetime.datetime.utcnow()
     db.commit()
     db.refresh(tag)
     return tag
 
 
-def update_tag(db: Session, tag: TagModel, tag_update_params: TagCreate):
+def update_tag(db: Session, tag: TagRecord, tag_update_params: TagCreate):
     tag.name = tag_update_params.name
     tag.color = tag_update_params.color
     return set_tag_update_time_and_commit(db=db, tag=tag)
 
 
-def delete_tag(db: Session, tag: TagModel):
+def delete_tag(db: Session, tag: TagRecord):
     db.delete(tag)
     db.commit()

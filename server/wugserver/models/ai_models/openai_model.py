@@ -3,7 +3,7 @@ import openai
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.api_key_model import ApiKeyModel
 from wugserver.models.db.message_db_model import MessageRecord
-from wugserver.schema.message import Message, MessageCreate
+from wugserver.schema.message import Message, MessageCreate, MultiMediaContent
 from wugserver.constants import Provider
 
 
@@ -28,6 +28,11 @@ class GPTModels(OpenAIModels):
     def requires_context(cls) -> bool:
         return True
 
+    @classmethod
+    def assert_input_format(message: list[MultiMediaContent]):
+        if len(message) != 1 or message[0].type != "text":
+            raise ValueError("GPT model requires a single text input prompt")
+
     def post_message(
         self,
         api_key: ApiKeyModel,
@@ -36,7 +41,7 @@ class GPTModels(OpenAIModels):
     ):
         previous_messages = [self.to_openai_message(m) for m in interaction_context]
         previous_messages.append(
-            self.new_user_openai_message(message_create_params.message)
+            self.new_user_openai_message(message_create_params.message[0].content)
         )
 
         # As of 4/29/2023 GPT3.5 doesn't accept parameters. Disregard messageCreateParams.model_config
@@ -45,7 +50,7 @@ class GPTModels(OpenAIModels):
             model=message_create_params.model,
             messages=previous_messages,
         )
-        return response["choices"][0]["message"]["content"]
+        return self.wrap_text_message(response["choices"][0]["message"]["content"])
 
     def new_user_openai_message(self, message: str):
         return {"role": "user", "content": message}
@@ -61,6 +66,11 @@ class GPTModels(OpenAIModels):
 
 class DALLEModel(OpenAIModels):
     supported_model_names = ["DALL-E2"]
+
+    @classmethod
+    def assert_input_format(message: list[MultiMediaContent]):
+        if len(message) != 1 or message[0].type != "text":
+            raise ValueError("DALL-E model requires a single text input prompt")
 
     @classmethod
     def get_user_models_list(cls, key: str):
@@ -79,4 +89,4 @@ class DALLEModel(OpenAIModels):
             prompt=prompt,
             n=1,
         )
-        return response["data"][0]["url"]
+        return self.wrap_image_message(response["data"][0]["url"])
