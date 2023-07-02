@@ -23,6 +23,7 @@ interface ChatViewProps {
 interface ChatViewState {
     editedTitle?: string
     chatHistory?: ChatHistory
+    availableModels?: string[]
     inputValue: string
     isWaitingForResponse: boolean
     addTagButtonPosition?: { x: number, y: number }
@@ -83,6 +84,11 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
     componentDidMount(): void {
         this.loadHistory()
+
+        const userId = Cookies.load('user_id')
+        SERVER.get(`/users/${userId}/models/list`).then(response => {
+            this.setState({ availableModels: response.data.model_names })
+        })
     }
 
     loadHistory() {
@@ -331,7 +337,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         </div>
 
         const chooseModelMenu = <div className='dropdown-models'>
-            {["echo", "gpt-3.5-turbo"].map( (modelName) => {
+            {(this.state.availableModels ?? []).map( (modelName) => {
                 return <div key={modelName}>
                     {modelName}
                 </div>

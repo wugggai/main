@@ -3,6 +3,7 @@ import './Login.css'
 import axios from 'axios';
 import { API_BASE } from '../Constants';
 import Cookies from 'react-cookies'
+import { passwordStrength } from 'check-password-strength'
 
 interface LoginProps {
     
@@ -14,6 +15,8 @@ interface LoginState {
     confirmPassword: string
     isSignUp: boolean
     showInstructions: boolean
+    passwordWarning?: string
+    confirmWarning?: string
 }
  
 class Login extends React.Component<LoginProps, LoginState> {
@@ -107,11 +110,30 @@ class Login extends React.Component<LoginProps, LoginState> {
                 <div style={{height: '20px'}} />
                 <label htmlFor='password'>Password</label>
                 <br />
-                <input type="password" name="password" className='textfield login-field' value={this.state.password} onChange={e => this.setState({ password: e.target.value })} />
+                <input type="password" name="password" className='textfield login-field' value={this.state.password} onChange={e => {
+                    this.setState({
+                        password: e.target.value,
+                        passwordWarning: passwordStrength(e.target.value).contains.length === 4 ? undefined : "Password must have at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character.",
+                        confirmWarning: e.target.value === this.state.confirmPassword ? undefined : "Passwords do not match."
+                    })
+                }} />
+                {this.state.passwordWarning && <div className='warning'>
+                    {this.state.passwordWarning}
+                </div>}
                 <div style={{height: '20px'}} />
                 <label htmlFor='confirm-password'>Confirm Password</label>
                 <br />
-                <input type="password" name='confirm-password' className='textfield login-field' value={this.state.confirmPassword} onChange={e => this.setState({ confirmPassword: e.target.value })} />
+                <input type="password" name='confirm-password' className='textfield login-field' value={this.state.confirmPassword} onChange={e => {
+                    
+                    this.setState({
+                        confirmPassword: e.target.value,
+                        confirmWarning: e.target.value === this.state.password ? undefined : "Passwords do not match."
+                    })
+                }} />
+                {this.state.confirmWarning && <div className='warning'>
+                    {this.state.confirmWarning}
+                </div>
+                }
                 <div className='terms'>
                     By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
                 </div>
