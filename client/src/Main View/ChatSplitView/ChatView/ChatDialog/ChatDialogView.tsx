@@ -60,7 +60,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                 } else if (segment.type === "image") {
                     return <img key={index} src={segment.content}/>;
                 } else {
-                    return null; // Handle other segment types if needed
+                    return null;
                 }
             });
 
