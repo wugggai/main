@@ -44,7 +44,10 @@ def create_interaction_route(
     initial_message = interaction_create_params.initial_message
     auto_title = "Untitled Conversation"
     if initial_message is not None:
-        auto_title = " ".join(initial_message.message.split()[:10])
+        for segment in initial_message.message:
+            if segment.type == 'text':
+                auto_title = segment.content.split()[:10]
+                break
     interaction = create_interaction(
         db=db,
         creator_user_id=creator_user_id,
@@ -61,8 +64,10 @@ def create_interaction_route(
             message_model=message_model,
         )
 
+    print("RESPONSE: ", optional_message_response)
     return InteractionWithLatestMessage(
-        interaction=interaction, last_message=optional_message_response
+        interaction=interaction,
+        last_message=optional_message_response,
     )
 
 

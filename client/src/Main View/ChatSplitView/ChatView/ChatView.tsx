@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { AI, ChatHistory, ChatMetadata, Tag } from '../../../Interfaces';
+import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag } from '../../../Interfaces';
 import './ChatView.css'
 import SplitView from 'react-split'
 import ChatDialogView from './ChatDialog/ChatDialogView';
@@ -93,7 +93,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
     loadHistory() {
         if (!this.props.isNewInteraction) {
-            SERVER.get(`/interactions/${this.props.chatMetadata.interaction.id}/messages?from_latest=false`).then(response => {
+            SERVER.get(`/interactions/${this.props.chatMetadata.interaction.id}/messages?limit=1000&from_latest=false`).then(response => {
                 this.setState({ chatHistory: { messages: response.data } })
                 setTimeout(() => {
                     const input = document.querySelector('#chat-input') as HTMLTextAreaElement | undefined
@@ -113,9 +113,13 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
         } else if (this.state.inputValue) {
+            const messageSegment: MessageSegment = {
+                type: "text",
+                content: this.state.inputValue,
+            }
             if (this.state.chatHistory) {
                 this.state.chatHistory.messages.push({
-                    message: this.state.inputValue,
+                    message: [messageSegment],
                     source: 'user',
                     id: 'tmp',
                     timestamp: new Date().toISOString(),
@@ -125,7 +129,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 this.setState({
                     chatHistory: {
                         messages: [{
-                            message: this.state.inputValue,
+                            message: [messageSegment],
                             source: 'user',
                             id: 'tmp',
                             timestamp: new Date().toISOString(),
@@ -136,8 +140,12 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             }
             const userInput = this.state.inputValue
             this.setState({ inputValue: '', isWaitingForResponse: true })
+            const requestMessageSegment: MessageSegment = {
+                type: "text",
+                content: this.state.inputValue,
+            }
             SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
-                message: userInput,
+                message: [requestMessageSegment],
                 model: this.props.chatMetadata.interaction.ai_type,
                 model_config: {}
             },
@@ -163,10 +171,14 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             alert("Not logged in")
             return
         }
+        const messageSegment: MessageSegment = {
+            type: "text",
+            content: this.state.inputValue,
+        }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
             initial_message: withMessage ? {
-                message: this.state.inputValue,
+                message: [messageSegment],
                 model_config: {},
                 model: this.props.chatMetadata.interaction.ai_type
             } : undefined
@@ -186,10 +198,14 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 })
             }
             if (withMessage) {
+                const messageSegment: MessageSegment = {
+                    type: "text",
+                    content: this.state.inputValue,
+                }
                 this.setState({
                     chatHistory: {messages: [
                         {
-                            message: this.state.inputValue,
+                            message: [messageSegment],
                             source: 'user',
                             timestamp: new Date().toISOString(),
                             id: response.data.id,

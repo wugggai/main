@@ -3,7 +3,7 @@ import openai
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.api_key_model import ApiKeyModel
 from wugserver.models.db.message_db_model import MessageRecord
-from wugserver.schema.message import Message, MessageCreate, MultiMediaContent
+from wugserver.schema.message import Message, MessageCreate, MessageSegment
 from wugserver.constants import Provider
 
 
@@ -29,7 +29,7 @@ class GPTModels(OpenAIModels):
         return True
 
     @classmethod
-    def assert_input_format(message: list[MultiMediaContent]):
+    def assert_input_format(cls, message: list[MessageSegment]):
         if len(message) != 1 or message[0].type != "text":
             raise ValueError("GPT model requires a single text input prompt")
 
@@ -68,7 +68,7 @@ class DALLEModel(OpenAIModels):
     supported_model_names = ["DALL-E2"]
 
     @classmethod
-    def assert_input_format(message: list[MultiMediaContent]):
+    def assert_input_format(cls, message: list[MessageSegment]):
         if len(message) != 1 or message[0].type != "text":
             raise ValueError("DALL-E model requires a single text input prompt")
 
@@ -83,7 +83,7 @@ class DALLEModel(OpenAIModels):
         message_create_params: MessageCreate,
         interaction_context=None,
     ):
-        prompt = message_create_params.message
+        prompt = message_create_params.message[0].content
         response = openai.Image.create(
             api_key=api_key.api_key,
             prompt=prompt,
