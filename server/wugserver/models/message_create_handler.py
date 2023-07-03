@@ -46,10 +46,7 @@ def handle_message_create_request(
     try:
         requested_model.assert_input_format(message_create_params.message)
     except ValueError as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Bad input: {e}"
-        )
+        raise HTTPException(status_code=400, detail=f"Bad input: {e}")
 
     interaction_context = []
     if requested_model.requires_context():

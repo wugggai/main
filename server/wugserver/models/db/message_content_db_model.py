@@ -8,6 +8,7 @@ from wugserver.dependencies import get_db
 from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, relationship, Session
 
+
 class MessageContentTypes(enum.Enum):
     text = 1
     image = 2
@@ -34,7 +35,9 @@ class MessageContentDbModel:
     def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
-    def create_message_content_record(self, message_id: UUID, type: str, content: str, order: int):
+    def create_message_content_record(
+        self, message_id: UUID, type: str, content: str, order: int
+    ):
         try:
             _type = MessageContentTypes[type]
         except KeyError:

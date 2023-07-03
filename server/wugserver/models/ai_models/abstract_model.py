@@ -51,15 +51,17 @@ class AIModel(object):
     @classmethod
     def wrap_text_message(cls, message: str):
         return cls.wrap_message(
-            message=message, type='text',
+            message=message,
+            type="text",
         )
 
     @classmethod
     def wrap_image_message(cls, message: str):
         return cls.wrap_message(
-            message=message, type='image',
+            message=message,
+            type="image",
         )
-    
+
     @classmethod
     def wrap_message(cls, message: str, type: str):
         content = MessageSegment(

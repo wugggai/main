@@ -9,7 +9,6 @@ from wugserver.schema.message import Message, MessageSegment
 
 
 class MessageModel:
-    
     @classmethod
     def db_message_to_pydantic_message(cls, message: MessageRecord):
         return Message(
@@ -78,8 +77,7 @@ class MessageModel:
         ]
 
         message_record = self.message_db_model.add_content_to_message(
-            message=empty_message,
-            message_content=message_content_records
+            message=empty_message, message_content=message_content_records
         )
         return self.db_message_to_pydantic_message(message_record)
 

@@ -22,7 +22,7 @@ class MessageFavoriteRecord(Base):
         index=True,
         primary_key=True,
     )
-    
+
     # dummy record to resolve relationship to messages table
     messages = relationship("MessageRecord", back_populates="favorites")
 

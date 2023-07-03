@@ -45,7 +45,7 @@ def create_interaction_route(
     auto_title = "Untitled Conversation"
     if initial_message is not None:
         for segment in initial_message.message:
-            if segment.type == 'text':
+            if segment.type == "text":
                 auto_title = segment.content.split()[:10]
                 break
     interaction = create_interaction(

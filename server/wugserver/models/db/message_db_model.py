@@ -9,7 +9,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from wugserver.database import Base
 from wugserver.dependencies import get_db
 from wugserver.models.db.message_favorite_db_model import MessageFavoriteRecord
-from wugserver.models.db.message_content_db_model import MessageContentTypes, MessageContentRecord
+from wugserver.models.db.message_content_db_model import (
+    MessageContentTypes,
+    MessageContentRecord,
+)
 
 
 # TODO: Message table should store userId
@@ -79,18 +82,22 @@ class MessageDbModel:
         self.db.refresh(message)
         return message
 
-    def add_content_to_message(self, message: MessageRecord, message_content: list[MessageContentRecord]):
+    def add_content_to_message(
+        self, message: MessageRecord, message_content: list[MessageContentRecord]
+    ):
         message.message = message_content
         self.db.commit()
         self.db.refresh(message)
         return message
 
     def _get_interaction_message_count(self, interaction_id: UUID):
-        last_message = self.db.query(MessageRecord) \
-            .filter(MessageRecord.interaction_id == interaction_id) \
-            .order_by(MessageRecord.offset.desc()) \
-            .limit(1) \
+        last_message = (
+            self.db.query(MessageRecord)
+            .filter(MessageRecord.interaction_id == interaction_id)
+            .order_by(MessageRecord.offset.desc())
+            .limit(1)
             .one_or_none()
+        )
         if last_message:
             return last_message.offset + 1
         return 0
