@@ -5,7 +5,7 @@
 }
 
 .settings-table tr {
-    height: 80px;
+    height: 70px;
 }
 
 .settings-table td > * {
@@ -13,7 +13,7 @@
 }
 
 .settings-table input {
-    width: 200px;
+    width: 220px;
 }
 
 .settings-table .caption {

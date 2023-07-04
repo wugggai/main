@@ -11,18 +11,24 @@ interface AccountPageProps {
  
 interface AccountPageState {
     email?: string
+    passwordFieldsExpanded: boolean
     password: string
-    passwordUpdating?: boolean // undefined: hidden, false: 'change', true: spinner
+    confirmPassword: string
+    passwordUpdating: boolean
 }
  
 class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
     constructor(props: AccountPageProps) {
         super(props);
         this.state = {
-            password: ''
+            password: '',
+            confirmPassword: '',
+            passwordFieldsExpanded: false,
+            passwordUpdating: false
         };
         this.changePassword = this.changePassword.bind(this);
         this.logout = this.logout.bind(this);
+        this.expandPasswordFields = this.expandPasswordFields.bind(this);
     }
 
     componentDidMount(): void {
@@ -45,15 +51,25 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         })
     }
 
+    expandPasswordFields() {
+        this.setState({ passwordFieldsExpanded: true })
+    }
+
     changePassword() {
         const userId = Cookies.load('user_id')
         if (userId === undefined) {
             return
         }
         this.setState({ passwordUpdating: true })
-        // SERVER.patch(`/users/${userId}/password`, undefined).then(response => {
-        //     this.setState({ passwordUpdating: undefined })
-        // })
+        SERVER.patch(`/users/${userId}/password`, {
+            new_password: this.state.password
+        }).then(response => {
+            console.log(response)
+            this.setState({ passwordFieldsExpanded: false, password: '', confirmPassword: '', passwordUpdating: false })
+        }).catch(err => {
+            alert("Error: " + err.response)
+            this.setState({ passwordUpdating: false })
+        })
     }
 
     logout() {
@@ -69,7 +85,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             return <Loading />
         }
 
-        const inlineSpinner = <div style={{position: 'relative', display: 'inline-block', width: '35px', height: '40px'}}>
+        const inlineSpinner = <div style={{position: 'relative', display: 'inline-block', width: '75px', height: '43px'}}>
             <Loading size={20} />
         </div>
 
@@ -88,16 +104,55 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 </tr>
                 <tr>
                     <td>Password</td>
-                    <td><input type="password" placeholder='Password' className='textfield settings-textfield'
-                        value={this.state.password}
-                        onChange={e => this.setState({ passwordUpdating: false, password: e.target.value })}
-                    />{
-                        this.state.passwordUpdating ?
-                            inlineSpinner
-                            : 
-                            (this.state.passwordUpdating !== undefined && <button onClick={this.changePassword}>Change</button>)
-                    }</td>
+                    <td>{!this.state.passwordFieldsExpanded &&
+                        <Fragment>
+                            <input type="password" placeholder='••••••••' className='textfield settings-textfield' readOnly disabled /> <button onClick={this.expandPasswordFields}>Change</button>
+                        </Fragment>}
+                    </td>
                 </tr>
+                {this.state.passwordFieldsExpanded &&
+                    <Fragment>
+                        <tr style={{height: '40px'}}>
+                            <td>Current Password</td>
+                            <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
+                        </tr>
+                        <tr style={{height: '40px'}}>
+                            <td>New Password</td>
+                            <td><input type="password" placeholder='' className='textfield settings-textfield' value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} /></td>
+                        </tr>
+                        <tr>
+                            <td />
+                            <td>
+                                <div className='caption' style={{margin: '6px 1px', width: '220px'}}>
+                                    Your new password must be at least 8 characters long and contains:
+                                    <ul>
+                                        <li>At least 1 uppercase letter</li>
+                                        <li>At least 1 lowercase letter</li>
+                                        <li>At least 1 number</li>
+                                        <li>At least 1 symbol</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style={{height: '40px'}}>
+                            <td>Confirm New Password</td>
+                            <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
+                        </tr>
+                        <tr>
+                            <td />
+                            <td style={{textAlign: 'right'}}>
+                                {
+                                    this.state.passwordUpdating ?
+                                        inlineSpinner
+                                        : 
+                                        <button onClick={this.changePassword} style={{marginRight: 0}}>Change</button>
+                                }
+                                <br />
+                                <span style={{fontSize: '13px', color: 'var(--lighter-text-color)'}}>Or <span style={{textDecoration: 'underline', cursor: 'pointer'}} onClick={() => this.setState({ passwordFieldsExpanded: false, password: '' })}>discard</span></span>
+                            </td>
+                        </tr>
+                    </Fragment>
+                }
             </table>
             <button className='settings-button' onClick={this.logout}>Log Out</button>
         </Fragment>

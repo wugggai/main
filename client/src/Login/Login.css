@@ -39,7 +39,7 @@
 }
 
 .login-screen .right h3 {
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 .login-screen .right .login-fields {
@@ -71,8 +71,6 @@
 }
 
 .login-screen #forgot-password {
-    text-decoration: none;
-    color: var(--text-color);
     font-size: 12px;
 }
 
@@ -85,9 +83,28 @@
     font-size: 15px;
     border-radius: 25px;
     padding: 12px 10px;
-    width: 200px;
+    width: 180px;
     /* margin: 0 auto; */
     margin: 20px calc((100% - 200px) / 2) 10px;
+}
+
+.login-fields .reset-button {
+    background-color: white;
+    color: var(--text-color);
+    margin-left: 0;
+    display: inline-block;
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
+
+.login-fields .reset-button:hover:not(:disabled) {
+    background-color: #f3f3f3 !important;
+    color: var(--text-color) !important;
+}
+
+.login-fields .reset-button:disabled {
+    background-color: white !important;
+    color: var(--lighter-text-color);
 }
 
 .login-screen .login-button:hover:not(:disabled) {
@@ -126,4 +143,10 @@
     padding: 5px;
     margin: 5px 0px;
     display: inline-block;
+}
+
+.login-screen .reset-instructions {
+    font-size: 14px;
+    color: var(--text-color);
+    margin-bottom: 15px;
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import './Login.css'
 import axios from 'axios';
 import { API_BASE } from '../Constants';
@@ -13,25 +13,29 @@ interface LoginState {
     username: string
     password: string
     confirmPassword: string
-    isSignUp: boolean
+    mode: 'login' | 'sign up' | 'reset'
     showInstructions: boolean
     passwordWarning?: string
     confirmWarning?: string
+    resetDone: boolean
 }
+
  
 class Login extends React.Component<LoginProps, LoginState> {
     constructor(props: LoginProps) {
         super(props);
         this.state = {
             username: '',
-            isSignUp: false,
+            mode: 'login',
             password: '',
             confirmPassword: '',
-            showInstructions: false
+            showInstructions: false,
+            resetDone: false
         };
 
         this.login = this.login.bind(this);
         this.signUp = this.signUp.bind(this);
+        this.reset = this.reset.bind(this);
     }
 
     login() {
@@ -81,6 +85,14 @@ class Login extends React.Component<LoginProps, LoginState> {
         })
     }
 
+    reset() {
+        axios.post(API_BASE + '/users/forgetpassword', {
+            email: this.state.username
+        }).finally(() => {
+            this.setState({ resetDone: true })
+        })
+    }
+
     render() { 
         const enableButton = this.state.username && this.state.password && this.state.password == this.state.confirmPassword
         const loginScreen = <div className='login-fields'>
@@ -94,11 +106,11 @@ class Login extends React.Component<LoginProps, LoginState> {
                 <br />
                 <input type="password" name="password" className='textfield login-field' value={this.state.password} onChange={e => this.setState({ password: e.target.value })} />
                 <div style={{textAlign: 'right'}}>
-                    <a href='#' id="forgot-password">Forgot Password</a>
+                    <a href='#' id="forgot-password" onClick={() => this.setState({ mode: 'reset' })}>Forgot Password</a>
                 </div>
             </fieldset>
             <button className='login-button generic-button' onClick={this.login}>Log In</button>
-            <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({ isSignUp: true })}>Sign Up</a></div>
+            <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({ mode: 'sign up' })}>Sign Up</a></div>
         </div>
 
         const signupScreen = <div className='login-fields'>
@@ -139,26 +151,54 @@ class Login extends React.Component<LoginProps, LoginState> {
                 </div>
                 <button className='login-button generic-button' disabled={!enableButton} onClick={this.signUp}>Sign Up</button>
                 <div style={{textAlign: 'center'}} className='signup-message'>
-                    Or<a href='#' onClick={() => this.setState({ isSignUp: false })}>Return to Login</a>
+                    Or<a href='#' onClick={() => this.setState({ mode: 'login' })}>Return to Login</a>
                 </div>
             </fieldset>
+        </div>
+
+        const resetScreen = <div className='login-fields' style={{maxWidth: '300px'}}>
+            <h3>Password Reset</h3>
+            <div className='reset-instructions'>
+                Please enter your email address below and we will send you a link with instructions to reset your password.
+            </div>
+            <input type='email' placeholder='Email' value={this.state.username} onChange={e => this.setState({ username: e.target.value })} className='textfield login-field' />
+            {this.state.resetDone ?
+                <Fragment>
+                    <div style={{display: 'flex', alignItems: 'flex-start', margin: '10px 0px', fontSize: '14px'}}>
+                        <img src="/assets/check.svg" width={18} style={{marginRight: '4px'}} />
+                        <div style={{color: 'var(--theme-green)'}}>
+                            An email has been sent to your email address, please check your inbox and/or your spam folder.
+                        </div>
+                    </div>
+                    <div style={{fontSize: '13px', textAlign: 'center', margin: '20px 0'}}>
+                        Back to <a href='#' onClick={() => this.setState({ mode: 'login', resetDone: false, username: '' })}>Login</a>
+                    </div>
+                </Fragment>
+                :
+                <Fragment>
+                    <button disabled={!this.state.username} className='login-button reset-button' onClick={this.reset}>Reset Password</button>
+                    <span style={{fontSize: '13px'}}>
+                        Or <a href='#' onClick={() => this.setState({ mode: 'login', resetDone: false })}>Cancel</a>
+                    </span>
+                </Fragment>
+            }
         </div>
 
         const instructionScreen = <div className='login-fields'>
             Please check your inbox to verify your account.
             <br />
             <div style={{textAlign: 'center'}}>
-                <a href="#" onClick={() => this.setState({ isSignUp: false, showInstructions: false, password: '', username: '' })}>Return to Login</a>
+                <a href="#" onClick={() => this.setState({ mode: 'login', showInstructions: false, password: '', username: '' })}>Return to Login</a>
             </div>
         </div>
 
         let rightScreen: JSX.Element
-        if (this.state.showInstructions) {
-            rightScreen = instructionScreen
-        } else if (this.state.isSignUp) {
+        if (this.state.mode === 'login') {
+            rightScreen = this.state.showInstructions ? instructionScreen : loginScreen
+        } else if (this.state.mode === 'sign up') {
             rightScreen = signupScreen
         } else {
-            rightScreen = loginScreen
+            rightScreen = resetScreen
         }
  
         return <div className='center-screen login-screen'>
