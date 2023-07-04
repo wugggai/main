@@ -3,9 +3,8 @@ from fastapi import Depends
 from sqlalchemy import UUID
 from wugserver.models.db.message_db_model import MessageDbModel, MessageRecord
 from wugserver.models.db.interaction_model import InteractionRecord
-from wugserver.models.db.message_content_db_model import MessageContentDbModel
 from wugserver.models.db.message_favorite_db_model import MessageFavoriteDbModel
-from wugserver.schema.message import Message, MessageSegment
+from wugserver.schema.message import Message, MessageSegment, MessageTypes
 
 
 class MessageModel:
@@ -20,7 +19,7 @@ class MessageModel:
             favorite_by=message.favorite_by,
             message=[
                 MessageSegment(
-                    type=content_record.type.name,
+                    type=content_record.type,
                     content=content_record.content,
                 )
                 for content_record in sorted(message.message, key=lambda r: r.order)
@@ -30,15 +29,11 @@ class MessageModel:
     def __init__(
         self,
         message_db_model: MessageDbModel = Depends(MessageDbModel),
-        message_content_db_model: MessageContentDbModel = Depends(
-            MessageContentDbModel
-        ),
         message_favorite_db_model: MessageFavoriteDbModel = Depends(
             MessageFavoriteDbModel
         ),
     ) -> None:
         self.message_db_model = message_db_model
-        self.message_content_db_model = message_content_db_model
         self.message_favorite_db_model = message_favorite_db_model
 
     def get_interaction_messages(
@@ -48,13 +43,9 @@ class MessageModel:
         limit: int,
         from_latest: bool = True,
     ) -> list[Message]:
-        raw_messages_records = self.message_db_model.get_interaction_messages(
+        return self.message_db_model.get_interaction_messages(
             interaction.id, offset, limit, from_latest
         )
-        return [
-            self.db_message_to_pydantic_message(raw_message)
-            for raw_message in raw_messages_records
-        ]
 
     def create_message(
         self,
@@ -62,24 +53,11 @@ class MessageModel:
         source: str,
         message: list[MessageSegment],
     ):
-        empty_message = self.message_db_model.create_empty_message(
+        return self.message_db_model.create_message(
             interaction_id=interaction.id,
             source=source,
+            message=message,
         )
-        message_content_records = [
-            self.message_content_db_model.create_message_content_record(
-                type=record.type,
-                content=record.content,
-                order=index,
-                message_id=empty_message.id,
-            )
-            for index, record in enumerate(message)
-        ]
-
-        message_record = self.message_db_model.add_content_to_message(
-            message=empty_message, message_content=message_content_records
-        )
-        return self.db_message_to_pydantic_message(message_record)
 
     def get_interaction_last_message(self, interaction: InteractionRecord):
         last_message_in_list = self.get_interaction_messages(interaction, 0, 1, True)

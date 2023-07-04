@@ -1,10 +1,16 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from enum import Enum
+from pydantic import BaseModel, Field, validator
 from uuid import UUID
 
 
+class MessageTypes(Enum):
+    text = "text"
+    image_url = "image_url"
+
+
 class MessageSegment(BaseModel):
-    type: str
+    type: MessageTypes
     content: str
 
 

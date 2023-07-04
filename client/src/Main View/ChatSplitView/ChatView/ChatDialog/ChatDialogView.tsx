@@ -57,7 +57,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
             const messageSegments = msg.message.map((segment, index) => {
                 if (segment.type === "text") {
                     return <MarkdownTextView key={index} rawText={segment.content} />;
-                } else if (segment.type === "image") {
+                } else if (segment.type === "image_url") {
                     return <img key={index} src={segment.content}/>;
                 } else {
                     return null;

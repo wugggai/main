@@ -64,7 +64,6 @@ def create_interaction_route(
             message_model=message_model,
         )
 
-    print("RESPONSE: ", optional_message_response)
     return InteractionWithLatestMessage(
         interaction=interaction,
         last_message=optional_message_response,
@@ -94,8 +93,8 @@ def get_interactions_route(
         res.append(
             InteractionWithLatestMessage(
                 interaction=interaction,
-                last_message=message_model.get_interaction_last_message(
-                    interaction=interaction
+                last_message=message_model.db_message_to_pydantic_message(
+                    message_model.get_interaction_last_message(interaction=interaction)
                 ),
             )
         )
@@ -125,8 +124,8 @@ def get_deleted_interactions_route(
         res.append(
             InteractionWithLatestMessage(
                 interaction=interaction,
-                last_message=message_model.get_interaction_last_message(
-                    interaction=interaction
+                last_message=message_model.db_message_to_pydantic_message(
+                    message_model.get_interaction_last_message(interaction=interaction)
                 ),
             )
         )

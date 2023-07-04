@@ -24,7 +24,7 @@ class MessageFavoriteRecord(Base):
     )
 
     # dummy record to resolve relationship to messages table
-    messages = relationship("MessageRecord", back_populates="favorites")
+    message = relationship("MessageRecord", back_populates="favorites")
 
     timestamp = Column(DateTime, default=datetime.datetime.utcnow())
 

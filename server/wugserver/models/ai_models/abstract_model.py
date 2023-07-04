@@ -1,8 +1,9 @@
+from abc import abstractmethod
 from sqlalchemy.orm import Session
 from typing import Any
 
 from wugserver.models.db.api_key_model import get_user_api_key_for_provider
-from wugserver.schema.message import MessageCreate, MessageSegment
+from wugserver.schema.message import MessageCreate, MessageSegment, MessageTypes
 from wugserver.constants import Provider
 
 
@@ -44,7 +45,7 @@ class AIModel(object):
     def requires_context(cls) -> bool:
         return False
 
-    @classmethod
+    @abstractmethod
     def assert_input_format(cls, message: MessageSegment):
         pass
 
@@ -52,18 +53,18 @@ class AIModel(object):
     def wrap_text_message(cls, message: str):
         return cls.wrap_message(
             message=message,
-            type="text",
+            type=MessageTypes["text"],
         )
 
     @classmethod
     def wrap_image_message(cls, message: str):
         return cls.wrap_message(
             message=message,
-            type="image",
+            type=MessageTypes["image_url"],
         )
 
     @classmethod
-    def wrap_message(cls, message: str, type: str):
+    def wrap_message(cls, message: str, type: MessageTypes):
         content = MessageSegment(
             type=type,
             content=message,

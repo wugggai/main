@@ -78,4 +78,6 @@ def handle_message_create_request(
 
     # set the interaction's latest update time
     set_interaction_update_time_and_commit(db=db, interaction=interaction)
-    return ai_message
+    print(ai_message)
+    print(MessageModel.db_message_to_pydantic_message(ai_message))
+    return MessageModel.db_message_to_pydantic_message(ai_message)

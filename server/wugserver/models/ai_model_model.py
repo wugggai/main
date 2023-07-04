@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from wugserver.constants import ENV, Environment, Provider
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.ai_models.echo_model import EchoModel
-from wugserver.models.ai_models.openai_model import GPTModels, DALLEModel
+from wugserver.models.ai_models.openai_model import GPTModel, DALLEModel
 from wugserver.models.db.api_key_model import ApiKeyModel, get_all_user_api_keys
 
 """
@@ -15,7 +15,7 @@ ai_models.py: interface to access all AI models
 # Initializes the list of available models
 model_name_to_model: dict[str, AIModel] = {}
 provider_to_model: dict[Provider, list[AIModel]] = defaultdict(list)
-supported_models: list[AIModel] = [GPTModels(), DALLEModel(), EchoModel()]
+supported_models: list[AIModel] = [GPTModel(), DALLEModel(), EchoModel()]
 
 for model in supported_models:
     model_name_to_model.update({name: model for name in model.supported_model_names})

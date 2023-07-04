@@ -3,15 +3,20 @@ import openai
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.api_key_model import ApiKeyModel
 from wugserver.models.db.message_db_model import MessageRecord
-from wugserver.schema.message import Message, MessageCreate, MessageSegment
+from wugserver.schema.message import (
+    Message,
+    MessageCreate,
+    MessageSegment,
+    MessageTypes,
+)
 from wugserver.constants import Provider
 
 
-class OpenAIModels(AIModel):
+class OpenAIModel(AIModel):
     provider = Provider.openai
 
 
-class GPTModels(OpenAIModels):
+class GPTModel(OpenAIModel):
     supported_model_names = ["gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-4"]
 
     @classmethod
@@ -30,7 +35,7 @@ class GPTModels(OpenAIModels):
 
     @classmethod
     def assert_input_format(cls, message: list[MessageSegment]):
-        if len(message) != 1 or message[0].type != "text":
+        if len(message) != 1 or message[0].type != MessageTypes.text:
             raise ValueError("GPT model requires a single text input prompt")
 
     def post_message(
@@ -60,16 +65,22 @@ class GPTModels(OpenAIModels):
             "role": "assistant"
             if message.source in self.supported_model_names
             else "user",
-            "content": message.message,
+            "content": "".join(
+                [
+                    segment.content
+                    for segment in message.message
+                    if segment.type == MessageTypes.text
+                ]
+            ),
         }
 
 
-class DALLEModel(OpenAIModels):
+class DALLEModel(OpenAIModel):
     supported_model_names = ["DALL-E2"]
 
     @classmethod
     def assert_input_format(cls, message: list[MessageSegment]):
-        if len(message) != 1 or message[0].type != "text":
+        if len(message) != 1 or message[0].type != MessageTypes.text:
             raise ValueError("DALL-E model requires a single text input prompt")
 
     @classmethod

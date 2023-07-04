@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.message_db_model import MessageRecord
-from wugserver.schema.message import MessageCreate, MessageSegment
+from wugserver.schema.message import MessageCreate, MessageSegment, MessageTypes
 from wugserver.constants import Provider
 
 """
@@ -17,8 +17,8 @@ class EchoModel(AIModel):
 
     @classmethod
     def assert_input_format(cls, message: list[MessageSegment]):
-        if len(message) < 1 or message[0].type != "text":
-            raise ValueError("echo model requires a single text input message")
+        if len(message) < 1:
+            raise ValueError("echo model requires at least one input message")
 
     def post_message(
         self,
@@ -27,11 +27,12 @@ class EchoModel(AIModel):
         message_create_params: MessageCreate,
     ):
         current_messages_count = len(interaction_context)
+        message = message_create_params.message
 
         return self.wrap_text_message(
-            f"You just created Message #{current_messages_count} "
-            f"in an interaction with {current_messages_count} messages. "
-            f'The message was: "{message_create_params.message[0].content}". '
+            f"You just created Message #{current_messages_count} in an interaction. "
+            f"The message contains {len(message)} segment(s). "
+            f'First segment has type {message[0].type.value} and content: "{message[0].content}". '
             f"This response message is Message #{current_messages_count + 1}."
         )
 
