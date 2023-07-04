@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import BaseModel
 from uuid import UUID
 from wugserver.schema.message import Message, MessageCreate
-from wugserver.schema.tag import Tag
 
 
 class InteractionCreate(BaseModel):

@@ -31,12 +31,20 @@ from wugserver.models.db.interaction_model import (
     get_interaction_by_id,
     get_interaction_owner,
 )
+from wugserver.models.db.message_draft_db_model import MessageDraftRecord
 from wugserver.models.db.tag_model import get_tag_by_id, get_tag_owner
 
 
 def authorize_by_matching_user_id(current_user_id: int, user_id: int):
     if current_user_id != user_id:
         raise HTTPException(status_code=403, detail=f"user is not {user_id}")
+
+
+def authorize_message_draft(user_id: int, message_draft_record: MessageDraftRecord):
+    if user_id != message_draft_record.user_id:
+        raise HTTPException(
+            status_code=403, detail=f"user cannot access {message_draft_record.id}"
+        )
 
 
 def authorized_get_interaction(

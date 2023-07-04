@@ -1,14 +1,13 @@
 import logging
 import os
-from fastapi import Depends, FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from wugserver.routers import (
     api_keys,
     authentication,
     interactions,
+    message_drafts,
     messages,
     password,
     tags,
@@ -48,6 +47,11 @@ app.include_router(
 )
 app.include_router(
     messages.router,
+    prefix=api_router_prefix,
+    dependencies=[Depends(get_current_active_user)],
+)
+app.include_router(
+    message_drafts.router,
     prefix=api_router_prefix,
     dependencies=[Depends(get_current_active_user)],
 )
