@@ -10,6 +10,7 @@ from wugserver.constants import ENV, Environment
 #       PRODUCTION db will not be accessible from dev
 mysql_db_conn = os.environ.get("MYSQL_DB_CONN")
 
+
 def create_azure_mysql_engine():
     return create_engine(mysql_db_conn)
 

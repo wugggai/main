@@ -1,21 +1,30 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from enum import Enum
+from pydantic import BaseModel, Field, validator
 from uuid import UUID
 
 
-# TODO: messageCreate should capture the userId too
+class MessageTypes(Enum):
+    text = "text"
+    image_url = "image_url"
+
+
+class MessageSegment(BaseModel):
+    type: MessageTypes
+    content: str
+
+
 class MessageCreate(BaseModel):
-    message: str
+    message: list[MessageSegment]
     model: str = Field(default="echo")
     model_config: dict
 
 
 class Message(BaseModel):
     id: UUID
-    message: str
+    message: list[MessageSegment]
     interaction_id: UUID
     source: str
-    message: str
     offset: int
     timestamp: datetime
     favorite_by: list[int]

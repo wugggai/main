@@ -53,11 +53,20 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
             if (iconAssetName.startsWith("user")) {
                 iconAssetName = "user"
             }
+
+            const messageSegments = msg.message.map((segment, index) => {
+                if (segment.type === "text") {
+                    return <MarkdownTextView key={index} rawText={segment.content} />;
+                } else if (segment.type === "image_url") {
+                    return <img key={index} src={segment.content}/>;
+                } else {
+                    return null;
+                }
+            });
+
             dialogCells.push(<div className='history-item' style={{ display: 'flex' }} key={i}>
                 <img src={`/assets/${iconAssetName}.png`} width={40} className='avatar' />
-                <div className='message'>
-                    <MarkdownTextView rawText={msg.message}/>
-                </div>
+                <div className='messageContainer'>{messageSegments}</div>
             </div>)
         })
 

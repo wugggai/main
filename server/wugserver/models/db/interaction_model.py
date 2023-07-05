@@ -16,7 +16,7 @@ from uuid import UUID, uuid4
 from wugserver.models.db.interaction_tag_association import (
     interaction_tag_association_table,
 )
-from wugserver.models.db.tag_model import TagModel, set_tag_update_time_and_commit
+from wugserver.models.db.tag_model import TagRecord, set_tag_update_time_and_commit
 from wugserver.schema.interaction import InteractionCreate, InteractionUpdate
 
 
@@ -28,7 +28,7 @@ class InteractionRecord(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     title = Column(String(256))
-    tags: Mapped[list[TagModel]] = relationship(
+    tags: Mapped[list[TagRecord]] = relationship(
         secondary=interaction_tag_association_table,
         back_populates="interactions",
     )
@@ -127,7 +127,7 @@ def get_deleted_interactions_by_creator_user_id(
 def update_interaction(
     db: Session,
     interaction: InteractionRecord,
-    tags: list[TagModel] | None,
+    tags: list[TagRecord] | None,
     title: str | None,
     deleted: bool | None,
 ):

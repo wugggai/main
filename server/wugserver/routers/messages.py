@@ -48,12 +48,16 @@ def get_messages_route(
     interaction = authorized_get_interaction(
         db=db, current_user_id=current_user.id, interaction_id=interaction_id
     )
-    return message_model.get_interaction_messages(
+    raw_messages = message_model.get_interaction_messages(
         interaction=interaction,
         offset=offset,
         limit=limit,
         from_latest=from_latest,
     )
+    return [
+        message_model.db_message_to_pydantic_message(raw_message)
+        for raw_message in raw_messages
+    ]
 
 
 @router.post("/users/{user_id}/messages/{message_id}/favorite")

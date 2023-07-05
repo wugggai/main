@@ -4,9 +4,28 @@ from sqlalchemy import UUID
 from wugserver.models.db.message_db_model import MessageDbModel, MessageRecord
 from wugserver.models.db.interaction_model import InteractionRecord
 from wugserver.models.db.message_favorite_db_model import MessageFavoriteDbModel
+from wugserver.schema.message import Message, MessageSegment, MessageTypes
 
 
 class MessageModel:
+    @classmethod
+    def db_message_to_pydantic_message(cls, message: MessageRecord):
+        return Message(
+            id=message.id,
+            interaction_id=message.interaction_id,
+            source=message.source,
+            offset=message.offset,
+            timestamp=message.timestamp,
+            favorite_by=message.favorite_by,
+            message=[
+                MessageSegment(
+                    type=content_record.type,
+                    content=content_record.content,
+                )
+                for content_record in sorted(message.message, key=lambda r: r.order)
+            ],
+        )
+
     def __init__(
         self,
         message_db_model: MessageDbModel = Depends(MessageDbModel),
@@ -23,13 +42,22 @@ class MessageModel:
         offset: int,
         limit: int,
         from_latest: bool = True,
-    ) -> list[MessageRecord]:
+    ) -> list[Message]:
         return self.message_db_model.get_interaction_messages(
             interaction.id, offset, limit, from_latest
         )
 
-    def create_message(self, interaction: InteractionRecord, source: str, message: str):
-        return self.message_db_model.create_message(interaction.id, source, message)
+    def create_message(
+        self,
+        interaction: InteractionRecord,
+        source: str,
+        message: list[MessageSegment],
+    ):
+        return self.message_db_model.create_message(
+            interaction_id=interaction.id,
+            source=source,
+            message=message,
+        )
 
     def get_interaction_last_message(self, interaction: InteractionRecord):
         last_message_in_list = self.get_interaction_messages(interaction, 0, 1, True)

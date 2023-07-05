@@ -1,13 +1,13 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from wugserver.models.ai_models.ai_models import get_model_by_name
+from wugserver.models.ai_model_model import get_model_by_name
 from wugserver.models.db.interaction_model import (
     InteractionRecord,
     set_interaction_update_time_and_commit,
 )
 from wugserver.models.message_model import MessageModel
-from wugserver.schema.message import MessageCreate
+from wugserver.schema.message import MessageCreate, MessageSegment
 
 
 def handle_message_create_request(
@@ -43,11 +43,18 @@ def handle_message_create_request(
             detail=f"No API key provided for {message_create_params.model}",
         )
 
-    interaction_context = message_model.get_interaction_all_messages(
-        interaction=interaction
-    )
     try:
-        model_res_msg = requested_model.post_message(
+        requested_model.assert_input_format(message_create_params.message)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Bad input: {e}")
+
+    interaction_context = []
+    if requested_model.requires_context():
+        interaction_context = message_model.get_interaction_all_messages(
+            interaction=interaction
+        )
+    try:
+        model_res_msg: list[MessageSegment] = requested_model.post_message(
             api_key=api_key,
             interaction_context=interaction_context,
             message_create_params=message_create_params,
@@ -71,4 +78,6 @@ def handle_message_create_request(
 
     # set the interaction's latest update time
     set_interaction_update_time_and_commit(db=db, interaction=interaction)
-    return ai_message
+    print(ai_message)
+    print(MessageModel.db_message_to_pydantic_message(ai_message))
+    return MessageModel.db_message_to_pydantic_message(ai_message)

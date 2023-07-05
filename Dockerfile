@@ -38,7 +38,8 @@ COPY --from=node-build /client/build /app/client
 
 # Install Python dependencies for backend
 # WORKDIR /app/server
-RUN poetry config virtualenvs.create false \
+RUN poetry config installer.max-workers 20 \
+  && poetry config virtualenvs.create false \
   && poetry install --no-interaction --no-ansi
 
 # Set work directory back to /app

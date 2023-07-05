@@ -7,6 +7,11 @@ dayjs.extend(timezone);
 
 export type AI = 'gpt-3.5-turbo' | 'gpt-4'
 
+export interface MessageSegment {
+    type: string
+    content: string
+}
+
 export interface Interaction {
     title: string
     id: string
@@ -19,7 +24,7 @@ export interface Interaction {
 export interface ChatMetadata {
     interaction: Interaction
     last_message: {
-        message: string
+        message: MessageSegment[]
         source: string
         id: string
         timestamp: string
@@ -31,7 +36,7 @@ export interface ChatHistoryItem {
     id: string
     interaction_id?: string
     source: 'user' | 'echo' | AI
-    message: string
+    message: MessageSegment[]
     offset: number
     timestamp: string
 }
