@@ -10,6 +10,8 @@ from wugserver.schema.message import Message, MessageSegment, MessageTypes
 class MessageModel:
     @classmethod
     def db_message_to_pydantic_message(cls, message: MessageRecord):
+        if message is None:
+            return None
         return Message(
             id=message.id,
             interaction_id=message.interaction_id,

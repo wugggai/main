@@ -87,36 +87,9 @@ class MessageDbModel:
         self.db.refresh(message)
         return message
 
-    # def create_empty_message(self, interaction_id: UUID, source: str):
-    #     message = MessageRecord(
-    #         id=uuid4(),
-    #         interaction_id=interaction_id,
-    #         source=source,
-    #         offset=offset,
-    #         message=[],
-    #         timestamp=datetime.datetime.utcnow(),
-    #     )
-    #     self.db.add(message)
-    #     self.db.commit()
-    #     self.db.refresh(message)
-    #     return message
-
-    # def add_content_to_message(
-    #     self, message: MessageRecord, message_content: list[MessageContentRecord]
-    # ):
-    #     message.message = message_content
-    #     self.db.commit()
-    #     self.db.refresh(message)
-    #     return message
-
     def _get_interaction_message_count(self, interaction_id: UUID):
-        last_message = (
+        return (
             self.db.query(MessageRecord)
             .filter(MessageRecord.interaction_id == interaction_id)
-            .order_by(MessageRecord.offset.desc())
-            .limit(1)
-            .one_or_none()
+            .count()
         )
-        if last_message:
-            return last_message.offset + 1
-        return 0
