@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from wugserver.dependencies import get_db
 
+from wugserver.constants import ENV, Environment
 from wugserver.models.db.user_db_model import UserRecord
 from wugserver.models.external.sendgrid import send_verification_email
 from wugserver.models.user_model import UserModel
@@ -57,7 +58,6 @@ async def get_user_from_token(token: str, user_model: UserModel):
     if not token:
         raise credentials_exception
     try:
-        print(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("auth")
         if email is None:
@@ -101,15 +101,25 @@ def register_user(
         data={"auth": user.email},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-    res = send_verification_email(user.email, token)
-    if 200 <= int(res.status_code) <= 299:
-        db_user = user_model.create_db_user(user)
-        if user.password:
-            user_password_model.create_user_password(db_user.id, user.password)
-        return db_user
 
-    res_json = json.loads(res.body)
-    raise HTTPException(
-        status_code=503,
-        detail=f"Could not send verification email to {email}: {res_json['errors']}",
-    )
+    if ENV is not Environment.dev:
+        try:
+            res = send_verification_email(user.email, token)
+        except Exception as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Could not send verification email to {email}: {e}",
+            )
+        if not 200 <= int(res.status_code) <= 299:
+            res_json = json.loads(res.body)
+            raise HTTPException(
+                status_code=503,
+                detail=f"Could not send verification email to {email}: {res_json['errors']}",
+            )
+
+    db_user = user_model.create_db_user(user)
+    if user.password:
+        user_password_model.create_user_password(db_user.id, user.password)
+    if ENV is Environment.dev:
+        user_model.activate_user(db_user)
+    return db_user

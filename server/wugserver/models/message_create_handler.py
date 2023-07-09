@@ -44,7 +44,7 @@ def handle_message_create_request(
         )
 
     try:
-        requested_model.assert_input_format(message_create_params.message)
+        requested_model.assert_input_format(message_create_params)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"Bad input: {e}")
 
@@ -78,6 +78,4 @@ def handle_message_create_request(
 
     # set the interaction's latest update time
     set_interaction_update_time_and_commit(db=db, interaction=interaction)
-    print(ai_message)
-    print(MessageModel.db_message_to_pydantic_message(ai_message))
     return MessageModel.db_message_to_pydantic_message(ai_message)

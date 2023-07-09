@@ -34,7 +34,8 @@ class GPTModel(OpenAIModel):
         return True
 
     @classmethod
-    def assert_input_format(cls, message: list[MessageSegment]):
+    def assert_input_format(cls, message_create_params: MessageCreate):
+        message = message_create_params.message
         if len(message) != 1 or message[0].type != MessageTypes.text:
             raise ValueError("GPT model requires a single text input prompt")
 
@@ -78,6 +79,8 @@ class GPTModel(OpenAIModel):
 class DALLEModel(OpenAIModel):
     supported_model_names = ["DALL-E2"]
 
+
+class DALLET2IModel(DALLEModel):
     @classmethod
     def assert_input_format(cls, message: list[MessageSegment]):
         if len(message) != 1 or message[0].type != MessageTypes.text:
@@ -98,6 +101,8 @@ class DALLEModel(OpenAIModel):
         response = openai.Image.create(
             api_key=api_key.api_key,
             prompt=prompt,
-            n=1,
+            n=message_create_params.model_config.get("n", 1),
+            size=message_create_params.model_config.get("size", "512x512"),
         )
-        return self.wrap_image_message(response["data"][0]["url"])
+        urls = [d["url"] for d in response["data"]]
+        return self.wrap_image_message(urls)
