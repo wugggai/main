@@ -46,9 +46,7 @@ def update_api_key_record(
 def get_user_api_key_for_provider(db: Session, user_id: int, provider: str):
     return (
         db.query(ApiKeyModel)
-        .filter(
-            ApiKeyModel.owner_user_id == user_id and ApiKeyModel.provider == provider
-        )
+        .filter(ApiKeyModel.owner_user_id == user_id, ApiKeyModel.provider == provider)
         .first()
     )
 
