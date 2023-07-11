@@ -3,6 +3,7 @@
     top: 102px;
     box-sizing: border-box;
     bottom: 0px;
+    width: calc(100% - 40px);
 }
 
 .chat-view #chat-dialog {

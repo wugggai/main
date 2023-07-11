@@ -6,14 +6,14 @@ import Cookies from 'react-cookies'
 import { passwordStrength } from 'check-password-strength'
 
 interface LoginProps {
-    
+    resetToken?: string
 }
  
 interface LoginState {
     username: string
     password: string
     confirmPassword: string
-    mode: 'login' | 'sign up' | 'reset'
+    mode: 'login' | 'sign up' | 'reset' | 'new password'
     showInstructions: boolean
     passwordWarning?: string
     confirmWarning?: string
@@ -26,7 +26,7 @@ class Login extends React.Component<LoginProps, LoginState> {
         super(props);
         this.state = {
             username: '',
-            mode: 'login',
+            mode: this.props.resetToken ? 'new password' : 'login',
             password: '',
             confirmPassword: '',
             showInstructions: false,
@@ -36,6 +36,7 @@ class Login extends React.Component<LoginProps, LoginState> {
         this.login = this.login.bind(this);
         this.signUp = this.signUp.bind(this);
         this.reset = this.reset.bind(this);
+        this.setNewPassword = this.setNewPassword.bind(this);
     }
 
     login() {
@@ -76,8 +77,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                 password: '',
                 confirmPassword: ''
             })
-            // Cookies.save("userId", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
-            console.log(response.data)
+            Cookies.save("userId", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
         }).catch(err => {
             if (err.response?.status === 409) {
                 alert("This email address is already taken.")
@@ -88,13 +88,27 @@ class Login extends React.Component<LoginProps, LoginState> {
     reset() {
         axios.post(API_BASE + '/users/forgetpassword', {
             email: this.state.username
-        }).finally(() => {
+        }).then(response => {
+            console.log(response)
+        })
+        .finally(() => {
             this.setState({ resetDone: true })
         })
     }
 
+    setNewPassword() {
+        axios.put(API_BASE + '/users/resetpassword', {
+            token: this.props.resetToken,
+            new_password: this.state.password
+        }).then(response => {
+            console.log(response)
+        })
+    }
+
     render() { 
-        const enableButton = this.state.username && this.state.password && this.state.password == this.state.confirmPassword
+        const pStrength = passwordStrength<string>(this.state.password)
+        const enableButton = this.state.password && this.state.password === this.state.confirmPassword && pStrength.contains.length === 4
+
         const loginScreen = <div className='login-fields'>
             <h3>Login</h3>
             <fieldset>
@@ -136,7 +150,6 @@ class Login extends React.Component<LoginProps, LoginState> {
                 <label htmlFor='confirm-password'>Confirm Password</label>
                 <br />
                 <input type="password" name='confirm-password' className='textfield login-field' value={this.state.confirmPassword} onChange={e => {
-                    
                     this.setState({
                         confirmPassword: e.target.value,
                         confirmWarning: e.target.value === this.state.password ? undefined : "Passwords do not match."
@@ -192,13 +205,55 @@ class Login extends React.Component<LoginProps, LoginState> {
             </div>
         </div>
 
+        const newPasswordScreen = <div className='login-fields'>
+            <h3>Password Reset</h3>
+            <fieldset>
+                <label htmlFor='email'>Email</label>
+                <input type="email" name='email' className='textfield login-field' disabled value={this.state.username} />
+                <div style={{height: '20px'}} />
+
+                <label htmlFor='password'>New Password</label>
+                <br />
+                <input type="password" name="password" className='textfield login-field' value={this.state.password} onChange={e => this.setState({ password: e.target.value })} />
+                {(pStrength.contains.length < 4 || this.state.password.length < 8) && <div style={{fontSize: '13px', color: 'var(--lighter-text-color)', margin: '2px 0px'}}>
+                    Your new password must be at least 8 characters long and contains:
+                    <div className='password-warning-container'>
+                        <div style={{color: pStrength.contains.includes("uppercase") ? 'inherit' : 'red'}}>At least 1 uppercase letter</div>
+                        <div style={{color: pStrength.contains.includes("lowercase") ? 'inherit' : 'red'}}>At least 1 lowercase letter</div>
+                        <div style={{color: pStrength.contains.includes("number") ? 'inherit' : 'red'}}>At least 1 number</div>
+                        <div style={{color: pStrength.contains.includes("symbol") ? 'inherit' : 'red'}}>At least 1 symbol</div>
+                    </div>
+                </div>}
+                <div style={{height: '20px'}} />
+
+                <label htmlFor='password'>Confirm Password</label>
+                <br />
+                <input type="password" name="password" className='textfield login-field' value={this.state.confirmPassword} onChange={e => {
+                    this.setState({
+                        confirmPassword: e.target.value,
+                        confirmWarning: e.target.value === this.state.password ? undefined : "Passwords do not match."
+                    })
+                }} />
+                {this.state.confirmWarning && <div className='warning'>
+                    {this.state.confirmWarning}
+                </div>}
+                <div style={{textAlign: 'center'}}>
+                    <button className='login-button reset-button' disabled={!enableButton} onClick={this.setNewPassword}>Save Password</button>
+                </div>
+            </fieldset>
+        </div>
+
         let rightScreen: JSX.Element
         if (this.state.mode === 'login') {
             rightScreen = this.state.showInstructions ? instructionScreen : loginScreen
         } else if (this.state.mode === 'sign up') {
             rightScreen = signupScreen
-        } else {
+        } else if (this.state.mode === 'reset') {
             rightScreen = resetScreen
+        } else if (this.state.mode === 'new password') {
+            rightScreen = newPasswordScreen
+        } else {
+            rightScreen = <Fragment />
         }
  
         return <div className='center-screen login-screen'>

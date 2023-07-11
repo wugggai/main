@@ -14,7 +14,7 @@ import Login from '../Login/Login';
 import Cookies from 'react-cookies'
 
 interface MainViewProps {
-    
+    resetPasswordToken?: string
 }
  
 interface MainViewState {
@@ -34,7 +34,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
-            showLoginScreen: !Cookies.load('access_token'),
+            showLoginScreen: !Cookies.load('access_token') || this.props.resetPasswordToken !== undefined,
             currentTabIndex: 0,
             selectedTagIds: new Set()
         };
@@ -127,7 +127,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 {/* {newTagPopover} */}
             </SplitView>;
 
-            {this.state.showLoginScreen && <Login />}
+            {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} />}
         </Fragment>
     }
 }
