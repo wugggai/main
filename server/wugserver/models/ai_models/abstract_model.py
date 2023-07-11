@@ -46,27 +46,34 @@ class AIModel(object):
         return False
 
     @abstractmethod
-    def assert_input_format(cls, message: MessageSegment):
+    def assert_input_format(cls, message_create_params: MessageCreate):
         pass
 
     @classmethod
-    def wrap_text_message(cls, message: str):
+    def wrap_text_message(cls, message: str | list[str]):
         return cls.wrap_message(
             message=message,
             type=MessageTypes["text"],
         )
 
     @classmethod
-    def wrap_image_message(cls, message: str):
+    def wrap_image_message(cls, message: str | list[str]):
         return cls.wrap_message(
             message=message,
             type=MessageTypes["image_url"],
         )
 
     @classmethod
-    def wrap_message(cls, message: str, type: MessageTypes):
-        content = MessageSegment(
-            type=type,
-            content=message,
-        )
-        return [content]
+    def wrap_message(cls, message: str | list[str], type: MessageTypes):
+        if isinstance(message, str):
+            message = [message]
+
+        res = []
+        for seg in message:
+            res.append(
+                MessageSegment(
+                    type=type,
+                    content=seg,
+                )
+            )
+        return res
