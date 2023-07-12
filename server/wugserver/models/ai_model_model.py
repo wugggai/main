@@ -43,9 +43,9 @@ def get_user_available_models(db: Session, user_id: int):
 
     for api_key in api_keys:
         try:
-            provider = Provider[api_key.provider]
+            provider = Provider(api_key.provider)
         except KeyError:
-            raise ValueError(f"Provider {provider} is no longer supported.")
+            raise ValueError(f"Provider {api_key.provider} is no longer supported.")
         models = provider_to_model.get(provider)
         if models is None:
             continue

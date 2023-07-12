@@ -1,4 +1,7 @@
 import openai
+# NOTE: Retry OpenAI connection 1 time instead of 2
+#       to shorten page load time for users without direct API access
+openai.api_requestor.MAX_CONNECTION_RETRIES = 1
 
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.db.api_key_model import ApiKeyModel
@@ -21,8 +24,11 @@ class GPTModel(OpenAIModel):
 
     @classmethod
     def get_user_models_list(cls, key: str):
-        response = openai.Model.list(api_key=key)
-        api_supported_models = [model["id"] for model in response["data"]]
+        try:
+            response = openai.Model.list(api_key=key)
+            api_supported_models = [model["id"] for model in response["data"]]
+        except Exception:
+            api_supported_models = ["gpt-3.5-turbo", "gpt-3.5-turbo-16k"]
         return [
             model
             for model in cls.supported_model_names
