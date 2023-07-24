@@ -1,4 +1,5 @@
 import openai
+
 # NOTE: Retry OpenAI connection 1 time instead of 2
 #       to shorten page load time for users without direct API access
 openai.api_requestor.MAX_CONNECTION_RETRIES = 1
