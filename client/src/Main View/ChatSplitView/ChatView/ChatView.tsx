@@ -249,12 +249,16 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         }
     }
 
-    setModel(name: string) {
+    setModel(name: string | undefined) {
+        if (!name) {
+            return name
+        }
         this.props.chatMetadata.interaction.ai_type = name as AI
         if (!this.props.isNewInteraction) {
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 1000)
         }
+        return this.props.chatMetadata.interaction.ai_type
     }
 
     recalculateInputHeight() {
@@ -409,7 +413,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     <span>Model:</span>
                     <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)} >
                         <button className='select-model-button'>
-                            {this.props.chatMetadata.interaction.ai_type || this.props.chatMetadata.last_message?.source || "Choose Model"}
+                            {this.props.chatMetadata.interaction.ai_type || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"}
                             <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
                         </button>
                     </Dropdown>
