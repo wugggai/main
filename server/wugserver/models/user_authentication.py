@@ -40,10 +40,9 @@ def authenticate_user(
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+    if not expires_delta:
+        expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -108,7 +107,7 @@ def register_user(
         except Exception as e:
             raise HTTPException(
                 status_code=503,
-                detail=f"Could not send verification email to {email}: {e}",
+                detail=f"Could not send verification email to {user.email}: {e}",
             )
         if not 200 <= int(res.status_code) <= 299:
             res_json = json.loads(res.body)
