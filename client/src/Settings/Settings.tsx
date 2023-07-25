@@ -22,7 +22,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
             <TabView tabs={[
                 {title: "Account", view: <AccountPage />},
                 {title: "API Keys", view: <APIKeysPage />},
-                {title: "Display", view: <div />}
+                // {title: "Display", view: <div />}
             ]} />
         </div>;
     }

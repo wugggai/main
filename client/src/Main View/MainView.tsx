@@ -15,6 +15,7 @@ import Cookies from 'react-cookies'
 
 interface MainViewProps {
     resetPasswordToken?: string
+    verificationToken?: string
 }
  
 interface MainViewState {
@@ -34,7 +35,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
-            showLoginScreen: !Cookies.load('access_token') || this.props.resetPasswordToken !== undefined,
+            showLoginScreen: !Cookies.load('access_token') || !Cookies.load('user_id') || this.props.resetPasswordToken !== undefined || this.props.verificationToken !== undefined,
             currentTabIndex: 0,
             selectedTagIds: new Set()
         };
@@ -42,7 +43,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
     componentDidMount(): void {
         const userId = getUserId()
-        if (userId === undefined) {
+        if (userId === undefined || this.state.showLoginScreen) {
             this.setState({ tagList: [], showLoginScreen: true })
             return
         }
@@ -52,7 +53,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 tagList: response.data
             })
         }).catch(err => {
-            if (err.response?.status === 401) {
+            if (err.response?.status === 401 || err.response?.status === 400) {
                 this.setState({ showLoginScreen: true, tagList: [] })
             }
         })
@@ -127,7 +128,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 {/* {newTagPopover} */}
             </SplitView>;
 
-            {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} />}
+            {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} verificationToken={this.props.verificationToken} />}
         </Fragment>
     }
 }

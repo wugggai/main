@@ -16,7 +16,7 @@ function App() {
 
 function GetVerificationPage(): JSX.Element {
   const { token } = useParams()
-  return <Verification token={token || ''} />
+  return <MainView verificationToken={token} />
 }
 
 function GetSetNewPasswordPage(): JSX.Element {

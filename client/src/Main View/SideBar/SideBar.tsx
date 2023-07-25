@@ -75,7 +75,7 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
         }
 
         const topTabs = ["Chats", "Trash"]
-        const bottomTabs = ["Settings", "Discord"]
+        const bottomTabs = ["Settings"]
         return <div className='sidebar' onClick={() => this.setState({ newTagPopoverAnchor: undefined })}>
             <div style={{height: '50px'}} />
             {

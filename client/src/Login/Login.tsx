@@ -4,16 +4,20 @@ import axios from 'axios';
 import { API_BASE } from '../Constants';
 import Cookies from 'react-cookies'
 import { passwordStrength } from 'check-password-strength'
+import Verification from './Verification';
 
 interface LoginProps {
     resetToken?: string
+    verificationToken?: string
 }
+
+type Mode = 'login' | 'sign up' | 'reset' | 'new password' | 'verified'
  
 interface LoginState {
     username: string
     password: string
     confirmPassword: string
-    mode: 'login' | 'sign up' | 'reset' | 'new password'
+    mode: Mode
     showInstructions: boolean
     passwordWarning?: string
     confirmWarning?: string
@@ -24,15 +28,23 @@ interface LoginState {
 class Login extends React.Component<LoginProps, LoginState> {
     constructor(props: LoginProps) {
         super(props);
+
+        let mode: Mode = "login"
+        if (this.props.resetToken) {
+            mode = "new password"
+        } else if (this.props.verificationToken) {
+            mode = "verified"
+        }
+
         this.state = {
             username: '',
-            mode: this.props.resetToken ? 'new password' : 'login',
+            mode: mode,
             password: '',
             confirmPassword: '',
             showInstructions: false,
             resetDone: false
         };
-
+        
         this.login = this.login.bind(this);
         this.signUp = this.signUp.bind(this);
         this.reset = this.reset.bind(this);
@@ -73,11 +85,13 @@ class Login extends React.Component<LoginProps, LoginState> {
         }).then(response => {
             this.setState({
                 showInstructions: true,
+                mode: 'login',
                 username: '',
                 password: '',
                 confirmPassword: ''
             })
-            Cookies.save("userId", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
+            console.log(response)
+            Cookies.save("user_id", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
         }).catch(err => {
             if (err.response?.status === 409) {
                 alert("This email address is already taken.")
@@ -101,7 +115,8 @@ class Login extends React.Component<LoginProps, LoginState> {
             token: this.props.resetToken,
             new_password: this.state.password
         }).then(response => {
-            console.log(response)
+            alert("Password changed! We will now redirect you to the login screen, where you can log in with your new password.")
+            window.location.assign('/')
         })
     }
 
@@ -215,7 +230,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                 <label htmlFor='password'>New Password</label>
                 <br />
                 <input type="password" name="password" className='textfield login-field' value={this.state.password} onChange={e => this.setState({ password: e.target.value })} />
-                {(pStrength.contains.length < 4 || this.state.password.length < 8) && <div style={{fontSize: '13px', color: 'var(--lighter-text-color)', margin: '2px 0px'}}>
+                {(pStrength.contains.length < 4 || this.state.password.length < 8) && <div style={{fontSize: '13px', color: 'var(--lighter-text-color)', margin: '2px 0px', width: 320}}>
                     Your new password must be at least 8 characters long and contains:
                     <div className='password-warning-container'>
                         <div style={{color: pStrength.contains.includes("uppercase") ? 'inherit' : 'red'}}>At least 1 uppercase letter</div>
@@ -243,6 +258,10 @@ class Login extends React.Component<LoginProps, LoginState> {
             </fieldset>
         </div>
 
+        const accountVerified  = <div className='login-fields'>
+            {this.props.verificationToken && <Verification token={this.props.verificationToken}/>}
+        </div>
+
         let rightScreen: JSX.Element
         if (this.state.mode === 'login') {
             rightScreen = this.state.showInstructions ? instructionScreen : loginScreen
@@ -252,6 +271,8 @@ class Login extends React.Component<LoginProps, LoginState> {
             rightScreen = resetScreen
         } else if (this.state.mode === 'new password') {
             rightScreen = newPasswordScreen
+        } else if (this.state.mode === 'verified') {
+            rightScreen = accountVerified
         } else {
             rightScreen = <Fragment />
         }
