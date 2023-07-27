@@ -9,6 +9,7 @@ interface APIKeysPageProps {
 }
  
 interface APIKeysPageState {
+    isLoaded: boolean
     openaiAPIKey?: string | null
     stableDiffusionAPIKey?: string | null
     isUpdatingAPIKey?: boolean // undefined: hidden, false: 'Update', true: spinner
@@ -23,7 +24,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
     constructor(props: APIKeysPageProps) {
         super(props);
         this.state = {
-
+            isLoaded: false
         };
         this.updateAPIKey = this.updateAPIKey.bind(this);
     }
@@ -40,6 +41,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         axios.get(API_BASE + `/users/${userId}/apikey`)
         .then(response => {
             console.log(response)
+            this.setState({ isLoaded: true })
             response.data.forEach((e: APIKeysObject) => {
                 if (e.provider == "openai") {
                     this.setState({ openaiAPIKey: e.api_key })
@@ -49,7 +51,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
             })
         })
         .catch(response => {
-            this.setState({ openaiAPIKey: null })
+            this.setState({ openaiAPIKey: null, stableDiffusionAPIKey: null })
         })
     }
 
@@ -71,7 +73,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
 
     render() { 
         
-        if (this.state.openaiAPIKey === undefined) {
+        if (!this.state.isLoaded) {
             return <Loading />
         }
 
