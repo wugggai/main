@@ -10,7 +10,13 @@ interface APIKeysPageProps {
  
 interface APIKeysPageState {
     openaiAPIKey?: string | null
+    stableDiffusionAPIKey?: string | null
     isUpdatingAPIKey?: boolean // undefined: hidden, false: 'Update', true: spinner
+}
+
+interface APIKeysObject {
+    provider: string
+    api_key: string
 }
  
 class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
@@ -31,10 +37,16 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         }
 
         // Should fetch all keys in one request
-        axios.get(API_BASE + `/users/${userId}/apikey/providers/openai`)
+        axios.get(API_BASE + `/users/${userId}/apikey`)
         .then(response => {
             console.log(response)
-            this.setState({ openaiAPIKey: response.data.api_key })
+            response.data.forEach((e: APIKeysObject) => {
+                if (e.provider == "openai") {
+                    this.setState({ openaiAPIKey: e.api_key })
+                } else if (e.provider == "stable diffusion") {
+                    this.setState({ stableDiffusionAPIKey: e.api_key })
+                }
+            })
         })
         .catch(response => {
             this.setState({ openaiAPIKey: null })
@@ -81,6 +93,18 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                         this.setState({ isUpdatingAPIKey: false, openaiAPIKey: e.target.value })}
                     } value={this.state.openaiAPIKey || ''} />
                     {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={this.updateAPIKey} disabled={!this.state.openaiAPIKey}>Update</button>)}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div>Stable Diffusion API Key</div>
+                    <div className='caption'>Manage your keys at <a href='https://stablediffusionapi.com/settings/api'>stablediffusionapi.com</a></div>
+                </td>
+                <td>
+                    <input type="text" placeholder='sk-....' className='textfield settings-textfield' style={{minWidth: '250px'}} autoCorrect='false' onChange={(e) => {
+                        this.setState({ isUpdatingAPIKey: false, stableDiffusionAPIKey: e.target.value })}
+                    } value={this.state.stableDiffusionAPIKey || ''} />
+                    {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={this.updateAPIKey} disabled={!this.state.stableDiffusionAPIKey}>Update</button>)}
                 </td>
             </tr>
         </table>;
