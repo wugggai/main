@@ -43,7 +43,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
             response.data.forEach((e: APIKeysObject) => {
                 if (e.provider == "openai") {
                     this.setState({ openaiAPIKey: e.api_key })
-                } else if (e.provider == "stable diffusion") {
+                } else if (e.provider == "stable_diffusion") {
                     this.setState({ stableDiffusionAPIKey: e.api_key })
                 }
             })
@@ -53,7 +53,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         })
     }
 
-    updateAPIKey() {
+    updateAPIKey(provider: string, api_key: string) {
         const userId = getUserId()
         if (userId === undefined) {
             alert("You must be logged in to set the API key.")
@@ -62,8 +62,8 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         }
 
         this.setState({ isUpdatingAPIKey: true })
-        SERVER.post(`/users/${userId}/apikey/providers/openai`, {
-            api_key: this.state.openaiAPIKey
+        SERVER.post(`/users/${userId}/apikey/providers/${provider}`, {
+            api_key: api_key
         }).then(response => {
             this.setState({ isUpdatingAPIKey: undefined })
         })
@@ -92,7 +92,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                     <input type="text" placeholder='sk-....' className='textfield settings-textfield' style={{minWidth: '250px'}} autoCorrect='false' onChange={(e) => {
                         this.setState({ isUpdatingAPIKey: false, openaiAPIKey: e.target.value })}
                     } value={this.state.openaiAPIKey || ''} />
-                    {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={this.updateAPIKey} disabled={!this.state.openaiAPIKey}>Update</button>)}
+                    {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={() => this.updateAPIKey("openai", this.state.openaiAPIKey || '')} disabled={!this.state.openaiAPIKey}>Update</button>)}
                 </td>
             </tr>
             <tr>
@@ -101,10 +101,10 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                     <div className='caption'>Manage your keys at <a href='https://stablediffusionapi.com/settings/api'>stablediffusionapi.com</a></div>
                 </td>
                 <td>
-                    <input type="text" placeholder='sk-....' className='textfield settings-textfield' style={{minWidth: '250px'}} autoCorrect='false' onChange={(e) => {
+                    <input type="text" placeholder='' className='textfield settings-textfield' style={{minWidth: '250px'}} autoCorrect='false' onChange={(e) => {
                         this.setState({ isUpdatingAPIKey: false, stableDiffusionAPIKey: e.target.value })}
                     } value={this.state.stableDiffusionAPIKey || ''} />
-                    {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={this.updateAPIKey} disabled={!this.state.stableDiffusionAPIKey}>Update</button>)}
+                    {this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : <button onClick={() => this.updateAPIKey("stable_diffusion", this.state.stableDiffusionAPIKey || '')} disabled={!this.state.stableDiffusionAPIKey}>Update</button>)}
                 </td>
             </tr>
         </table>;

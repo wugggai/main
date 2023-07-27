@@ -5,7 +5,7 @@ from enum import Enum
 
 class Provider(str, Enum):
     openai = "openai"
-    stable_diffusion = "stable diffusion"
+    stable_diffusion = "stable_diffusion"
     none = "none"
 
 
