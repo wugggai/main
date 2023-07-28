@@ -89,7 +89,8 @@ class DALLEModel(OpenAIModel):
 
 class DALLET2IModel(DALLEModel):
     @classmethod
-    def assert_input_format(cls, message: list[MessageSegment]):
+    def assert_input_format(cls, message_create_params: MessageCreate):
+        message = message_create_params.message
         if len(message) != 1 or message[0].type != MessageTypes.text:
             raise ValueError("DALL-E model requires a single text input prompt")
 
