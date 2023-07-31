@@ -425,7 +425,8 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             </div>
             <hr />
             <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} isTrash={this.props.isTrash} />
-            {!this.props.isTrash && <div className='chat-input-container'>
+            {!this.props.isTrash && <>
+            <div className='chat-input-container'>
                 <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
                 onKeyDown={e => {
                     if (e.key === 'Enter' && !e.shiftKey) {
@@ -437,8 +438,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
                     <img src="/assets/send.svg" width={20} className='center-content' />
                 </button>
-                <div className='input-prompt'>Press Shift + Enter to start new line.</div>
-            </div>}
+            </div>
+            <div className='input-prompt'>Press Shift + Enter to start new line.</div>
+            </>}
         </div>;
     }
 }

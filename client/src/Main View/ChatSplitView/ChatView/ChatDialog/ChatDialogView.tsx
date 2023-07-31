@@ -71,7 +71,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         })
 
         return <div className='dialog-container'>
-            <div id='chat-dialog' style={{ paddingBottom: this.props.isTrash ? '20px' : '85px' }}>
+            <div id='chat-dialog'>
                 {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex', minHeight: '70px' }} key={-1}>
                     <img src={`/assets/gpt-3.5-turbo.png`} width={40} className='avatar' />
                     <div className='message'>

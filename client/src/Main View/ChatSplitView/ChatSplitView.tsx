@@ -4,9 +4,9 @@ import SplitView from 'react-split'
 import ChatPreview from './ChatPreview/ChatPreview';
 import { Loading } from '../../UI Components/Loading';
 import ChatView from './ChatView/ChatView';
-import axios from 'axios';
-import { API_BASE, SERVER, getUserId } from '../../Constants';
+import { SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
+import './ChatSplitView.css'
 
 interface ChatViewProps {
     onChatHistoryLoaded?: () => void
@@ -23,6 +23,7 @@ interface ChatViewState {
 }
  
 class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
+    // Initial sizes (percentages) of the splits
     splitSizes = [28, 72]
 
     constructor(props: ChatViewProps) {
@@ -119,32 +120,37 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 })
             }} isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })} />
         } else {
-            content = <div className='center-content'>No chat selected</div>
+            content = <div className='no-chat-empty-state'>No chat selected</div>
         }
 
         return <Fragment>
-            <SplitView className='split' minSize={[280, 400]} maxSize={[450, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes }>
-                <ChatPreview
-                    chatHistoryMetadata={this.state.chatHistoryMetadata}
-                    newChatMetadata={this.state.newInteractionMetadata}
-                    selectionChanged={(i) => {
-                        if (i === undefined) {
-                            this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
-                        } else if (this.state.newInteractionMetadata && i !== 0) {
-                            this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
-                        } else if (i !== this.state.selectedIndex) {
-                            this.setState({ selectedIndex: i })
-                        }
-                    }}
-                    selectedIndex={this.state.newInteractionMetadata ? 0 : this.state.selectedIndex}
-                    onCreateNewInteraction={this.newInteraction}
-                    filterByTags={this.props.selectedTagIds}
-                    isTrash={this.props.isTrash}
-                />
+            <SplitView className='split' minSize={[280, 400]} maxSize={[448, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}}>
+                <div>
+                    <ChatPreview
+                        chatHistoryMetadata={this.state.chatHistoryMetadata}
+                        newChatMetadata={this.state.newInteractionMetadata}
+                        selectionChanged={(i) => {
+                            console.log(i);
+                            if (i === undefined) {
+                                this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
+                            } else if (this.state.newInteractionMetadata && i !== 0) {
+                                this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
+                            } else if (i !== this.state.selectedIndex) {
+                                this.setState({ selectedIndex: i })
+                            }
+                        }}
+                        selectedIndex={this.state.newInteractionMetadata ? 0 : this.state.selectedIndex}
+                        onCreateNewInteraction={this.newInteraction}
+                        filterByTags={this.props.selectedTagIds}
+                        isTrash={this.props.isTrash}
+                    />
+                </div>
                 
-                <div style={{position: 'relative'}}>
+                <div>
                     {content}
                 </div>
+                {/* <div style={{margin: '10px', backgroundColor: "blue"}}></div>
+                <div style={{margin: '10px', backgroundColor: "yellow"}}></div> */}
             </SplitView>
             <AlertSheet
                 show={this.state.deletingChat !== undefined}

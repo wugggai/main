@@ -28,6 +28,7 @@ interface MainViewState {
  
 class MainView extends React.Component<MainViewProps, MainViewState> {
 
+    // Initial sizes (percentages) of the splits
     splitSizes = [16, 84]
 
     constructor(props: MainViewProps) {
@@ -86,11 +87,10 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         return <Fragment>
             <SplitView className='center-screen split'
                 direction='horizontal'
-                minSize={[210, 500]}
-                maxSize={[310, Infinity]} sizes={this.splitSizes}
+                minSize={[208, 496]}
+                maxSize={[320, Infinity]} sizes={this.splitSizes}
                 snapOffset={0} gutterSize={4}
-                style={{minHeight: '560px', minWidth: '800px', ...(this.state.showLoginScreen ? overlayStyles : {})}}
-                onDrag={newSizes => this.splitSizes = newSizes }
+                style={{...(this.state.showLoginScreen ? overlayStyles : {})}}
             >
                 <SideBar
                     currentTabIndex={this.state.currentTabIndex}
