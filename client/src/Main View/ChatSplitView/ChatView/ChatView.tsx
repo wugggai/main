@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag } from '../../../Interfaces';
+import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag, getCurrentDateString } from '../../../Interfaces';
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
@@ -126,7 +126,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     message: [messageSegment],
                     source: 'user',
                     id: 'tmp',
-                    timestamp: new Date().toISOString(),
+                    timestamp: getCurrentDateString(),
                     offset: this.state.chatHistory.messages.length
                 })
             } else {
@@ -136,7 +136,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                             message: [messageSegment],
                             source: 'user',
                             id: 'tmp',
-                            timestamp: new Date().toISOString(),
+                            timestamp: getCurrentDateString(),
                             offset: 0
                         }]
                     }
@@ -211,7 +211,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                         {
                             message: [messageSegment],
                             source: 'user',
-                            timestamp: new Date().toISOString(),
+                            timestamp: getCurrentDateString(),
                             id: response.data.id,
                             interaction_id: this.props.chatMetadata.interaction.id,
                             offset: 0 

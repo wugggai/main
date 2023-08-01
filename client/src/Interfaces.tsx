@@ -66,6 +66,10 @@ export function formatDate(date: string | Date | number | null): string {
     return originalDate.utc(true).tz(dayjs.tz.guess()).format(formatString)
 }
 
+export function getCurrentDateString(): string {
+    return dayjs().utc().format('YYYY-MM-DDTHH:mm:ss')
+}
+
 export function formatTimeInterval(ms: number): string {
     const days = Math.floor(ms / 86400000)
     const hours = Math.floor(ms / 3600000)

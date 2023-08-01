@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { ChatMetadata, Tag } from '../../Interfaces';
+import { ChatMetadata, Tag, formatDate, getCurrentDateString } from '../../Interfaces';
 import SplitView from 'react-split'
 import ChatPreview from './ChatPreview/ChatPreview';
 import { Loading } from '../../UI Components/Loading';
@@ -7,6 +7,7 @@ import ChatView from './ChatView/ChatView';
 import { SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
 import './ChatSplitView.css'
+import dayjs from 'dayjs';
 
 interface ChatViewProps {
     onChatHistoryLoaded?: () => void
@@ -53,7 +54,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             this.componentDidMount()
         }
     }
-
     newInteraction() {
         this.setState({
             newInteractionMetadata: {
@@ -62,7 +62,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     id: '',
                     tag_ids: [],
                     creator_user_id: `${getUserId()}`,
-                    last_updated: new Date().toISOString(),
+                    last_updated: getCurrentDateString(),
                     title: this.state.newInteractionMetadata?.interaction.title ?? "Untitled Conversation"
                 },
                 last_message: null
