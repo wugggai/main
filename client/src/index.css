@@ -38,15 +38,6 @@ code {
   height: 100%;
 }
 
-.center-content {
-  vertical-align: middle;
-  position: absolute;
-  margin: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .generic-container {
   position: absolute;
   top: 0;
@@ -64,25 +55,12 @@ hr {
   background: -webkit-gradient(linear, 0 0, 100% 0, from(transparent), to(transparent), color-stop(50%, rgba(0.25, 0.25, 0.25, 0.15)));
 }
 
-.textfield, .text-area {
+.textfield {
   outline: none;
   border: 1px solid var(--line);
 }
 
-.text-area {
-  border-radius: 5px;
-  font-size: 14px;
-  padding: 10px;
-  border: 1px solid var(--line);
-  outline: none;
-  box-sizing: border-box;
-  min-width: 100%;
-  max-width: 100%;
-  min-height: 100%;
-  resize: none;
-}
-
-.textfield:focus, .text-area:focus {
+.textfield:focus {
   transition-duration: 0.2s;
   box-shadow:  0 0 0 3px rgba(166, 147, 252, 0.1);
   -webkit-box-shadow: 0 0 0 3px rgba(166, 147, 252, 0.1);
