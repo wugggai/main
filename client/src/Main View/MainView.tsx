@@ -62,9 +62,9 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
     render() { 
         if (this.state.tagList === undefined) {
-            return <Loading />
+            return <div className='loading-state'><Loading /></div>
         }
-        let contentView: JSX.Element = <Loading />
+        let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
         switch (this.state.currentTabIndex) {
         case 0:
             contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} />

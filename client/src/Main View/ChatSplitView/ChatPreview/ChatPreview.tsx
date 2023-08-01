@@ -53,20 +53,21 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
             </li>
         })
         
-        const emptyMessage = <div style={{left: 0, right: 0, top: 150, maxHeight: 'calc(100% - 100px)'}}>
-            <div className='center-content'>
+        const emptyMessage = 
+            <div className='empty-conversation-list'>
                 No conversations.
             </div>
-        </div>
 
         return <div className='chat-preview' onMouseDown={() => this.props.selectionChanged(undefined)}>
-            <SearchBar style={{width: "100%", marginTop: "16px"}} onChange={(s) => this.setState({ searchString: s })}/>
-            {!this.props.isTrash && 
-                <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
-                    <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
-                    <span style={{verticalAlign: 'middle'}}>New Conversation</span>
-                </button>
-            }
+            <div className='chat-preview-header'>
+                <SearchBar style={{width: "100%", marginTop: "16px"}} onChange={(s) => this.setState({ searchString: s })}/>
+                {!this.props.isTrash && 
+                    <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
+                        <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
+                        <span style={{verticalAlign: 'middle'}}>New Conversation</span>
+                    </button>
+                }
+            </div>
             {
                 rows.filter(r => r !== undefined).length > 0 ?
                 (<ul className='preview-chat-list'>

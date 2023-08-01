@@ -1,3 +1,10 @@
+.loading-state {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .settings-textfield {
     padding: 8px 8px;
     border-radius: 6px;

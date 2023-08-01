@@ -100,7 +100,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
 
     render() {
         if (this.state.chatHistoryMetadata === undefined) {
-            return <Loading />
+            return <div className='loading-state'><Loading /></div>
         }
 
         let content: JSX.Element
@@ -130,7 +130,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                         chatHistoryMetadata={this.state.chatHistoryMetadata}
                         newChatMetadata={this.state.newInteractionMetadata}
                         selectionChanged={(i) => {
-                            console.log(i);
                             if (i === undefined) {
                                 this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
                             } else if (this.state.newInteractionMetadata && i !== 0) {
@@ -149,8 +148,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 <div>
                     {content}
                 </div>
-                {/* <div style={{margin: '10px', backgroundColor: "blue"}}></div>
-                <div style={{margin: '10px', backgroundColor: "yellow"}}></div> */}
             </SplitView>
             <AlertSheet
                 show={this.state.deletingChat !== undefined}

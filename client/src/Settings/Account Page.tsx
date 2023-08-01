@@ -82,7 +82,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
 
     render() { 
         if (this.state.email === undefined) {
-            return <Loading />
+            return <div className='loading-state'><Loading /></div>
         }
 
         const inlineSpinner = <div style={{position: 'relative', display: 'inline-block', width: '75px', height: '43px'}}>

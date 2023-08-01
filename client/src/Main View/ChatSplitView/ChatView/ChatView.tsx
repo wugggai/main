@@ -1,11 +1,9 @@
 import React, { Fragment } from 'react'
 import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag } from '../../../Interfaces';
 import './ChatView.css'
-import SplitView from 'react-split'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
-import axios from 'axios';
-import { API_BASE, SERVER, getUserId } from '../../../Constants';
+import { SERVER, getUserId } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
@@ -59,7 +57,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.removeTag = this.removeTag.bind(this);
         this.saveMetadata = this.saveMetadata.bind(this);
         this.loadHistory = this.loadHistory.bind(this);
-        this.recalculateInputHeight = this.recalculateInputHeight.bind(this);
+        this.autoGrowTextArea = this.autoGrowTextArea.bind(this);
         this.addNewTag = this.addNewTag.bind(this);
     }
 
@@ -67,18 +65,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         if (super.componentDidUpdate) super.componentDidUpdate(prevProps, prevState, snapshot)
         this.props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
+            this.setState({chatHistory: undefined})
             this.loadHistory()
-            this.setState({ inputValue: '' })
-            if (!this.props.isTrash) {
-                const chatInput = document.querySelector("#chat-input") as HTMLDivElement
-                if (chatInput) {
-                    chatInput.style.height = "50px"
-                }
-                const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-                if (dialogView) {
-                    dialogView.style.paddingBottom = "85px"
-                }
-            }
+            this.setState({ inputValue: '', isWaitingForResponse: false })
         }
     }
 
@@ -89,6 +78,20 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         SERVER.get(`/users/${userId}/models/list`).then(response => {
             this.setState({ availableModels: response.data.model_names })
         })
+    }
+
+    autoGrowTextArea(event: React.FormEvent<HTMLTextAreaElement>) {
+        const maxHeight = 5 * 24;
+        const area = event.currentTarget;
+        area.style.height = "24px";
+        area.style.height = (area.scrollHeight) + "px";
+
+        if (area.scrollHeight > maxHeight) {
+            area.style.overflowY = "auto";
+            area.style.height = maxHeight + "px";
+        } else {
+            area.style.overflowY = "hidden";
+        }
     }
 
     loadHistory() {
@@ -110,6 +113,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     sendMessage() {
+        this.setState({ isWaitingForResponse: true })
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
         } else if (this.state.inputValue) {
@@ -138,8 +142,8 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     }
                 })
             }
-            const userInput = this.state.inputValue
-            this.setState({ inputValue: '', isWaitingForResponse: true })
+
+            this.setState({ inputValue: ''})
             const requestMessageSegment: MessageSegment = {
                 type: "text",
                 content: this.state.inputValue,
@@ -161,7 +165,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 })
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
-            })
+            }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
 
@@ -261,16 +265,6 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         return this.props.chatMetadata.interaction.ai_type
     }
 
-    recalculateInputHeight() {
-        let box = document.querySelector("#chat-input") as HTMLTextAreaElement
-        box.style.height = '1px'
-        const newHeight = Math.max(this.props.isTrash ? 0 : 50, box.scrollHeight)
-        box.style.height = Math.min(500, newHeight) + "px"
-        box.style.overflow = newHeight < 500 ? 'hidden' : 'scroll'
-        const dialogView = document.querySelector("#chat-dialog") as HTMLDivElement
-        dialogView.style.paddingBottom = Math.min(500, newHeight) + 35 + "px"
-    }
-
     addNewTag() {
         if (this.props.availableTags.findIndex(v => v.name === this.state.newTagName) !== -1) {
             alert(`Tag with name ${this.state.newTagName} is already defined.`)
@@ -297,7 +291,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
     render() {
         if (!this.props.isNewInteraction && this.state.chatHistory === undefined) {
-            return <Loading />
+            return <div className='loading-spinner'><Loading /></div>
         }
 
         const addTagButton: JSX.Element = <div id='add-tag-button' onClick={(e) => {
@@ -427,19 +421,24 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} isTrash={this.props.isTrash} />
             {!this.props.isTrash && <>
             <div className='chat-input-container'>
-                <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
-                onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
-                        this.sendMessage()
-                    }
-                }}
-                onKeyUp={this.recalculateInputHeight} />
-                <button className='generic-button' id="send-message-button" disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
-                    <img src="/assets/send.svg" width={20} className='center-content' />
-                </button>
+                <div className='send-text-line'>
+                    <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
+                    onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            if (!this.state.isWaitingForResponse) {
+                                this.sendMessage()
+                            }
+                        }
+                    }}
+                    onInput={(e) => this.autoGrowTextArea(e)}
+                    />
+                    <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
+                        <img src={this.state.isWaitingForResponse ? "/assets/send-loading.svg" : "/assets/send.svg"} width={20}/>
+                    </button>
+                </div>
+                <div className='input-prompt'>Press Shift + Enter to start new line.</div>
             </div>
-            <div className='input-prompt'>Press Shift + Enter to start new line.</div>
             </>}
         </div>;
     }

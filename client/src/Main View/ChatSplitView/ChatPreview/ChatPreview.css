@@ -1,10 +1,22 @@
 .chat-preview {
-    padding: 8px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 16px;
     height: 100%;
+}
+
+.chat-preview-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.empty-conversation-list {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
 }
 
 .chat-preview-cell {
