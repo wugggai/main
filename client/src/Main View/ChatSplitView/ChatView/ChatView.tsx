@@ -14,6 +14,7 @@ interface ChatViewProps {
     isNewInteraction: boolean
     onChatInfoUpdated: () => void
     onDeleteInteraction: () => void
+    addNewTag: (tag: Tag) => void
     availableTags: Tag[]
     isTrash: boolean
 }
@@ -281,10 +282,12 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             this.tagMap[newTag.id] = newTag
             this.props.availableTags.push(newTag)
             this.addTag(newTag)
+            this.props.addNewTag(newTag)
             this.setState({
                 newTagName: undefined,
                 newTagColor: '#ffffff',
-                addTagButtonPosition: undefined
+                addTagButtonPosition: undefined,
+                isAddingTag: false
             })
         })
     }

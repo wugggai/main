@@ -108,20 +108,18 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
             <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
             { newTagPopover }
 
-            <div style={{position: 'absolute', bottom: '30px', width: '100%'}}>
-                {
-                    bottomTabs.map((tab, i) => {
-                        return <SideBarItem
-                            name={tab}
-                            icon={tab.toLowerCase()}
-                            isSelected={this.props.currentTabIndex===i + topTabs.length}
-                            key={i}
-                            onSelected={() => this.props.onTabChange(i + topTabs.length)}
-                        />
-                    })
-                }
+            {
+                bottomTabs.map((tab, i) => {
+                    return <SideBarItem
+                        name={tab}
+                        icon={tab.toLowerCase()}
+                        isSelected={this.props.currentTabIndex===i + topTabs.length}
+                        key={i}
+                        onSelected={() => this.props.onTabChange(i + topTabs.length)}
+                    />
+                })
+            }
             </div>
-        </div>;
     }
 }
  

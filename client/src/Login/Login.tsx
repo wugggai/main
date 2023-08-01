@@ -139,7 +139,10 @@ class Login extends React.Component<LoginProps, LoginState> {
                 </div>
             </fieldset>
             <button className='login-button generic-button' onClick={this.login}>Log In</button>
-            <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({ mode: 'sign up' })}>Sign Up</a></div>
+            <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({
+                mode: 'sign up',
+                password: ''
+            })}>Sign Up</a></div>
         </div>
 
         const signupScreen = <div className='login-fields'>

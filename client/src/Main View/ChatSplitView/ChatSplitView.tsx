@@ -7,10 +7,10 @@ import ChatView from './ChatView/ChatView';
 import { SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
 import './ChatSplitView.css'
-import dayjs from 'dayjs';
 
 interface ChatViewProps {
     onChatHistoryLoaded?: () => void
+    addNewTag: (tag: Tag) => void
     availableTags: Tag[]
     selectedTagIds: Set<string>
     isTrash: boolean
@@ -108,9 +108,12 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
             content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.forceUpdate()
-            }} isNewInteraction={false} onDeleteInteraction={() => {
+            }}
+            isNewInteraction={false} onDeleteInteraction={() => {
                 this.setState({ deletingChat: metadata })}
-            }/>
+            }
+            addNewTag={this.props.addNewTag}
+            />
         } else if (this.state.newInteractionMetadata !== undefined) {
             content = <ChatView chatMetadata={this.state.newInteractionMetadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.setState({
@@ -118,7 +121,10 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     selectedIndex: 0,
                     newInteractionMetadata: undefined
                 })
-            }} isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })} />
+            }}
+            isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })}
+            addNewTag={this.props.addNewTag}
+            />
         } else {
             content = <div className='no-chat-empty-state'>No chat selected</div>
         }

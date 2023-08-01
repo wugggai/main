@@ -4,6 +4,7 @@
     cursor: default;
     position: relative;
     user-select: none;
+    overflow-y: scroll;
     min-width: 210px !important;
     max-width: 310px !important;
 }
@@ -47,6 +48,7 @@
     margin-left: 20px;
     margin-right: 10px;
     position: relative;
+    min-height: calc(100vh - 310px);
 }
 
 .sidebar .tags .tag-item {

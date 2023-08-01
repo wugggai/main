@@ -67,10 +67,14 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
         switch (this.state.currentTabIndex) {
         case 0:
-            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} />
+            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} addNewTag={(tag: Tag) => {
+                this.forceUpdate()
+            }} />
             break
         case 1:
-            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} />
+            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} addNewTag={(tag: Tag) => {
+                this.forceUpdate()
+            }} />
             break
         case 2:
             contentView = <Settings />

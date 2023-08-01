@@ -38,9 +38,8 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         }
 
         // Should fetch all keys in one request
-        axios.get(API_BASE + `/users/${userId}/apikey`)
+        SERVER.get(`/users/${userId}/apikey`)
         .then(response => {
-            console.log(response)
             this.setState({ isLoaded: true })
             response.data.forEach((e: APIKeysObject) => {
                 if (e.provider == "openai") {
