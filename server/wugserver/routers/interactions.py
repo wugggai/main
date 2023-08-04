@@ -10,6 +10,7 @@ from wugserver.models.db.interaction_model import (
     update_interaction,
 )
 from wugserver.models.db.user_db_model import UserRecord
+from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.message_create_handler import handle_message_create_request
 from wugserver.models.message_model import MessageModel
 from wugserver.models.user_authentication import get_current_active_user
@@ -37,6 +38,7 @@ def create_interaction_route(
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
     message_model: MessageModel = Depends(MessageModel),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     authorize_by_matching_user_id(
         current_user_id=current_user.id, user_id=creator_user_id
@@ -62,6 +64,7 @@ def create_interaction_route(
             interaction=interaction,
             message_create_params=initial_message,
             message_model=message_model,
+            api_key_model=api_key_model,
         )
 
     return InteractionWithLatestMessage(

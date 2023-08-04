@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from wugserver.dependencies import get_db
 from wugserver.models.db.user_db_model import UserRecord
+from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.message_model import MessageModel
 from wugserver.models.user_authentication import get_current_active_user
 from wugserver.models.message_create_handler import handle_message_create_request
@@ -22,6 +23,7 @@ def create_message_route(
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
     message_model: MessageModel = Depends(MessageModel),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     interaction = authorized_get_interaction(
         db=db, current_user_id=current_user.id, interaction_id=interaction_id
@@ -32,6 +34,7 @@ def create_message_route(
         interaction=interaction,
         message_create_params=message_create_params,
         message_model=message_model,
+        api_key_model=api_key_model,
     )
 
 

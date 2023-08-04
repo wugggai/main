@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from sqlalchemy.orm import Session
-from wugserver.constants import ENV, Environment, Provider
+from wugserver.constants import ENV, Environment, Provider, get_provider_by_name
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.ai_models.echo_model import EchoModel
 from wugserver.models.ai_models.openai_model import GPTModel, DALLET2IModel
@@ -9,7 +9,7 @@ from wugserver.models.ai_models.stable_diffusion_model import (
     StableDiffusionV3T2IModel,
     all_dreambooth_models,
 )
-from wugserver.models.db.api_key_model import ApiKeyModel, get_all_user_api_keys
+from wugserver.models.api_key_model import ApiKeyModel
 
 """
 ai_models.py: interface to access all AI models
@@ -37,15 +37,23 @@ def get_model_by_name(model_name: str) -> AIModel | None:
     return model_name_to_model.get(model_name, None)
 
 
-def get_user_available_models(db: Session, user_id: int):
+def get_any_model_of_provider(provider: Provider) -> AIModel:
+    # print(provider_to_model.keys())
+    models = provider_to_model.get(provider, None)
+    if not models:
+        raise ValueError(f"Provider {provider} has no models")
+    return models[0]
+
+
+def get_user_available_models(
+    user_id: int,
+    api_key_model: ApiKeyModel,
+):
     available_models = []
-    api_keys: list[ApiKeyModel] = get_all_user_api_keys(db=db, user_id=user_id)
+    api_keys: list[ApiKeyRecord] = api_key_model.get_all_api_keys(user_id=user_id)
 
     for api_key in api_keys:
-        try:
-            provider = Provider(api_key.provider)
-        except KeyError:
-            raise ValueError(f"Provider {api_key.provider} is no longer supported.")
+        provider = get_provider_by_name(api_key.provider)
         models = provider_to_model.get(provider)
         if models is None:
             continue
