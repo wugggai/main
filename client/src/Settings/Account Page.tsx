@@ -98,7 +98,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                 <tr>
                     <td>
                         <div>Email</div>
-                        <div className='caption'>this is the same email you use for signing in</div>
+                        <div className='caption'>this is the same email you use for logging in</div>
                     </td>
                     <td><input type="email" placeholder='name@example.com' className='textfield settings-textfield' autoCorrect='false' value={this.state.email} disabled/></td>
                 </tr>

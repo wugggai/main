@@ -143,7 +143,14 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                     }
                 })
             }
-
+            this.props.chatMetadata.last_message = {
+                id: "tmp",
+                message: [{ type: "text", content: this.state.inputValue }],
+                offset: (this.props.chatMetadata.last_message?.offset ?? -1) + 1,
+                source: "user",
+                timestamp: getCurrentDateString()
+            }
+            this.props.onChatInfoUpdated()
             this.setState({ inputValue: ''})
             const requestMessageSegment: MessageSegment = {
                 type: "text",

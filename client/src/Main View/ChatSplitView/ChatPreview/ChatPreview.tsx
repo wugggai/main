@@ -61,7 +61,7 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
         return <div className='chat-preview' onMouseDown={() => this.props.selectionChanged(undefined)}>
             <div className='chat-preview-header'>
                 <SearchBar style={{width: "100%", marginTop: "16px"}} onChange={(s) => this.setState({ searchString: s })}/>
-                {!this.props.isTrash && 
+                {!this.props.isTrash && this.props.filterByTags.size === 0 && 
                     <button className='generic-button new-conversation-button' onClick={this.props.onCreateNewInteraction}>
                         <img src="/assets/plus.png" width={18} style={{verticalAlign: 'middle', marginRight: '10px', marginTop: '1px', filter: 'invert(1)'}} />
                         <span style={{verticalAlign: 'middle'}}>New Conversation</span>
