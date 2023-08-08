@@ -1,7 +1,6 @@
 import requests
 
 from wugserver.models.ai_models.abstract_model import AIModel
-from wugserver.models.db.api_key_model import ApiKeyModel
 from wugserver.models.db.message_db_model import MessageRecord
 from wugserver.schema.message import (
     Message,
@@ -36,7 +35,7 @@ class StableDiffusionT2IModel(StableDiffusionModel):
 
     def post_message(
         self,
-        api_key: ApiKeyModel,
+        api_key: str,
         interaction_context: list[MessageRecord],
         message_create_params: MessageCreate,
     ):
@@ -47,7 +46,7 @@ class StableDiffusionT2IModel(StableDiffusionModel):
             negative_prompt = message[1].content
         model_config = message_create_params.model_config
         image_urls = self.make_api_request(
-            api_key=api_key.api_key,
+            api_key=api_key,
             prompt=prompt,
             negative_prompt=negative_prompt,
             model_config=model_config,

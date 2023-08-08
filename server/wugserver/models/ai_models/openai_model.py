@@ -5,7 +5,6 @@ import openai
 openai.api_requestor.MAX_CONNECTION_RETRIES = 1
 
 from wugserver.models.ai_models.abstract_model import AIModel
-from wugserver.models.db.api_key_model import ApiKeyModel
 from wugserver.models.db.message_db_model import MessageRecord
 from wugserver.schema.message import (
     Message,
@@ -37,6 +36,10 @@ class GPTModel(OpenAIModel):
         ]
 
     @classmethod
+    def get_user_verification_model(cls, key: str):
+        return "gpt-3.5-turbo"
+
+    @classmethod
     def requires_context(cls) -> bool:
         return True
 
@@ -48,7 +51,7 @@ class GPTModel(OpenAIModel):
 
     def post_message(
         self,
-        api_key: ApiKeyModel,
+        api_key: str,
         interaction_context: list[MessageRecord],
         message_create_params: MessageCreate,
     ):
@@ -59,7 +62,7 @@ class GPTModel(OpenAIModel):
 
         # As of 4/29/2023 GPT3.5 doesn't accept parameters. Disregard messageCreateParams.model_config
         response = openai.ChatCompletion.create(
-            api_key=api_key.api_key,
+            api_key=api_key,
             model=message_create_params.model,
             messages=previous_messages,
         )
@@ -101,13 +104,13 @@ class DALLET2IModel(DALLEModel):
 
     def post_message(
         self,
-        api_key: ApiKeyModel,
+        api_key: str,
         message_create_params: MessageCreate,
         interaction_context=None,
     ):
         prompt = message_create_params.message[0].content
         response = openai.Image.create(
-            api_key=api_key.api_key,
+            api_key=api_key,
             prompt=prompt,
             n=message_create_params.model_config.get("n", 1),
             size=message_create_params.model_config.get("size", "512x512"),

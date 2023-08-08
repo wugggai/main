@@ -1,14 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from wugserver.dependencies import get_db
-from wugserver.models.db.api_key_model import (
-    create_api_key_record,
-    get_all_user_api_keys,
-    get_user_api_key_for_provider,
-    obfuscate_api_key,
-    update_api_key_record,
-)
+from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.db.user_db_model import UserRecord
+from wugserver.models.message_create_handler import verify_api_key
 from wugserver.models.user_authentication import get_current_active_user
 from wugserver.routers.authorization import authorize_by_matching_user_id
 from wugserver.schema.api_key import ApiKeyBase, ApiKeyCreate
@@ -25,20 +20,20 @@ def create_api_key_route(
     user_id: int,
     provider: Provider,
     api_key_create: ApiKeyCreate,
-    db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
-    existing_key = get_user_api_key_for_provider(
-        db=db, user_id=user_id, provider=provider
+    existing_key = api_key_model.get_api_key_by_provider(
+        user_id=user_id, provider=provider
     )
     if existing_key:
         raise HTTPException(status_code=409, detail="API Key already provided")
-    record = create_api_key_record(
-        db=db, user_id=user_id, provider=provider, api_key_create=api_key_create
+    verify_api_key(key=api_key_create.api_key, provider_name=provider)
+    record = api_key_model.create_api_key(
+        user_id=user_id, provider=provider, api_key=api_key_create
     )
-    record.api_key = obfuscate_api_key(record.api_key)
-    return record
+    return api_key_model.obfuscate_api_key_record(record)
 
 
 @router.put("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
@@ -46,48 +41,44 @@ def update_api_key_route(
     user_id: int,
     provider: Provider,
     api_key_create: ApiKeyCreate,
-    db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
-    existing_key = get_user_api_key_for_provider(
-        db=db, user_id=user_id, provider=provider
+    existing_key = api_key_model.get_api_key_by_provider(
+        user_id=user_id, provider=provider
     )
     if not existing_key:
         raise HTTPException(status_code=404, detail="API Key not provided")
-    # TODO: update_api_key_record should pass the existing_key object
-    record = update_api_key_record(
-        db=db, user_id=user_id, provider=provider, api_key_create=api_key_create
+    verify_api_key(key=api_key_create.api_key, provider_name=provider)
+    record = api_key_model.update_api_key(
+        user_id=user_id, provider=provider, api_key=api_key_create
     )
-    record.api_key = obfuscate_api_key(record.api_key)
-    return record
+    return api_key_model.obfuscate_api_key_record(record)
 
 
 @router.get("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
 def get_api_key_route(
     user_id: int,
     provider: Provider,
-    db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
-    existing_key = get_user_api_key_for_provider(
-        db=db, user_id=user_id, provider=provider
+    existing_key = api_key_model.get_api_key_by_provider(
+        user_id=user_id, provider=provider
     )
     if not existing_key:
         raise HTTPException(status_code=404, detail="API Key not provided")
-    existing_key.api_key = obfuscate_api_key(existing_key.api_key)
-    return existing_key
+    return api_key_model.obfuscate_api_key_record(existing_key)
 
 
 @router.get("/users/{user_id}/apikey", response_model=list[ApiKeyBase])
 def get_all_api_key_route(
     user_id: int,
-    db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
 ):
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
-    all_api_keys = get_all_user_api_keys(db=db, user_id=user_id)
-    for record in all_api_keys:
-        record.api_key = obfuscate_api_key(record.api_key)
-    return all_api_keys
+    records = api_key_model.get_all_api_keys(user_id=user_id)
+    return [api_key_model.obfuscate_api_key_record(record) for record in records]

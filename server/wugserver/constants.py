@@ -9,6 +9,13 @@ class Provider(str, Enum):
     none = "none"
 
 
+def get_provider_by_name(name: str) -> Provider:
+    try:
+        return Provider(name)
+    except KeyError:
+        raise ValueError(f"Provider {name} is no longer supported.")
+
+
 class Environment(str, Enum):
     dev = "DEV"
     staging = "STAGING"

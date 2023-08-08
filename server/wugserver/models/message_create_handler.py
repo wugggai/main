@@ -1,12 +1,15 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from wugserver.models.ai_model_model import get_model_by_name
+from wugserver.constants import get_provider_by_name
+from wugserver.models.ai_model_model import get_any_model_of_provider, get_model_by_name
+from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.db.interaction_model import (
     InteractionRecord,
     set_interaction_update_time_and_commit,
 )
 from wugserver.models.message_model import MessageModel
+from wugserver.schema.api_key import ApiKeyCreate
 from wugserver.schema.message import MessageCreate, MessageSegment
 
 
@@ -16,6 +19,7 @@ def handle_message_create_request(
     interaction: InteractionRecord,
     message_create_params: MessageCreate,
     message_model: MessageModel,
+    api_key_model: ApiKeyModel,
 ):
     """
     handles all message creation requests
@@ -36,7 +40,11 @@ def handle_message_create_request(
             status_code=404, detail=f"{message_create_params.model} is not availble"
         )
     # verifies that user has provided api_key
-    api_key = requested_model.get_user_api_key(db=db, user_id=user_id)
+    provider = requested_model.get_provider()
+    api_key = api_key_model.get_api_key_by_provider(
+        user_id=user_id,
+        provider=provider,
+    )
     if api_key is None:
         raise HTTPException(
             status_code=403,
@@ -55,7 +63,7 @@ def handle_message_create_request(
         )
     try:
         model_res_msg: list[MessageSegment] = requested_model.post_message(
-            api_key=api_key,
+            api_key=api_key.api_key,
             interaction_context=interaction_context,
             message_create_params=message_create_params,
         )
@@ -79,3 +87,31 @@ def handle_message_create_request(
     # set the interaction's latest update time
     set_interaction_update_time_and_commit(db=db, interaction=interaction)
     return MessageModel.db_message_to_pydantic_message(ai_message)
+
+
+# verify_api_key sends a dummy message to a model of the corresponding key's provider
+# raises HTTP 400 if API key is unusable
+def verify_api_key(key: str, provider_name: str):
+    try:
+        provider = get_provider_by_name(provider_name)
+        model_cls = get_any_model_of_provider(provider)
+        model = model_cls.get_user_verification_model(key)
+        try:
+            model_cls.post_message(
+                api_key=key,
+                interaction_context=[],
+                message_create_params=MessageCreate(
+                    message=[
+                        MessageSegment(
+                            type="text",
+                            content="Hello World",
+                        )
+                    ],
+                    model=model,
+                    model_config={},
+                ),
+            )
+        except Exception as e:
+            raise Exception(f"Failed to send message to {model}: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"API Key verification failed: {e}")

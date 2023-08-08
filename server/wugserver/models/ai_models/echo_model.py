@@ -36,10 +36,6 @@ class EchoModel(AIModel):
             f"This response message is Message #{current_messages_count + 1}."
         )
 
-    # EchoModel does not require an API key
-    def get_user_api_key(self, db: Session, user_id: int):
-        return "key"
-
     @classmethod
     def requires_context(cls) -> bool:
         return True
