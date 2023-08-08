@@ -49,6 +49,7 @@ class Login extends React.Component<LoginProps, LoginState> {
         this.signUp = this.signUp.bind(this);
         this.reset = this.reset.bind(this);
         this.setNewPassword = this.setNewPassword.bind(this);
+        this.handleEnter = this.handleEnter.bind(this)
     }
 
     login() {
@@ -97,6 +98,20 @@ class Login extends React.Component<LoginProps, LoginState> {
                 alert("This email address is already taken.")
             }
         })
+    }
+
+    handleEnter(event: React.KeyboardEvent<HTMLDivElement>) {
+        if (event.key === 'Enter') {
+            if (this.state.mode === 'login') {
+                this.login()
+            } else if (this.state.mode === 'sign up') {
+                this.signUp()
+            } else if (this.state.mode === 'reset') {
+                this.reset()
+            } else if (this.state.mode === 'new password') {
+                this.setNewPassword()
+            }
+        }
     }
 
     reset() {
@@ -290,7 +305,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                     <p>Product Description</p>
                 </div>
             </div>
-            <div className='right'>
+            <div className='right' onKeyDown={this.handleEnter}>
                 {rightScreen}
             </div>
         </div>;

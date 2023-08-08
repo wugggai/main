@@ -236,6 +236,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 this.props.chatMetadata.last_message = metadata.last_message
             }
             this.props.onChatInfoUpdated()
+            this.setState({ isWaitingForResponse: false});
         })
     }
 
@@ -304,20 +305,20 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             return <div className='loading-spinner'><Loading /></div>
         }
 
-        const addTagButton: JSX.Element = <div id='add-tag-button' onClick={(e) => {
+        const addTagButton: JSX.Element = <div className='add-tag-button' onClick={(e) => {
             e.stopPropagation()
             if (this.state.addTagButtonPosition != undefined) {
                 this.setState({ addTagButtonPosition: undefined })
                 return
             }
-            const button = document.querySelector(".chat-view #add-tag-button") as HTMLDivElement
+            const button = document.querySelector(".add-tag-button") as HTMLDivElement
             const rect = button.getBoundingClientRect()
             this.setState({
                 addTagButtonPosition: rect
             })
         }}>
-            <img src='/assets/label.png' width={20} className='center-content'/>
-            <img src='/assets/plus.png' width={10} className='center-content' />
+            <img src='/assets/label.png' className='label-icon'/>
+            <img src='/assets/plus.png' className='plus-icon' />
         </div>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {

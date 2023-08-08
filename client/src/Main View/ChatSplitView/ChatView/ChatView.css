@@ -112,13 +112,24 @@
     max-width: 1000px;
 }
 
-.chat-view #add-tag-button {
+.add-tag-button {
     display: inline-block;
     position: relative;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 14px;
     background-color: var(--selection-background);
+    .label-icon {
+        position: relative;
+        width: 16px;
+        left: 4px;
+    }
+    .plus-icon {
+        position: absolute;
+        left: 8px;
+        width: 8px;
+        top: 8px;
+    }
 }
 
 .dropdown-tags {
