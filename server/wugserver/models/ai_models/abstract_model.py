@@ -36,6 +36,10 @@ class AIModel(object):
         return []
 
     @classmethod
+    def get_user_verification_model(cls, key: str) -> str:
+        return cls.get_user_models_list(key)[0]
+
+    @classmethod
     def requires_context(cls) -> bool:
         return False
 

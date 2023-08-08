@@ -95,7 +95,7 @@ def verify_api_key(key: str, provider_name: str):
     try:
         provider = get_provider_by_name(provider_name)
         model_cls = get_any_model_of_provider(provider)
-        model = model_cls.get_user_models_list(key)[0]
+        model = model_cls.get_user_verification_model(key)
         try:
             model_cls.post_message(
                 api_key=key,

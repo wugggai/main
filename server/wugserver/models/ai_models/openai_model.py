@@ -36,6 +36,10 @@ class GPTModel(OpenAIModel):
         ]
 
     @classmethod
+    def get_user_verification_model(cls, key: str):
+        return "gpt-3.5-turbo"
+
+    @classmethod
     def requires_context(cls) -> bool:
         return True
 
