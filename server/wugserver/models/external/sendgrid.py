@@ -10,7 +10,7 @@ domain = current_domain()
 # sends verification email
 # return: sendgrid API response
 def send_verification_email(email: str, token: str):
-    verification_path = domain + "/api/verification/token/" + token
+    verification_path = domain + "/verification/token/" + token
     from_email = Email("tommywei110@gmail.com")
     to_email = To(email)
     subject = "Email Verification"

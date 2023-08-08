@@ -18,12 +18,10 @@ def patch_user_password_route(
     current_user: UserRecord = Depends(get_current_active_user),
     user_password_model: UserPasswordModel = Depends(UserPasswordModel),
 ):
-    if user_id == current_user.id:
-        user_password_model.patch_user_password(
-            current_user.id, password_update.new_password
-        )
-    else:
-        raise HTTPException(status_code=403, detail="No access")
+    authorize_by_matching_user_id(current_user.id, user_id)
+    user_password_model.patch_user_password(
+        current_user.id, password_update.new_password
+    )
 
 
 @router.put("/users/resetpassword")
