@@ -172,6 +172,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                         onClick: () => this.moveInteractionToTrash()
                     }
                 ]}
+                onEnter={() => this.moveInteractionToTrash() }
             />
         </Fragment>
     }

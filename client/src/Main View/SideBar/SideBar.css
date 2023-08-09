@@ -4,7 +4,7 @@
     cursor: default;
     position: relative;
     user-select: none;
-    overflow-y: scroll;
+    overflow-y: hidden;
     min-width: 210px !important;
     max-width: 310px !important;
 }
