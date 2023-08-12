@@ -15,12 +15,34 @@ interface AlertSheetProps {
         type: "normal" | "default" | "default-hollow" | "destructive"
     }[]
     children?: JSX.Element[]
+    onEnter?: () => void
 }
 
 class AlertSheet extends React.Component<AlertSheetProps> {
+    constructor(props: AlertSheetProps) {
+        super(props)
+        this.handleEnter = this.handleEnter.bind(this)
+    }
+
+    componentDidMount() {
+        document.addEventListener('keydown', this.handleEnter);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.handleEnter);
+    }
+
+    handleEnter(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            if (this.props.onEnter) {
+                this.props.onEnter();
+            }
+        }
+    }
+
     render() { 
         return (
-            <div className='alert-sheet-background' onClick={ this.props.onClickedOutside } style={{opacity: this.props.show ? 1 : 0, pointerEvents: this.props.show ? 'auto' : 'none' }}>
+            <div className='alert-sheet-background' tabIndex={0} onClick={ this.props.onClickedOutside } style={{opacity: this.props.show ? 1 : 0, pointerEvents: this.props.show ? 'auto' : 'none' }}>
                 <div className='alert-sheet-content' style={{width: this.props.width || '365px', overflow: (this.props.allowScroll === false) ? 'visible' : undefined}} onClick={(e) => { e.stopPropagation() }}>
                     <Fragment>
                         <div className='alert-title'>{this.props.title}</div>

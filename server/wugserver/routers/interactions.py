@@ -25,6 +25,7 @@ from wugserver.schema.interaction import (
     InteractionWithLatestMessage,
     InteractionUpdate,
 )
+from wugserver.schema.message import MessageTypes
 
 router = APIRouter()
 
@@ -47,8 +48,8 @@ def create_interaction_route(
     auto_title = "Untitled Conversation"
     if initial_message is not None:
         for segment in initial_message.message:
-            if segment.type == "text":
-                auto_title = segment.content.split()[:10]
+            if segment.type == MessageTypes.text:
+                auto_title = " ".join(segment.content.split()[:10])
                 break
     interaction = create_interaction(
         db=db,

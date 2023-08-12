@@ -188,7 +188,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             content: this.state.inputValue,
         }
         SERVER.post(`/users/${userId}/interactions`, {
-            title: this.state.editedTitle || this.props.chatMetadata.interaction.title,
+            title: this.state.editedTitle,
             initial_message: withMessage ? {
                 message: [messageSegment],
                 model_config: {},
