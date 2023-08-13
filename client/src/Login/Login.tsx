@@ -91,7 +91,6 @@ class Login extends React.Component<LoginProps, LoginState> {
                 password: '',
                 confirmPassword: ''
             })
-            console.log(response)
             Cookies.save("user_id", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
         }).catch(err => {
             if (err.response?.status === 409) {
@@ -118,7 +117,6 @@ class Login extends React.Component<LoginProps, LoginState> {
         axios.post(API_BASE + '/users/forgetpassword', {
             email: this.state.username
         }).then(response => {
-            console.log(response)
         })
         .finally(() => {
             this.setState({ resetDone: true })
