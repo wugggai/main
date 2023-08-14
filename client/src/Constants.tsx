@@ -9,13 +9,15 @@ export const SERVER = axios.create({
 
 SERVER.interceptors.response.use(
   response => response, // return the response for successful requests
-  (error) => {
-      if (error.response?.status === 401) {
-          Cookies.remove('access_token');
-          Cookies.remove('user_id');
-          window.location.assign('/');
+  (err) => {
+      if (err.response?.status === 401) {
+          Cookies.remove('access_token')
+          Cookies.remove('user_id')
+          window.location.assign('/')
+          return
       }
-      return Promise.reject(error); // always return the error
+      alert(`Server responded with error: \n${err.response.data.detail}`)
+      return Promise.reject(err); // always return the error
   })
 
 export const SYNTAX_THEME = {
