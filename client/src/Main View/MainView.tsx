@@ -7,8 +7,7 @@ import { ChatMetadata, Tag } from '../Interfaces';
 import { SpinnerCircularFixed } from 'spinners-react';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
 import { Loading } from '../UI Components/Loading';
-import axios from 'axios';
-import { API_BASE, SERVER, getUserId } from '../Constants';
+import { SERVER, getUserId } from '../Constants';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
 import Cookies from 'react-cookies'
