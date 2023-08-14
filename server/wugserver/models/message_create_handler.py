@@ -39,17 +39,20 @@ def handle_message_create_request(
         raise HTTPException(
             status_code=404, detail=f"{message_create_params.model} is not availble"
         )
+    api_key: str = ""
     # verifies that user has provided api_key
     provider = requested_model.get_provider()
-    api_key = api_key_model.get_api_key_by_provider(
-        user_id=user_id,
-        provider=provider,
-    )
-    if api_key is None:
-        raise HTTPException(
-            status_code=403,
-            detail=f"No API key provided for {message_create_params.model}",
+    if requested_model.requires_api_key():
+        api_key_record = api_key_model.get_api_key_by_provider(
+            user_id=user_id,
+            provider=provider,
         )
+        if api_key_record is None:
+            raise HTTPException(
+                status_code=403,
+                detail=f"No API key provided for {message_create_params.model}",
+            )
+        api_key = api_key_record.api_key
 
     try:
         requested_model.assert_input_format(message_create_params)
@@ -63,7 +66,7 @@ def handle_message_create_request(
         )
     try:
         model_res_msg: list[MessageSegment] = requested_model.post_message(
-            api_key=api_key.api_key,
+            api_key=api_key,
             interaction_context=interaction_context,
             message_create_params=message_create_params,
         )

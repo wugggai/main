@@ -43,6 +43,10 @@ class AIModel(object):
     def requires_context(cls) -> bool:
         return False
 
+    @classmethod
+    def requires_api_key(cls) -> bool:
+        return True
+
     @abstractmethod
     def assert_input_format(cls, message_create_params: MessageCreate):
         pass

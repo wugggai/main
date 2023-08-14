@@ -16,6 +16,10 @@ class EchoModel(AIModel):
     provider = Provider.none
 
     @classmethod
+    def requires_api_key(cls) -> bool:
+        return False
+
+    @classmethod
     def assert_input_format(cls, message_create_params: MessageCreate):
         if len(message_create_params.message) < 1:
             raise ValueError("echo model requires at least one input message")
