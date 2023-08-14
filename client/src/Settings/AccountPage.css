@@ -5,6 +5,19 @@
     align-items: center;
 }
 
+.spacer {
+    height: 8px; /* Adjust this value to your preference */
+    display: block; /* Ensures it takes up space */
+    clear: both; /* Useful if you have floated elements */
+    content: ""; /* It's often used with pseudo-elements, but no harm in using it here as well */
+}
+
+.error-message {
+    height: 8px;
+    font-size: 12px;
+    color: red;
+}
+
 .settings-textfield {
     padding: 8px 8px;
     border-radius: 6px;
@@ -12,7 +25,7 @@
 }
 
 .settings-table tr {
-    height: 70px;
+    height: 72px;
 }
 
 .settings-table td > * {
@@ -20,7 +33,7 @@
 }
 
 .settings-table input {
-    width: 220px;
+    width: 300px;
 }
 
 .settings-table .caption {
@@ -39,7 +52,18 @@
     background-color: transparent;
 }
 
+.settings-table button:hover, .settings-button:hover {
+    /* Here, you can define the hover state properties */
+    background-color: var(--button-tint);  /* For example, changing the background color */
+    color: white;  /* Changing text color to white on hover */
+}
+
 .settings-button {
     border: 1px solid var(--theme-warning);
     color: var(--theme-warning);
+}
+
+.horizontal-container div {
+    display: inline-block;
+    vertical-align: middle;
 }

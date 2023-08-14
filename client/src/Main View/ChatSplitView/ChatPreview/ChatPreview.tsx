@@ -23,7 +23,6 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
         this.state = {
             searchString: ''
         };
-        console.log("Loaded conversations:", props.chatHistoryMetadata)
     }
 
     render() {

@@ -49,7 +49,6 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             return
         }
         SERVER.get(`/users/${userId}/tags`).then(response => {
-            console.log("tags:", response.data)
             this.setState({
                 tagList: response.data
             })

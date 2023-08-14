@@ -16,7 +16,7 @@ router = APIRouter()
 # NOTE: Endpoints must never return unobfuscated API Key
 #       Client should not need to implement obfuscation
 @router.post("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
-def create_api_key_route(
+def create_or_update_api_key_route(
     user_id: int,
     provider: Provider,
     api_key_create: ApiKeyCreate,
@@ -27,33 +27,15 @@ def create_api_key_route(
     existing_key = api_key_model.get_api_key_by_provider(
         user_id=user_id, provider=provider
     )
+    verify_api_key(key=api_key_create.api_key, provider_name=provider)
     if existing_key:
-        raise HTTPException(status_code=409, detail="API Key already provided")
-    verify_api_key(key=api_key_create.api_key, provider_name=provider)
-    record = api_key_model.create_api_key(
-        user_id=user_id, provider=provider, api_key=api_key_create
-    )
-    return api_key_model.obfuscate_api_key_record(record)
-
-
-@router.put("/users/{user_id}/apikey/providers/{provider}", response_model=ApiKeyBase)
-def update_api_key_route(
-    user_id: int,
-    provider: Provider,
-    api_key_create: ApiKeyCreate,
-    current_user: UserRecord = Depends(get_current_active_user),
-    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
-):
-    authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
-    existing_key = api_key_model.get_api_key_by_provider(
-        user_id=user_id, provider=provider
-    )
-    if not existing_key:
-        raise HTTPException(status_code=404, detail="API Key not provided")
-    verify_api_key(key=api_key_create.api_key, provider_name=provider)
-    record = api_key_model.update_api_key(
-        user_id=user_id, provider=provider, api_key=api_key_create
-    )
+        record = api_key_model.update_api_key(
+            user_id=user_id, provider=provider, api_key=api_key_create
+        )
+    else:
+        record = api_key_model.create_api_key(
+            user_id=user_id, provider=provider, api_key=api_key_create
+        )
     return api_key_model.obfuscate_api_key_record(record)
 
 
