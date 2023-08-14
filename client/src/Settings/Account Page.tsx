@@ -3,7 +3,7 @@ import './AccountPage.css'
 import { Loading } from '../UI Components/Loading';
 import axios from 'axios';
 import Cookies from 'react-cookies'
-import { API_BASE, SERVER } from '../Constants';
+import { SERVER } from '../Constants';
 
 interface AccountPageProps {
     
@@ -39,10 +39,8 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
             return
         }
 
-        axios.get(API_BASE + "/users/me", {
-            headers: { "Authorization": `Bearer ${accessToken}` }
-        }).then(response => {
-            console.log(response)
+        SERVER.get("/users/me")
+        .then(response => {
             this.setState({ email: response.data.email })
         }).catch(err => {
             alert("You must be logged in to view account settings.")
