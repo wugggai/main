@@ -5,7 +5,7 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
-export type AI = 'gpt-3.5-turbo' | 'gpt-4'
+export type AI = 'gpt-3.5-turbo' | 'gpt-4' | "gpt-3.5-turbo-16k" | "DALL-E2" | "stable-diffusion-v3"
 
 export interface MessageSegment {
     type: string

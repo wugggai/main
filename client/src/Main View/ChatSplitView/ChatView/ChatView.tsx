@@ -3,7 +3,7 @@ import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag, getCurrentDateStrin
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
-import { SERVER, getUserId } from '../../../Constants';
+import { SERVER, SUPPORTED_MODELS, getUserId } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
@@ -42,7 +42,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.state = {
             inputValue: '',
             isWaitingForResponse: false,
-            isUpdatingModel: false,
+            isUpdatingModel: true,
             isAddingTag: false,
             newTagColor: '#ffffff'
         };
@@ -77,7 +77,10 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
 
         const userId = Cookies.load('user_id')
         SERVER.get(`/users/${userId}/models/list`).then(response => {
-            this.setState({ availableModels: response.data.model_names })
+            this.setState({
+                availableModels: response.data.model_names,
+                isUpdatingModel: false
+            })
         })
     }
 
@@ -108,7 +111,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             this.setState({ chatHistory: { messages: []} })
             setTimeout(() => {
                 const input = document.querySelector('#chat-input') as HTMLTextAreaElement
-                input.focus()
+                input?.focus()
             }, 1);
         }
     }
@@ -269,7 +272,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.props.chatMetadata.interaction.ai_type = name as AI
         if (!this.props.isNewInteraction) {
             this.setState({ isUpdatingModel: true })
-            setTimeout(() => this.setState({ isUpdatingModel: false }), 1000)
+            setTimeout(() => this.setState({ isUpdatingModel: false }), 200)
         }
         return this.props.chatMetadata.interaction.ai_type
     }
@@ -362,10 +365,10 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         </div>
 
         const chooseModelMenu = <div className='dropdown-models'>
-            {(this.state.availableModels ?? []).map( (modelName) => {
-                return <div key={modelName}>
+            {SUPPORTED_MODELS.map( (modelName) => {
+                return <button key={modelName} disabled={(this.state.availableModels || []).indexOf(modelName) === -1}>
                     {modelName}
-                </div>
+                </button>
             })}
         </div>
 
@@ -422,7 +425,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                             <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
                         </button>
                     </Dropdown>
-                    {this.state.isUpdatingModel && <div style={{width: 28, height: 15, display: 'inline-block', verticalAlign: 'middle', position: 'relative'}}>
+                    {this.state.isUpdatingModel && <div style={{padding: '1px 5px 0px', display: 'inline-block', position: 'relative', height: '15px'}}>
                         <Loading size={15} />
                     </div>}
                 </div>}

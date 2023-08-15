@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import './AccountPage.css'
 import { Loading } from '../UI Components/Loading';
 import { SERVER, getUserId } from '../Constants';
@@ -65,7 +65,7 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
     }
 
     render() {
-        const inlineSpinner = <div style={{position: 'relative', display: 'inline-block', width: '35px', height: '40px'}}>
+        const inlineSpinner = <div style={{position: 'relative', display: 'inline-block', padding: '0px 8px'}}>
             <Loading size={20} />
         </div>
         const title = <div>{this.props.title}</div>
@@ -87,7 +87,7 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
             disabled={!this.state.inputKey}>
             Update
         </button>
-        const spinnerOrButton = <div>{this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : updateButton)}</div>
+        const spinnerOrButton = <Fragment>{this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : updateButton)}</Fragment>
         const savedKey = <div>{this.state.savedKey}</div>
         
         return <table className='settings-table'>
