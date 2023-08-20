@@ -63,6 +63,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                 keyManagementLink='https://platform.openai.com/account/api-keys'
                 keyManagementSiteName='openai.com'
                 inputPlaceholder='sk-...'
+                initialKey={this.initialOpenAIKey}
             ></APIKeyInputBar>
             <div className="spacer"></div>
             <APIKeyInputBar
@@ -70,6 +71,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                 title='Stable Diffusion API Key'
                 keyManagementLink='https://stablediffusionapi.com/settings/api'
                 keyManagementSiteName='stablediffusionapi.com'
+                initialKey={this.initialStableDiffusionKey}
             ></APIKeyInputBar>
         </div>
     }

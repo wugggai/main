@@ -40,8 +40,7 @@ class UserPasswordModel:
     def patch_user_password(self, user_id: int, new_password: str):
         if verify_user_password(user_id, new_password):
             raise HTTPException(
-                status_code=400,
-                detail=f"Please provide a different password"
+                status_code=400, detail=f"Please provide a different password"
             )
         new_hashed_password = pwd_context.hash(new_password)
         self.user_password_db_model.update_user_password(user_id, new_hashed_password)
