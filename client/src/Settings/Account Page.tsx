@@ -152,7 +152,7 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     </Fragment>
                 }
             </table>
-            <button className='settings-button' onClick={this.logout}>Log Out</button>
+            <button className='warning-button' onClick={this.logout}>Log Out</button>
         </Fragment>
     }
 }

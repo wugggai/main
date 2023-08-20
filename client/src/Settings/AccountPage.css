@@ -18,6 +18,12 @@
     color: red;
 }
 
+.success-message {
+    height: 8px;
+    font-size: 12px;
+    color: green;
+}
+
 .settings-textfield {
     padding: 8px 8px;
     border-radius: 6px;
@@ -34,6 +40,8 @@
 
 .settings-table input {
     width: 300px;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .settings-table .caption {
@@ -41,26 +49,38 @@
     color: var(--lighter-text-color);
 }
 
-.settings-table button, .settings-button {
+.settings-table button {
     border: 1px solid var(--button-tint);
     color: var(--button-tint);
     padding: 7px 10px;
     margin: 5px;
     min-width: 75px;
+    height: 32px;
     font-size: 14px;
     border-radius: 6px;
     background-color: transparent;
 }
 
-.settings-table button:hover, .settings-button:hover {
-    /* Here, you can define the hover state properties */
-    background-color: var(--button-tint);  /* For example, changing the background color */
+.settings-table .warning-button, .warning-button {
+    border: 1px solid var(--theme-warning);
+    color: var(--theme-warning);
+    padding: 7px 10px;
+    margin: 5px;
+    min-width: 75px;
+    height: 32px;
+    font-size: 14px;
+    border-radius: 6px;
+    background-color: transparent;
+}
+
+.settings-table button:hover {
+    background-color: var(--button-tint);
     color: white;  /* Changing text color to white on hover */
 }
 
-.settings-button {
-    border: 1px solid var(--theme-warning);
-    color: var(--theme-warning);
+.settings-table .warning-button:hover, .warning-button:hover {
+    background-color: var(--theme-warning);
+    color: white;  /* Changing text color to white on hover */
 }
 
 .horizontal-container div {

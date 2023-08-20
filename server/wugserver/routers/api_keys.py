@@ -64,3 +64,14 @@ def get_all_api_key_route(
     authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
     records = api_key_model.get_all_api_keys(user_id=user_id)
     return [api_key_model.obfuscate_api_key_record(record) for record in records]
+
+
+@router.delete("/users/{user_id}/apikey/providers/{provider}", status_code=204)
+def delete_api_key_route(
+    user_id: int,
+    provider: Provider,
+    current_user: UserRecord = Depends(get_current_active_user),
+    api_key_model: ApiKeyModel = Depends(ApiKeyModel),
+):
+    authorize_by_matching_user_id(current_user_id=current_user.id, user_id=user_id)
+    api_key_model.delete_api_key(user_id=user_id, provider=provider)

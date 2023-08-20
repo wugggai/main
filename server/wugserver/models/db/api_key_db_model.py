@@ -50,6 +50,16 @@ class ApiKeyDbModel:
         self.db.refresh(db_api_key)
         return db_api_key
 
+    def delete_api_key(
+        self,
+        user_id: int,
+        provider: str,
+    ):
+        keyRec = self.get_api_key_by_provider(user_id, provider)
+        if keyRec:
+            self.db.delete(keyRec)
+            self.db.commit()
+
     def get_api_key_by_provider(self, user_id: int, provider: str):
         return (
             self.db.query(ApiKeyRecord)

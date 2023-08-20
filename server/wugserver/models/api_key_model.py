@@ -43,6 +43,16 @@ class ApiKeyModel:
             user_id=user_id, provider=provider, key=api_key.api_key
         )
 
+    def delete_api_key(
+        self,
+        user_id: int,
+        provider: str,
+    ) -> None:
+        self.api_key_db_model.delete_api_key(
+            user_id=user_id,
+            provider=provider,
+        )
+
     def get_api_key_by_provider(
         self,
         user_id: int,
