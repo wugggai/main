@@ -50,14 +50,14 @@ def handle_message_create_request(
         if api_key_record is None:
             raise HTTPException(
                 status_code=403,
-                detail=f"No API key provided for {message_create_params.model}",
+                detail=f"no API key provided for {message_create_params.model}",
             )
         api_key = api_key_record.api_key
 
     try:
         requested_model.assert_input_format(message_create_params)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Bad input: {e}")
+        raise HTTPException(status_code=400, detail=f"bad input: {e}")
 
     interaction_context = []
     if requested_model.requires_context():
@@ -73,7 +73,7 @@ def handle_message_create_request(
     except Exception as e:
         raise HTTPException(
             status_code=503,
-            detail=f"Cannot send message to {message_create_params.model}: {e}",
+            detail=f"cannot send message to {message_create_params.model}: {e}",
         )
 
     message_model.create_message(
@@ -114,7 +114,7 @@ def verify_api_key(key: str, provider_name: str):
                     model_config={},
                 ),
             )
-        except Exception as e:
-            raise Exception(f"Failed to send message to {model}: {e}")
+        except Exception as exception:
+            raise Exception(f"failed to send message to {model}: {exception}")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"API Key verification failed: {e}")

@@ -15,11 +15,18 @@ interface APIKeyInputBarProps {
 }
 
 interface APIKeyInputBarState {
-    isUpdatingAPIKey?: boolean // undefined: hidden, false: 'Update', true: spinner
-    savedKey: string
+    isUpdatingAPIKey?: boolean // false: 'Update', true: spinner
     inputKey: string
+    savedKey: string
+    displayKey: string
     apiKeyErrMsg: string
+    apiKeySuccessMsg: string
 }
+
+const createErrMsg = `Invalid API key, please follow the provider's instructions and double check your copy-paste`
+const deleteErrMsg = "Failed to delete API key, please try again later"
+const createSuccessMsg = "API key successfully verified"
+const deleteSuccessMsg = "API key successfully deleted"
 
 export interface APIKeysObject {
     provider: string
@@ -31,11 +38,14 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
         super(props);
         this.state ={
             isUpdatingAPIKey: false,
-            savedKey: props.initialKey || '',
             inputKey: '',
+            savedKey: props.initialKey || '',
+            displayKey: props.initialKey || '',
             apiKeyErrMsg: '',
+            apiKeySuccessMsg: '',
         }
         this.updateAPIKey = this.updateAPIKey.bind(this);
+        this.deleteAPIKey = this.deleteAPIKey.bind(this);
     }
 
     updateAPIKey(key: string) {
@@ -51,17 +61,47 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
         }).then(res => {
             let data: APIKeysObject = res.data
             this.setState({
-                isUpdatingAPIKey: undefined,
-                savedKey: data.api_key,
+                isUpdatingAPIKey: false,
                 inputKey: '',
+                savedKey: data.api_key,
+                displayKey: data.api_key,
                 apiKeyErrMsg: '',
+                apiKeySuccessMsg: createSuccessMsg,
             })
         }).catch(_ => {
             this.setState({
                 isUpdatingAPIKey: false,
-                apiKeyErrMsg: `Invalid API key, please follow the provider's instructions and double check your copy-paste`,
+                apiKeyErrMsg: createErrMsg,
+                apiKeySuccessMsg: '',
             })
         })
+    }
+
+    deleteAPIKey() {
+        const userId = getUserId()
+        if (userId === undefined) {
+            alert("You must be logged in to delete the API key.")
+            window.location.reload()
+            return
+        }
+        this.setState({ isUpdatingAPIKey: true })
+        SERVER.delete(`/users/${userId}/apikey/providers/${this.props.provider}`)
+            .then(res => {
+                this.setState({
+                    isUpdatingAPIKey: false,
+                    savedKey: '',
+                    displayKey: '',
+                    apiKeyErrMsg: '',
+                    apiKeySuccessMsg: deleteSuccessMsg,
+                })
+            })
+            .catch(_ => {
+                this.setState({
+                    isUpdatingAPIKey: false,
+                    apiKeyErrMsg: deleteErrMsg,
+                    apiKeySuccessMsg: '',
+                })
+            })
     }
 
     render() {
@@ -75,20 +115,45 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
             placeholder={this.props.inputPlaceholder || ''} 
             autoCorrect='false' 
             onChange={(e) => {
-                this.setState({ 
+                this.setState({
                     isUpdatingAPIKey: false,
-                    inputKey: e.target.value, 
+                    inputKey: e.target.value,
+                    displayKey: e.target.value,
+                    apiKeyErrMsg: '',
                 })
             }}
-            value={this.state.inputKey || this.state.savedKey}
+            onBlur={() => {
+                this.setState({
+                    displayKey: this.state.inputKey || this.state.savedKey
+                })
+                if (this.state.inputKey === "" && this.state.savedKey) {
+                    this.setState({
+                        isUpdatingAPIKey: false,
+                    })
+                }
+            }}
+            value={this.state.displayKey}
         />
-        const updateButton = <button 
+        const updateButton = <button
             onClick={() => {this.updateAPIKey(this.state.inputKey || '')}} 
             disabled={!this.state.inputKey}>
             Update
         </button>
-        const spinnerOrButton = <Fragment>{this.state.isUpdatingAPIKey !== undefined && (this.state.isUpdatingAPIKey ? inlineSpinner : updateButton)}</Fragment>
-        const savedKey = <div>{this.state.savedKey}</div>
+        const deleteButton = <button className='warning-button'
+            onClick={() => {this.deleteAPIKey()}} 
+            disabled={!this.state.savedKey}>
+            Delete
+        </button>
+        const buttons = <div className="horizontal-container">
+            {updateButton} {deleteButton}
+        </div>
+        const spinnerOrButtons = <div>{this.state.isUpdatingAPIKey ? inlineSpinner : buttons}</div>
+        let errOrSuccessMessage = <div className='error-message'></div>
+        if (this.state.apiKeyErrMsg) {
+            errOrSuccessMessage = <div className='error-message'>{this.state.apiKeyErrMsg}</div>
+        } else if (this.state.apiKeySuccessMsg) {
+            errOrSuccessMessage = <div className='success-message'>{this.state.apiKeySuccessMsg}</div>
+        }
         
         return <table className='settings-table'>
             <colgroup>
@@ -104,9 +169,9 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
                 <td>
                     <div className='spacer'></div>
                     <div className="horizontal-container">
-                        {inputbox} {spinnerOrButton}
+                        {inputbox} {spinnerOrButtons}
                     </div>
-                    <div className='error-message'>{this.state.apiKeyErrMsg}</div>
+                    {errOrSuccessMessage}
                 </td>
             </tr>
         </table>
