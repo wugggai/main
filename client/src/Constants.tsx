@@ -16,7 +16,6 @@ SERVER.interceptors.response.use(
           window.location.assign('/')
           return
       }
-      alert(`Server responded with error: \n${err.response.data.detail}`)
       return Promise.reject(err); // always return the error
   })
 

@@ -2,6 +2,8 @@ import React from 'react'
 import './AccountPage.css'
 import { Loading } from '../UI Components/Loading';
 import { SERVER, getUserId } from '../Constants';
+import { useNotification } from '../Components/Notification/NotificationContext';
+import { NotificationProps } from '../Components/Notification/Notification';
 
 interface APIKeyInputBarProps {
     provider: string
@@ -13,6 +15,9 @@ interface APIKeyInputBarProps {
     additionalCaption?: string
     initialKey?: string
 }
+
+type APIKeyInputBarImplProps = APIKeyInputBarProps & {showNotification: ((_: NotificationProps) => void)}
+
 
 interface APIKeyInputBarState {
     isUpdatingAPIKey?: boolean // false: 'Update', true: spinner
@@ -33,8 +38,8 @@ export interface APIKeysObject {
     api_key: string
 }
 
-class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBarState> {
-    constructor(props: APIKeyInputBarProps) {
+class APIKeyInputBarImpl extends React.Component<APIKeyInputBarImplProps, APIKeyInputBarState> {
+    constructor(props: APIKeyInputBarImplProps) {
         super(props);
         this.state ={
             isUpdatingAPIKey: false,
@@ -68,7 +73,8 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
                 apiKeyErrMsg: '',
                 apiKeySuccessMsg: createSuccessMsg,
             })
-        }).catch(_ => {
+        }).catch((error) => {
+            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
             this.setState({
                 isUpdatingAPIKey: false,
                 apiKeyErrMsg: createErrMsg,
@@ -163,22 +169,27 @@ class APIKeyInputBar extends React.Component<APIKeyInputBarProps, APIKeyInputBar
                 <col style={{width: '272px'}} />
                 <col />
             </colgroup>
-        
-            <tr>
-                <td>
-                    {title}
-                    {caption}
-                </td>
-                <td>
-                    <div className='spacer'></div>
-                    <div className="horizontal-container">
-                        {inputbox} {spinnerOrButtons}
-                    </div>
-                    {errOrSuccessMessage}
-                </td>
-            </tr>
+            <tbody>
+                <tr>
+                    <td>
+                        {title}
+                        {caption}
+                    </td>
+                    <td>
+                        <div className='spacer'></div>
+                        <div className="horizontal-container">
+                            {inputbox} {spinnerOrButtons}
+                        </div>
+                        {errOrSuccessMessage}
+                    </td>
+                </tr>
+            </tbody> 
         </table>
     }
 }
 
+export function APIKeyInputBar(props: APIKeyInputBarProps) {
+    const showNotification = useNotification();
+    return <APIKeyInputBarImpl {...props} showNotification={showNotification}/>
+};
 export default APIKeyInputBar;

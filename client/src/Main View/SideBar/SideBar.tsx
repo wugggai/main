@@ -7,6 +7,8 @@ import { Tag } from '../../Interfaces'
 import axios from 'axios'
 import * as uuid from "uuid"
 import { SERVER, getUserId } from '../../Constants'
+import { useNotification } from '../../Components/Notification/NotificationContext'
+import { NotificationProps } from '../../Components/Notification/Notification'
 
 interface SideBarProps {
     currentTabIndex: number
@@ -17,6 +19,8 @@ interface SideBarProps {
     selectedTagIds: Set<string>
 }
  
+type SideBarImplProps = SideBarProps & {showNotification: ((_: NotificationProps) => void)}
+
 interface SideBarState {
     currentTabIndex: number
     newTagPopoverAnchor?: { x: number, y: number }
@@ -25,8 +29,8 @@ interface SideBarState {
     isAddingTag: boolean
 }
  
-class SideBar extends React.Component<SideBarProps, SideBarState> {
-    constructor(props: SideBarProps) {
+class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
+    constructor(props: SideBarImplProps) {
         super(props);
         this.state = {
             currentTabIndex: 0,
@@ -51,9 +55,10 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
             })
             let newTag = response.data as Tag
             this.props.onAddNewTag(newTag)
+        }).catch((error) => {
+            this.props.showNotification({title: "Something unexpected happened!", message: "Unexpected error."})
+
         })
-        // this.props.onAddNewTag({ name: this.state.newTagName, color: this.state.newTagColor!, uuid: '' })
-        // this.setState({ newTagName: '', newTagColor: undefined, newTagPopoverAnchor: undefined })
     }
 
     render() {
@@ -123,4 +128,8 @@ class SideBar extends React.Component<SideBarProps, SideBarState> {
     }
 }
  
+export function SideBar(props: SideBarProps) {
+    const showNotification = useNotification();
+    return <SideBarImpl {...props} showNotification={showNotification}/>
+};
 export default SideBar;

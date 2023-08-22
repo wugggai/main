@@ -2,9 +2,7 @@ import React, { Fragment } from 'react'
 import SideBar from './SideBar/SideBar';
 import SplitView from 'react-split'
 import './MainView.css'
-import ChatPreview from './ChatSplitView/ChatPreview/ChatPreview';
 import { ChatMetadata, Tag } from '../Interfaces';
-import { SpinnerCircularFixed } from 'spinners-react';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
 import { Loading } from '../UI Components/Loading';
 import { SERVER, getUserId } from '../Constants';
@@ -60,8 +58,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
     render() { 
         if (this.state.tagList === undefined) {
-            return <div className='loading-state'><Loading /></div>
-        }
+            return <div className='loading-state'><Loading /></div>}
         let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
         switch (this.state.currentTabIndex) {
         case 0:
