@@ -1,16 +1,17 @@
-import React, { Fragment } from 'react';
+import { NotificationProvider } from './Components/Notification/NotificationContext'
 import MainView from './Main View/MainView'
 
 import {BrowserRouter, Routes, Route, useParams, useSearchParams} from 'react-router-dom'
-import Verification from './Login/Verification';
 
 function App() {
   return <BrowserRouter>
-    <Routes>
-      <Route path='/verification/token/:token' element={<GetVerificationPage />} />
-      <Route path='/set_new_password' element={<GetSetNewPasswordPage />} />
-      <Route path='/' element={<MainView />} />
-    </Routes>
+    <NotificationProvider>
+      <Routes>
+          <Route path='/verification/token/:token' element={<GetVerificationPage />} />
+          <Route path='/set_new_password' element={<GetSetNewPasswordPage />} />
+          <Route path='/' element={<MainView />} />
+      </Routes>
+    </NotificationProvider>
   </BrowserRouter>
 }
 

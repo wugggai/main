@@ -1,0 +1,37 @@
+.notification {
+    background: #dd7064;
+    position: fixed;
+    right: 8px;
+    top: 8px;
+    width: 320px;
+    height: 116px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: white;
+    border-radius: 4px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: white;
+    height: 100%;
+    width: 40px;
+    cursor: pointer;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-content: space-around;
+    justify-content: center;
+    height: 100%;
+    gap: 8px;
+    text-overflow: ellipsis;
+    padding: 8px;
+}
+
+.message {
+    font-size: 12px;
+}

@@ -5,11 +5,16 @@ import { API_BASE } from '../Constants';
 import Cookies from 'react-cookies'
 import { passwordStrength } from 'check-password-strength'
 import Verification from './Verification';
+import { useNotification } from '../Components/Notification/NotificationContext';
+import { NotificationProps } from '../Components/Notification/Notification';
+import { error } from 'console';
 
 interface LoginProps {
     resetToken?: string
     verificationToken?: string
 }
+
+type LoginImplProps =  LoginProps & {showNotification: ((_: NotificationProps) => void)}
 
 type Mode = 'login' | 'sign up' | 'reset' | 'new password' | 'verified'
  
@@ -25,8 +30,8 @@ interface LoginState {
 }
 
  
-class Login extends React.Component<LoginProps, LoginState> {
-    constructor(props: LoginProps) {
+class LoginImpl extends React.Component<LoginImplProps, LoginState> {
+    constructor(props: LoginImplProps) {
         super(props);
 
         let mode: Mode = "login"
@@ -67,14 +72,14 @@ class Login extends React.Component<LoginProps, LoginState> {
                     Cookies.save("user_id", response.data.id, { expires: new Date(Date.now() + 30 * 86400 * 1000) })
                     window.location.reload()
                 }).catch(err => {
-                    alert(err)
+                    this.props.showNotification({title: "Something unexpected happened!", message: err.code})
                 })
             }
         }).catch(err => {
             if (err.response?.status === 401) {
-                alert("Incorrect username/password combination.")
+                this.props.showNotification({title: "Login error!", message: "Incorrect username/password combination."})
             } else if (err.response?.status === 422) {
-                alert("You must enter a username and a password.")
+                this.props.showNotification({title: "Login error!", message: "You must enter a username and a password."})
             }
         })
     }
@@ -94,7 +99,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             Cookies.save("user_id", response.data.id, {expires: new Date(Date.now() + 30 * 86400 * 1000)})
         }).catch(err => {
             if (err.response?.status === 409) {
-                alert("This email address is already taken.")
+                this.props.showNotification({title: "Sign up error!", message: "This email address is already taken."})
             }
         })
     }
@@ -116,9 +121,9 @@ class Login extends React.Component<LoginProps, LoginState> {
     reset() {
         axios.post(API_BASE + '/users/forgetpassword', {
             email: this.state.username
-        }).then(response => {
-        })
-        .finally(() => {
+        }).catch(err => {
+            this.props.showNotification({title: "Something unexpected happened!", message: err})
+        }).finally(() => {
             this.setState({ resetDone: true })
         })
     }
@@ -310,4 +315,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     }
 }
  
+export function Login(props: LoginProps) {
+    const showNotification = useNotification();
+    return <LoginImpl {...props} showNotification={showNotification}/>
+};
 export default Login;

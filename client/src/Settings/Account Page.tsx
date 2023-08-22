@@ -93,64 +93,66 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
                     <col style={{width: '300px'}} />
                     <col />
                 </colgroup>
-                <tr>
-                    <td>
-                        <div>Email</div>
-                        <div className='caption'>this is the same email you use for logging in</div>
-                    </td>
-                    <td><input type="email" placeholder='name@example.com' className='textfield settings-textfield' autoCorrect='false' value={this.state.email} disabled/></td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td>{!this.state.passwordFieldsExpanded &&
+                <tbody>
+                    <tr>
+                        <td>
+                            <div>Email</div>
+                            <div className='caption'>this is the same email you use for logging in</div>
+                        </td>
+                        <td><input type="email" placeholder='name@example.com' className='textfield settings-textfield' autoCorrect='false' value={this.state.email} disabled/></td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td>{!this.state.passwordFieldsExpanded &&
+                            <Fragment>
+                                <input type="password" placeholder='••••••••' className='textfield settings-textfield' readOnly disabled /> <button onClick={this.expandPasswordFields}>Change</button>
+                            </Fragment>}
+                        </td>
+                    </tr>
+                    {this.state.passwordFieldsExpanded &&
                         <Fragment>
-                            <input type="password" placeholder='••••••••' className='textfield settings-textfield' readOnly disabled /> <button onClick={this.expandPasswordFields}>Change</button>
-                        </Fragment>}
-                    </td>
-                </tr>
-                {this.state.passwordFieldsExpanded &&
-                    <Fragment>
-                        <tr style={{height: '40px'}}>
-                            <td>Current Password</td>
-                            <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
-                        </tr>
-                        <tr style={{height: '40px'}}>
-                            <td>New Password</td>
-                            <td><input type="password" placeholder='' className='textfield settings-textfield' value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} /></td>
-                        </tr>
-                        <tr>
-                            <td />
-                            <td>
-                                <div className='caption' style={{margin: '6px 1px', width: '220px'}}>
-                                    Your new password must be at least 8 characters long and contains:
-                                    <ul>
-                                        <li>At least 1 uppercase letter</li>
-                                        <li>At least 1 lowercase letter</li>
-                                        <li>At least 1 number</li>
-                                        <li>At least 1 symbol</li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr style={{height: '40px'}}>
-                            <td>Confirm New Password</td>
-                            <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
-                        </tr>
-                        <tr>
-                            <td />
-                            <td style={{textAlign: 'right'}}>
-                                {
-                                    this.state.passwordUpdating ?
-                                        inlineSpinner
-                                        : 
-                                        <button onClick={this.changePassword} style={{marginRight: 0}}>Change</button>
-                                }
-                                <br />
-                                <span style={{fontSize: '13px', color: 'var(--lighter-text-color)'}}>Or <span style={{textDecoration: 'underline', cursor: 'pointer'}} onClick={() => this.setState({ passwordFieldsExpanded: false, password: '' })}>discard</span></span>
-                            </td>
-                        </tr>
-                    </Fragment>
-                }
+                            <tr style={{height: '40px'}}>
+                                <td>Current Password</td>
+                                <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
+                            </tr>
+                            <tr style={{height: '40px'}}>
+                                <td>New Password</td>
+                                <td><input type="password" placeholder='' className='textfield settings-textfield' value={this.state.password} onChange={(e) => this.setState({ password: e.target.value })} /></td>
+                            </tr>
+                            <tr>
+                                <td />
+                                <td>
+                                    <div className='caption' style={{margin: '6px 1px', width: '220px'}}>
+                                        Your new password must be at least 8 characters long and contains:
+                                        <ul>
+                                            <li>At least 1 uppercase letter</li>
+                                            <li>At least 1 lowercase letter</li>
+                                            <li>At least 1 number</li>
+                                            <li>At least 1 symbol</li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style={{height: '40px'}}>
+                                <td>Confirm New Password</td>
+                                <td><input type="password" placeholder='' className='textfield settings-textfield' /></td>
+                            </tr>
+                            <tr>
+                                <td />
+                                <td style={{textAlign: 'right'}}>
+                                    {
+                                        this.state.passwordUpdating ?
+                                            inlineSpinner
+                                            : 
+                                            <button onClick={this.changePassword} style={{marginRight: 0}}>Change</button>
+                                    }
+                                    <br />
+                                    <span style={{fontSize: '13px', color: 'var(--lighter-text-color)'}}>Or <span style={{textDecoration: 'underline', cursor: 'pointer'}} onClick={() => this.setState({ passwordFieldsExpanded: false, password: '' })}>discard</span></span>
+                                </td>
+                            </tr>
+                        </Fragment>
+                    }
+                </tbody>
             </table>
             <button className='warning-button' onClick={this.logout}>Log Out</button>
         </Fragment>

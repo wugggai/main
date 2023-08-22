@@ -2,17 +2,21 @@ import axios from 'axios';
 import React, { Fragment } from 'react'
 import { API_BASE } from '../Constants';
 import Cookies from 'react-cookies'
+import { useNotification } from '../Components/Notification/NotificationContext';
+import { NotificationProps } from '../Components/Notification/Notification';
 
 interface VerificationProps {
     token: string
 }
+
+type VerificationImplProps = VerificationProps & {showNotification: ((_: NotificationProps) => void)}
  
 interface VerificationState {
     verified?: boolean
 }
  
-class Verification extends React.Component<VerificationProps, VerificationState> {
-    constructor(props: VerificationProps) {
+class VerificationImpl extends React.Component<VerificationImplProps, VerificationState> {
+    constructor(props: VerificationImplProps) {
         super(props);
         this.state = {};
     }
@@ -39,6 +43,7 @@ class Verification extends React.Component<VerificationProps, VerificationState>
             })
 
         }).catch(err => {
+            this.props.showNotification({title: "Verification error!", message: err.code})
             this.setState({ verified: false })
         })
     }
@@ -70,4 +75,8 @@ class Verification extends React.Component<VerificationProps, VerificationState>
     }
 }
  
+export function Verification(props: VerificationProps) {
+    const showNotification = useNotification();
+    return <VerificationImpl {...props} showNotification={showNotification}/>
+};
 export default Verification;

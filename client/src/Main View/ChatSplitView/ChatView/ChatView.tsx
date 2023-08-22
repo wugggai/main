@@ -8,6 +8,8 @@ import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
 import { TwitterPicker } from 'react-color';
+import { useNotification } from '../../../Components/Notification/NotificationContext';
+import { NotificationProps } from '../../../Components/Notification/Notification';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -18,6 +20,8 @@ interface ChatViewProps {
     availableTags: Tag[]
     isTrash: boolean
 }
+
+type ChatViewClassImplProps = ChatViewProps & {showNotification: ((_: NotificationProps) => void)}
  
 interface ChatViewState {
     editedTitle?: string
@@ -32,12 +36,12 @@ interface ChatViewState {
     isUpdatingModel: boolean
 }
  
-class ChatView extends React.Component<ChatViewProps, ChatViewState> {
+class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatViewState> {
     chatSplitSizes = [70, 30]
     isInitialRender = true
     tagMap: Record<string, Tag> = {} // Maps tag ids to Tag objects
 
-    constructor(props: ChatViewProps) {
+    constructor(props: ChatViewClassImplProps) {
         super(props);
         this.state = {
             inputValue: '',
@@ -62,7 +66,7 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         this.addNewTag = this.addNewTag.bind(this);
     }
 
-    componentDidUpdate(prevProps: Readonly<ChatViewProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
+    componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
         if (super.componentDidUpdate) super.componentDidUpdate(prevProps, prevState, snapshot)
         this.props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
@@ -166,7 +170,6 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
             },
             { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
             ).then(response => {
-                console.log('received message response', response.data)
                 this.state.chatHistory?.messages.push(response.data)
                 this.setState({
                     isWaitingForResponse: false
@@ -176,6 +179,8 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 })
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
+            }).catch((error) => {
+                this.props.showNotification({title: "Something unexpected happened!", message: error.code})
             }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
@@ -198,48 +203,50 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 model: this.props.chatMetadata.interaction.ai_type
             } : undefined
         }).then(response => {
-            const metadata = response.data as ChatMetadata
-            this.props.chatMetadata.interaction.id = metadata.interaction.id
-            this.props.chatMetadata.interaction.title = metadata.interaction.title
-            let systemResponse = []
-            console.log("response from create interaction:", metadata)
-            if (metadata.last_message) {
-                systemResponse.push({
-                    message: metadata.last_message.message,
-                    id: metadata.last_message.id,
-                    timestamp: metadata.last_message.timestamp,
-                    offset: metadata.last_message.offset,
-                    source: metadata.last_message.source as ("echo" | AI)
-                })
-            }
-            if (withMessage) {
-                const messageSegment: MessageSegment = {
-                    type: "text",
-                    content: this.state.inputValue,
+                const metadata = response.data as ChatMetadata
+                this.props.chatMetadata.interaction.id = metadata.interaction.id
+                this.props.chatMetadata.interaction.title = metadata.interaction.title
+                let systemResponse = []
+                console.log("response from create interaction:", metadata)
+                if (metadata.last_message) {
+                    systemResponse.push({
+                        message: metadata.last_message.message,
+                        id: metadata.last_message.id,
+                        timestamp: metadata.last_message.timestamp,
+                        offset: metadata.last_message.offset,
+                        source: metadata.last_message.source as ("echo" | AI)
+                    })
                 }
-                this.setState({
-                    chatHistory: {messages: [
-                        {
-                            message: [messageSegment],
-                            source: 'user',
-                            timestamp: getCurrentDateString(),
-                            id: response.data.id,
-                            interaction_id: this.props.chatMetadata.interaction.id,
-                            offset: 0 
-                        },
-                        ...systemResponse
-                    ]},
-                    inputValue: ''
-                })
-            } else if (this.state.chatHistory === undefined) {
-                this.setState({ chatHistory: {messages: []} })
-            }
-            if (this.state.editedTitle) {
-                this.props.chatMetadata.interaction.title = this.state.editedTitle
-                this.props.chatMetadata.last_message = metadata.last_message
-            }
-            this.props.onChatInfoUpdated()
-            this.setState({ isWaitingForResponse: false});
+                if (withMessage) {
+                    const messageSegment: MessageSegment = {
+                        type: "text",
+                        content: this.state.inputValue,
+                    }
+                    this.setState({
+                        chatHistory: {messages: [
+                            {
+                                message: [messageSegment],
+                                source: 'user',
+                                timestamp: getCurrentDateString(),
+                                id: response.data.id,
+                                interaction_id: this.props.chatMetadata.interaction.id,
+                                offset: 0 
+                            },
+                            ...systemResponse
+                        ]},
+                        inputValue: ''
+                    })
+                } else if (this.state.chatHistory === undefined) {
+                    this.setState({ chatHistory: {messages: []} })
+                }
+                if (this.state.editedTitle) {
+                    this.props.chatMetadata.interaction.title = this.state.editedTitle
+                    this.props.chatMetadata.last_message = metadata.last_message
+                }
+                this.props.onChatInfoUpdated()
+                this.setState({ isWaitingForResponse: false});
+        }).catch((error) => {
+            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
         })
     }
 
@@ -300,6 +307,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
                 addTagButtonPosition: undefined,
                 isAddingTag: false
             })
+        }).catch((error) => {
+            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
+
         })
     }
 
@@ -457,5 +467,9 @@ class ChatView extends React.Component<ChatViewProps, ChatViewState> {
         </div>;
     }
 }
- 
+
+export function ChatView(props: ChatViewProps) {
+    const showNotification = useNotification();
+    return <ChatViewClassImpl {...props} showNotification={showNotification}/>
+};
 export default ChatView;
