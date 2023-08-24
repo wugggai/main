@@ -26,7 +26,7 @@ type ChatViewClassImplProps = ChatViewProps & {showNotification: ((_: Notificati
 interface ChatViewState {
     editedTitle?: string
     chatHistory?: ChatHistory
-    availableModels?: string[]
+    availableModels?: [{name: string, via_system_key: boolean}]
     inputValue: string
     isWaitingForResponse: boolean
     addTagButtonPosition?: { x: number, y: number }
@@ -166,6 +166,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
                 message: [requestMessageSegment],
                 model: this.props.chatMetadata.interaction.ai_type,
+                using_system_key: this.props.chatMetadata.interaction.using_system_key,
                 model_config: {}
             },
             { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
@@ -200,7 +201,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             initial_message: withMessage ? {
                 message: [messageSegment],
                 model_config: {},
-                model: this.props.chatMetadata.interaction.ai_type
+                model: this.props.chatMetadata.interaction.ai_type,
+                using_system_key: this.props.chatMetadata.interaction.using_system_key,
             } : undefined
         }).then(response => {
                 const metadata = response.data as ChatMetadata
@@ -276,6 +278,14 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         if (!name) {
             return name
         }
+        // hacky solution
+        if (name.startsWith("trial_")) {
+            this.props.chatMetadata.interaction.using_system_key = true
+            name = name.substring(6)
+        } else {
+            this.props.chatMetadata.interaction.using_system_key = false
+        }
+
         this.props.chatMetadata.interaction.ai_type = name as AI
         if (!this.props.isNewInteraction) {
             this.setState({ isUpdatingModel: true })
@@ -376,7 +386,13 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
         const chooseModelMenu = <div className='dropdown-models'>
             {SUPPORTED_MODELS.map( (modelName) => {
-                return <button key={modelName} disabled={(this.state.availableModels || []).indexOf(modelName) === -1}>
+                return <button key={modelName} disabled={(this.state.availableModels?.map((model) => model.name) || []).indexOf(modelName) === -1}>
+                    {modelName}
+                </button>
+            })}
+            {(this.state.availableModels ?? []).filter((model) => model.via_system_key == true).map( (model) => {
+                const modelName =  "trial_" + model.name
+                return <button key={modelName}>
                     {modelName}
                 </button>
             })}

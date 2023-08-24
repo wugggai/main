@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from wugserver.dependencies import get_db
 from wugserver.models.ai_model_model import get_user_available_models
 from wugserver.models.api_key_model import ApiKeyModel
+from wugserver.models.db.system_key_usage_db_model import SystemKeyUsageDbModel
+from wugserver.models.system_key_model import SystemKeyModel
+from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.models.user_model import UserModel
 from wugserver.models.user_password_model import UserPasswordModel
@@ -44,11 +47,16 @@ def get_users_available_models(
     user_id: int,
     current_user: UserRecord = Depends(get_current_active_user),
     api_key_model: ApiKeyModel = Depends(ApiKeyModel),
+    system_key_model: SystemKeyModel = Depends(SystemKeyModel),
+    system_key_usage_model: SystemKeyUsageModel = Depends(SystemKeyUsageModel),
 ):
     authorize_by_matching_user_id(current_user.id, user_id)
+
     return ModelList(
         model_names=get_user_available_models(
             user_id=current_user.id,
             api_key_model=api_key_model,
+            system_key_model=system_key_model,
+            system_key_usage_model=system_key_usage_model,
         )
     )
