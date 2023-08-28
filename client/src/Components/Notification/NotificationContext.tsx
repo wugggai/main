@@ -13,16 +13,22 @@ interface Props {
 
 export function NotificationProvider({ children }: Props) {
   const [notificationConfig, setNotification] = useState<NotificationProps | undefined>(undefined);
+  const [timeout, updateTimeout] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const showNotification = (notificationConfig: NotificationProps) => {
     setNotification(notificationConfig);
-    setTimeout(() => {
-      closeNotification();
-    }, 15000);
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    updateTimeout(
+      setTimeout(closeNotification, 15000)
+    );
   };
 
   const closeNotification = () => {
-    setNotification(undefined)
+    let newNotification = Object.assign({}, notificationConfig)
+    newNotification.show = false
+    setNotification(newNotification)
   }
 
   return (

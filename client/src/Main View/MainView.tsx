@@ -9,6 +9,7 @@ import { SERVER, getUserId } from '../Constants';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
 import Cookies from 'react-cookies'
+import OnboardingScreen from '../Components/OnboardingScreen/OnboardingScreen';
 
 interface MainViewProps {
     resetPasswordToken?: string
@@ -21,6 +22,7 @@ interface MainViewState {
     chatHistory?: ChatMetadata[]
     tagList?: Tag[]
     selectedTagIds: Set<string>
+    showOnboardingScreen: boolean
 }
  
 class MainView extends React.Component<MainViewProps, MainViewState> {
@@ -33,6 +35,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
+            showOnboardingScreen: true,
             showLoginScreen: !Cookies.load('access_token') || !Cookies.load('user_id') || this.props.resetPasswordToken !== undefined || this.props.verificationToken !== undefined,
             currentTabIndex: 0,
             selectedTagIds: new Set()
@@ -94,7 +97,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 <SideBar
                     currentTabIndex={this.state.currentTabIndex}
                     onTabChange={(newTab) => {
-                        if (this.state.currentTabIndex != newTab) {
+                        if (this.state.currentTabIndex !== newTab) {
                             this.setState({ currentTabIndex: newTab })
                         } else {
                             this.setState({ selectedTagIds: new Set() })
@@ -128,6 +131,19 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             </SplitView>;
 
             {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} verificationToken={this.props.verificationToken} />}
+            {this.state.showOnboardingScreen && !this.state.showLoginScreen && <OnboardingScreen show={true} onExit={() => this.setState({ showOnboardingScreen: false })}>
+                <div>
+                    <h1>Page 1</h1>
+                    <p>Welcome to LLM platform</p>
+                    <br />
+                    <img src="/assets/logo.png" width="100px" />
+                </div>
+                
+                <div>
+                    <h1>Page 2</h1>
+                </div>
+                <div><h1>Page 3</h1></div>
+            </OnboardingScreen>}
         </Fragment>
     }
 }

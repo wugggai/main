@@ -1,0 +1,68 @@
+.onboarding-sheet-background {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 50; /* Higher than all but the sheet content */
+  overflow: hidden;
+  transition-duration: 0.2s;
+}
+
+.onboarding-sheet-container {
+  position: absolute;
+  min-height: min(100%, 65%);
+  width: min(100%, 700px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.15);
+  z-index: 51;
+}
+
+.onboarding-sheet-content {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  bottom: 90px;
+}
+
+.onboarding-sheet-container .button-bar {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  right: 30px;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.onboarding-sheet-container .button-bar > .spacer {
+  flex-grow: 2;
+}
+
+.onboarding-sheet-container .button-bar > button {
+  border: none;
+  font-size: 15px;
+  border-radius: 6px;
+  padding: 11px 15px;
+  border: 1px solid var(--button-tint);
+  min-width: 80px;
+  cursor: pointer;
+}
+
+.onboarding-sheet-container .button-bar > .previous {
+  background-color: transparent;
+  color: var(--button-tint);
+}
+
+.onboarding-sheet-container .button-bar > .next {
+  background-color: var(--button-tint);
+  color: white;
+}

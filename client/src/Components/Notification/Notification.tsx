@@ -5,6 +5,7 @@ export interface NotificationProps {
     title: string;
     message: string;
     hideCloseButton?: boolean;
+    show?: boolean
 }
 
 type NotificationImplProps = NotificationProps & {onClose: () => void}
@@ -16,9 +17,12 @@ class Notification extends React.Component<NotificationImplProps> {
 
     render() { 
         return (
-            <div className='notification'>
+            <div className='notification' style={{
+                opacity: this.props.show !== false ? 1.0 : 0.0,
+                right: this.props.show !== false ? 10 : -200
+            }}>
                 <div className='info'>
-                    <div>
+                    <div style={{marginBottom: "4px"}}>
                         {this.props.title}
                     </div>
                     <div className='message'>

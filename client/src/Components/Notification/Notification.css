@@ -1,15 +1,17 @@
 .notification {
-    background: #dd7064;
+    background: #ee7a6e;
     position: fixed;
-    right: 8px;
-    top: 8px;
+    right: 10px;
+    top: 10px;
     width: 320px;
     height: 116px;
     display: flex;
     align-items: center;
     justify-content: space-around;
     color: white;
-    border-radius: 4px;
+    border-radius: 8px;
+    z-index: 100;
+    transition-duration: 0.3s;
 }
 
 .close-button {
@@ -21,17 +23,11 @@
     cursor: pointer;
 }
 
-.info {
-    display: flex;
-    flex-direction: column;
-    align-content: space-around;
-    justify-content: center;
-    height: 100%;
-    gap: 8px;
+.notification .info {
     text-overflow: ellipsis;
     padding: 8px;
 }
 
-.message {
+.notification .message {
     font-size: 12px;
 }
