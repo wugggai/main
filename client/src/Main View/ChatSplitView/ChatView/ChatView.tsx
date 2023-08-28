@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag, getCurrentDateString } from '../../../Interfaces';
+import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag, getCurrentDateString, localToGlobal } from '../../../Interfaces';
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
@@ -325,9 +325,9 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 return
             }
             const button = document.querySelector(".add-tag-button") as HTMLDivElement
-            const rect = button.getBoundingClientRect()
+            const rect = localToGlobal(button);
             this.setState({
-                addTagButtonPosition: rect
+                addTagButtonPosition: { x: rect.left, y: rect.top }
             })
         }}>
             <img src='/assets/label.png' className='label-icon'/>

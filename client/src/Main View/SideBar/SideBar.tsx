@@ -3,7 +3,7 @@ import './SideBar.css'
 import SideBarItem from './SideBarItem'
 import { Tags } from './Tags'
 import { Color, TwitterPicker } from 'react-color'
-import { Tag } from '../../Interfaces'
+import { Tag, localToGlobal } from '../../Interfaces'
 import axios from 'axios'
 import * as uuid from "uuid"
 import { SERVER, getUserId } from '../../Constants'
@@ -101,13 +101,15 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                     const target = e.target as HTMLImageElement
                     console.log(e)
                     // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })
-                    if (this.state.newTagPopoverAnchor === undefined)
+                    if (this.state.newTagPopoverAnchor === undefined) {
+                        let rect = localToGlobal(e.currentTarget)
                         this.setState({ newTagPopoverAnchor: {
-                            x: e.pageX,
-                            y: e.pageY
+                            x: rect.left,
+                            y: rect.top
                         } })
-                    else
+                    } else {
                         this.setState({ newTagPopoverAnchor: undefined })
+                    }
                 }}/>
             } />
             <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>

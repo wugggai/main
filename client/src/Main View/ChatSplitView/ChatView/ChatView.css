@@ -23,7 +23,7 @@
     padding: 16px 0px 16px 16px;
     gap: 8px;
     justify-content: space-between;
-    align-items: end;
+    /* align-items: end; */
     border-radius: 5px;
     border: 1px solid var(--line);
     outline: none;
@@ -120,17 +120,22 @@
     height: 24px;
     border-radius: 14px;
     background-color: var(--selection-background);
-    .label-icon {
-        position: relative;
-        width: 16px;
-        left: 4px;
-    }
-    .plus-icon {
-        position: absolute;
-        left: 8px;
-        width: 8px;
-        top: 8px;
-    }
+}
+
+.add-tag-button:hover {
+    background-color: #ebebeb;
+}
+
+.add-tag-button .label-icon {
+    position: relative;
+    width: 16px;
+    left: 4px;
+}
+.add-tag-button .plus-icon {
+    position: absolute;
+    left: 8px;
+    width: 8px;
+    top: 8px;
 }
 
 .dropdown-tags {

@@ -85,3 +85,32 @@ export function formatTimeInterval(ms: number): string {
         return `${seconds} Second${seconds === 1 ? "" : "s"}`
     }
 }
+
+/** Reliable way to get an element's position relative to the viewport. */
+export function localToGlobal(_el: HTMLElement): { top: number, left: number, bottom: number, right: number } {
+    var target = _el,
+    target_width = target.offsetWidth,
+    target_height = target.offsetHeight,
+    target_left = target.offsetLeft,
+    target_top = target.offsetTop,
+    gleft = 0,
+    gtop = 0,
+    rect = { top: 0, left: 0, bottom: 0, right: 0 };
+
+    var moonwalk = function(_parent: any) {
+     if (!!_parent) {
+         gleft += _parent.offsetLeft;
+         gtop += _parent.offsetTop;
+         moonwalk( _parent.offsetParent );
+     } else {
+         return rect = {
+            top: target.offsetTop + gtop,
+            left: target.offsetLeft + gleft,
+            bottom: (target.offsetTop + gtop) + target_height,
+            right: (target.offsetLeft + gleft) + target_width
+         };
+     }
+ };
+     moonwalk( target.offsetParent );
+     return rect;
+}
