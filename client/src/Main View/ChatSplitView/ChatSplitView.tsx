@@ -59,11 +59,13 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             newInteractionMetadata: {
                 interaction: {
                     ai_type: 'echo', // todo: choose from popup button
+                    using_system_key: false,
                     id: '',
                     tag_ids: [],
                     creator_user_id: `${getUserId()}`,
                     last_updated: getCurrentDateString(),
                     title: this.state.newInteractionMetadata?.interaction.title ?? "Untitled Conversation"
+                    
                 },
                 last_message: null
             },

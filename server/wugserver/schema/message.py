@@ -17,6 +17,7 @@ class MessageSegment(BaseModel):
 class MessageCreate(BaseModel):
     message: list[MessageSegment]
     model: str = Field(default="echo")
+    using_system_key: bool = False
     model_config: dict
 
 
