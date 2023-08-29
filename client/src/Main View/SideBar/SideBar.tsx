@@ -82,50 +82,53 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
         const topTabs = ["Chats", "Trash"]
         const bottomTabs = ["Settings"]
         return <div className='sidebar' onClick={() => this.setState({ newTagPopoverAnchor: undefined })}>
-            <div style={{height: '50px'}} />
-            {
-                topTabs.map((tab, i) => {
-                    return <SideBarItem
-                        name={tab}
-                        icon={tab.toLowerCase()}
-                        isSelected={this.props.currentTabIndex === i}
-                        key={i}
-                        onSelected={() => this.props.onTabChange(i)}
-                    />
-                })
-            }
-            <hr />
-            <SideBarItem name="Tags" icon="tags" isSelected={false} auxiliaryView={
-                <img src="/assets/plus.png" id="add-tag-button" onClick={(e) => {
-                    e.stopPropagation()
-                    const target = e.target as HTMLImageElement
-                    console.log(e)
-                    // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })
-                    if (this.state.newTagPopoverAnchor === undefined) {
-                        let rect = localToGlobal(e.currentTarget)
-                        this.setState({ newTagPopoverAnchor: {
-                            x: rect.left,
-                            y: rect.top
-                        } })
-                    } else {
-                        this.setState({ newTagPopoverAnchor: undefined })
-                    }
-                }}/>
-            } />
-            <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
-            { newTagPopover }
-
-            {
-                bottomTabs.map((tab, i) => {
-                    return <SideBarItem
-                        name={tab}
-                        icon={tab.toLowerCase()}
-                        isSelected={this.props.currentTabIndex===i + topTabs.length}
-                        key={i}
-                        onSelected={() => this.props.onTabChange(i + topTabs.length)}
-                    />
-                })
-            }
+            <div className='top-section'>
+                {
+                    topTabs.map((tab, i) => {
+                        return <SideBarItem
+                            name={tab}
+                            icon={tab.toLowerCase()}
+                            isSelected={this.props.currentTabIndex === i}
+                            key={i}
+                            onSelected={() => this.props.onTabChange(i)}
+                        />
+                    })
+                }
+                <hr className='divider' />
+                <SideBarItem name="Tags" icon="tags" isSelected={false} auxiliaryView={
+                    <img src="/assets/plus.png" id="add-tag-button" onClick={(e) => {
+                        e.stopPropagation()
+                        const target = e.target as HTMLImageElement
+                        console.log(e)
+                        // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })
+                        if (this.state.newTagPopoverAnchor === undefined) {
+                            let rect = localToGlobal(e.currentTarget)
+                            this.setState({ newTagPopoverAnchor: {
+                                x: rect.left,
+                                y: rect.top
+                            } })
+                        } else {
+                            this.setState({ newTagPopoverAnchor: undefined })
+                        }
+                    }}/>
+                } />
+                <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
+                { newTagPopover }
+            </div>
+            <div>
+                <hr className='divider' />
+                {
+                    bottomTabs.map((tab, i) => {
+                        return <SideBarItem
+                            name={tab}
+                            icon={tab.toLowerCase()}
+                            isSelected={this.props.currentTabIndex===i + topTabs.length}
+                            key={i}
+                            onSelected={() => this.props.onTabChange(i + topTabs.length)}
+                        />
+                    })
+                }
+                </div>
             </div>
     }
 }

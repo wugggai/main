@@ -1,0 +1,22 @@
+.item {
+    height: 48px;
+    overflow: hidden;
+    margin: 0px 8px;
+    border-radius: 10px;
+    transition-duration: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    &:hover {
+        background-color: #EDEDF970;
+    }
+    &.selected {
+        transition-duration: 0.2s;
+        background-color: #EDEDF970;
+    }
+}
+
+
+.sidebar-icon {
+    margin-left: 16px;
+}
