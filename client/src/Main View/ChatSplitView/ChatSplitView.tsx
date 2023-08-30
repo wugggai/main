@@ -102,7 +102,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         if (this.state.chatHistoryMetadata === undefined) {
             return <div className='loading-state'><Loading /></div>
         }
-
+        
         let content: JSX.Element
         if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.map(id => this.props.selectedTagIds.has(id)).includes(true))) {
             let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
@@ -130,7 +130,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
 
         return <Fragment>
-            <SplitView className='split' minSize={[280, 400]} maxSize={[448, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}}>
+            <SplitView className='split' minSize={[280, 400]} maxSize={[448, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes}>
                 <div>
                     <ChatPreview
                         chatHistoryMetadata={this.state.chatHistoryMetadata}
