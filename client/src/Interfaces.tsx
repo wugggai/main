@@ -19,6 +19,7 @@ export interface Interaction {
     last_updated: string
     creator_user_id: string
     ai_type: AI | 'echo'
+    using_system_key: boolean
 }
 
 export interface ChatMetadata {
