@@ -257,3 +257,7 @@
     align-items: center;
     height: 100%;
 }
+
+.divider {
+    margin: 8px 0px;
+}

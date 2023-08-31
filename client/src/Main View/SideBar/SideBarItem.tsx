@@ -1,5 +1,5 @@
 import { ReactElement } from 'react'
-import './SideBar.css'
+import './SideBarItem.css'
 
 interface SideBarItemProps {
     name: string
@@ -10,10 +10,9 @@ interface SideBarItemProps {
 }
  
 function SideBarItem(props: SideBarItemProps) {
-    return <div className='item' onMouseDown={props.onSelected}>
-        <div className='tint' style={{opacity: props.isSelected ? 1 : 0}}/>
+    return <div className={`item ${props.isSelected ? 'selected' : ''}`} onMouseDown={props.onSelected}>
         <img className='sidebar-icon' src={`/assets/${props.icon}.png`} alt={props.icon} width={20} height={20} />
-        <span className='sidebar-item-title'>{props.name}</span>
+        {props.name}
         <div style={{position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}}>
             {props.auxiliaryView}
         </div>
