@@ -115,7 +115,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                 <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
                 { newTagPopover }
             </div>
-            <div>
+            <div className='bottom-section'>
                 <hr className='divider' />
                 {
                     bottomTabs.map((tab, i) => {
@@ -128,8 +128,8 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                         />
                     })
                 }
-                </div>
             </div>
+        </div>
     }
 }
  

@@ -7,15 +7,16 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    &:hover {
-        background-color: #EDEDF970;
-    }
-    &.selected {
-        transition-duration: 0.2s;
-        background-color: #EDEDF970;
-    }
 }
 
+.item:hover {
+    background-color: #EDEDF970;
+}
+
+.item.selected {
+    transition-duration: 0.2s;
+    background-color: #ededf9cd;
+}
 
 .sidebar-icon {
     margin-left: 16px;

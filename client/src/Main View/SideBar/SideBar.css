@@ -7,13 +7,18 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
+    overflow-y: auto;
 }
 
 .top-section {
-    margin-top: 48px;
+    margin-top: 8px; /* Tommy said this */
     display: flex;
     flex-direction: column;
     gap: 8px;
+}
+
+.bottom-section {
+    margin-bottom: 8px;
 }
 
 .divider {
