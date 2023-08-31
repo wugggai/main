@@ -457,7 +457,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 </div>}
                 <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
             </div>
-            <hr />
+            <hr className='divider'/>
             <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} isTrash={this.props.isTrash} />
             {!this.props.isTrash && <>
             <div className='chat-input-container'>
