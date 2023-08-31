@@ -473,7 +473,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     }}
                     onInput={(e) => this.autoGrowTextArea(e)}
                     />
-                    <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.state.isWaitingForResponse} onClick={this.sendMessage}>
+                    <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.state.isWaitingForResponse || !this.state.inputValue} onClick={this.sendMessage}>
                         <img src={this.state.isWaitingForResponse ? "/assets/send-loading.svg" : "/assets/send.svg"} width={20}/>
                     </button>
                 </div>
