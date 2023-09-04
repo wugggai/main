@@ -66,33 +66,32 @@ def get_users_available_models(
 
 
 @router.get(
-    "/users/{user_id}/onboardinghistory/{type}", response_model=OnboardingHistory
+    "/users/{user_id}/onboardinghistory/{_type}", response_model=OnboardingHistory
 )
 def get_user_onboarding_history(
     user_id: int,
-    type: OnboardingType,
+    _type: OnboardingType,
     current_user: UserRecord = Depends(get_current_active_user),
     onboarding_history_model: OnboardingHistoryModel = Depends(OnboardingHistoryModel),
 ):
     authorize_by_matching_user_id(current_user.id, user_id)
-
-    existing = onboarding_history_model.get_user_onboarding_history(user_id, type)
+    existing = onboarding_history_model.get_user_onboarding_history(user_id, _type)
     if existing != None:
         return existing
-    return OnboardingHistory(type=type, count=0, last_done=None)
+    return OnboardingHistory(onboarding_type=_type.value, count=0, last_done=None)
 
 
 @router.put(
-    "/users/{user_id}/onboardinghistory/{type}", response_model=OnboardingHistory
+    "/users/{user_id}/onboardinghistory/{_type}", response_model=OnboardingHistory
 )
 def put_user_onboarding_history(
     user_id: int,
-    type: OnboardingType,
+    _type: OnboardingType,
     current_user: UserRecord = Depends(get_current_active_user),
     onboarding_history_model: OnboardingHistoryModel = Depends(OnboardingHistoryModel),
 ):
     authorize_by_matching_user_id(current_user.id, user_id)
 
     return onboarding_history_model.create_or_increment_onboarding_history(
-        user_id, type
+        user_id, _type
     )

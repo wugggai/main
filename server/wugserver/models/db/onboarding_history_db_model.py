@@ -28,13 +28,13 @@ class OnboardingHistoryDbModel:
     def create_or_increment_onboarding_history(
         self,
         user_id: int,
-        type: str,
+        _type: str,
     ) -> OnboardingHistoryRecord:
         record = (
             self.db.query(OnboardingHistoryRecord)
             .filter(
                 OnboardingHistoryRecord.user_id == user_id,
-                OnboardingHistoryRecord.onboarding_type == type,
+                OnboardingHistoryRecord.onboarding_type == _type,
             )
             .first()
         )
@@ -44,7 +44,7 @@ class OnboardingHistoryDbModel:
         else:
             record = OnboardingHistoryRecord(
                 user_id=user_id,
-                onboarding_type=type,
+                onboarding_type=_type,
                 count=1,
                 last_done=datetime.datetime.utcnow(),
             )
@@ -53,12 +53,12 @@ class OnboardingHistoryDbModel:
         self.db.refresh(record)
         return record
 
-    def get_user_onboarding_history(self, user_id: int, type: str):
+    def get_user_onboarding_history(self, user_id: int, _type: str):
         return (
             self.db.query(OnboardingHistoryRecord)
             .filter(
                 OnboardingHistoryRecord.user_id == user_id,
-                OnboardingHistoryRecord.onboarding_type == type,
+                OnboardingHistoryRecord.onboarding_type == _type,
             )
             .first()
         )

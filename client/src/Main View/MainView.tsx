@@ -35,7 +35,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
         document.title = "Conversations"
         this.state = {
-            showOnboardingScreen: true,
+            showOnboardingScreen: false,
             showLoginScreen: !Cookies.load('access_token') || !Cookies.load('user_id') || this.props.resetPasswordToken !== undefined || this.props.verificationToken !== undefined,
             currentTabIndex: 0,
             selectedTagIds: new Set()
@@ -48,7 +48,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             this.setState({ tagList: [], showLoginScreen: true })
             return
         }
-        SERVER.get(`/users/${userId}/tags`).then(response => {
+        SERVER.get(`/users/${userId}/tags`)
+        .then(response => {
             this.setState({
                 tagList: response.data
             })
@@ -56,6 +57,14 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             if (err.response?.status === 401 || err.response?.status === 400) {
                 this.setState({ showLoginScreen: true, tagList: [] })
             }
+        })
+
+        // Determine whether to show onboarding popups for current user
+        SERVER.get(`/users/${userId}/onboardinghistory/seen_onboarding_education`)
+        .then(response => {
+            this.setState({
+                showOnboardingScreen: response.data.count == 0
+            })
         })
     }
 
@@ -131,7 +140,14 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             </SplitView>;
 
             {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} verificationToken={this.props.verificationToken} />}
-            {this.state.showOnboardingScreen && !this.state.showLoginScreen && <OnboardingScreen show={true} onExit={() => this.setState({ showOnboardingScreen: false })}>
+            {this.state.showOnboardingScreen && !this.state.showLoginScreen &&
+            <OnboardingScreen
+                show={true}
+                onExit={() => {
+                    this.setState({ showOnboardingScreen: false })
+                    SERVER.put(`/users/${getUserId()}/onboardinghistory/seen_onboarding_education`)
+                }}
+            >
                 <div>
                     <h1>Page 1</h1>
                     <p>Welcome to LLM platform</p>
