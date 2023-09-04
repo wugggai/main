@@ -40,7 +40,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                 if (segment.type === "text") {
                     return <MarkdownTextView key={index} rawText={segment.content} />;
                 } else if (segment.type === "image_url") {
-                    return <img key={index} src={segment.content}/>;
+                    return <img className='ai-image' key={index} src={segment.content}/>;
                 } else {
                     return null;
                 }
