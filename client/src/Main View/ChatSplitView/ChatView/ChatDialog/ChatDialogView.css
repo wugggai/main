@@ -63,3 +63,9 @@
 .history-item .message {
     margin-right: 50px;
 }
+
+.messageContainer .ai-image {
+    width: 50%;
+    box-sizing: border-box;
+    padding: 0 2px; /* Add space between images using padding */
+}
