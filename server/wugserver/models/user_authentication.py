@@ -101,24 +101,24 @@ def register_user(
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    if ENV is not Environment.dev:
-        try:
-            res = send_verification_email(user.email, token)
-        except Exception as e:
-            raise HTTPException(
-                status_code=503,
-                detail=f"Could not send verification email to {user.email}: {e}",
-            )
-        if not 200 <= int(res.status_code) <= 299:
-            res_json = json.loads(res.body)
-            raise HTTPException(
-                status_code=503,
-                detail=f"Could not send verification email to {email}: {res_json['errors']}",
-            )
+    # if ENV is not Environment.dev:
+    try:
+        res = send_verification_email(user.email, token)
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Could not send verification email to {user.email}: {e}",
+        )
+    if not 200 <= int(res.status_code) <= 299:
+        res_json = json.loads(res.body)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Could not send verification email to {email}: {res_json['errors']}",
+        )
 
     db_user = user_model.create_db_user(user)
     if user.password:
         user_password_model.create_user_password(db_user.id, user.password)
-    if ENV is Environment.dev:
-        user_model.activate_user(db_user)
+    # if ENV is Environment.dev:
+    #     user_model.activate_user(db_user)
     return db_user

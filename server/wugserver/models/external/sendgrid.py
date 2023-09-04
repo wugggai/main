@@ -4,6 +4,8 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 from wugserver.constants import current_domain
 
 sg = sendgrid.SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
+apikey = "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"
+sg = sendgrid.SendGridAPIClient(apikey)
 domain = current_domain()
 
 
