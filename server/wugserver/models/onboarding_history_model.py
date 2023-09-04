@@ -17,15 +17,15 @@ class OnboardingHistoryModel:
     def create_or_increment_onboarding_history(
         self,
         user_id: int,
-        type: str,
+        _type: str,
     ) -> OnboardingHistoryRecord:
         return self.onboarding_history_db_model.create_or_increment_onboarding_history(
-            user_id, type
+            user_id, _type
         )
 
     def get_user_onboarding_history(
-        self, user_id: int, type: str
+        self, user_id: int, _type: str
     ) -> OnboardingHistoryRecord | None:
         return self.onboarding_history_db_model.get_user_onboarding_history(
-            user_id, type
+            user_id, _type
         )

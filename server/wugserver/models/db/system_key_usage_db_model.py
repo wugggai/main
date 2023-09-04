@@ -17,7 +17,7 @@ class SystemKeyUsageRecord(Base):
         primary_key=True,
     )
     provider = Column(
-        String,
+        String(32),
         index=True,
         primary_key=True,
     )
