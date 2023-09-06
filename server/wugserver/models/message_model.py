@@ -1,4 +1,3 @@
-from typing import Optional
 from fastapi import Depends
 from sqlalchemy import UUID
 from wugserver.models.db.message_db_model import MessageDbModel, MessageRecord

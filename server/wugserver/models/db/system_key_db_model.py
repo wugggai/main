@@ -11,11 +11,11 @@ class SystemKeyRecord(Base):
     __tablename__ = "system_key"
 
     provider = Column(
-        String,
+        String(32),
         index=True,
         primary_key=True,
     )
-    key = Column(String)
+    key = Column(String(128))
     # how many time a user can use this key
     limit = Column(Integer)
 

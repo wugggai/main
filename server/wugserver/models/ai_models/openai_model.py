@@ -112,7 +112,7 @@ class DALLET2IModel(DALLEModel):
         response = openai.Image.create(
             api_key=api_key,
             prompt=prompt,
-            n=message_create_params.model_config.get("n", 1),
+            n=message_create_params.model_config.get("n", 4),
             size=message_create_params.model_config.get("size", "512x512"),
         )
         urls = [d["url"] for d in response["data"]]

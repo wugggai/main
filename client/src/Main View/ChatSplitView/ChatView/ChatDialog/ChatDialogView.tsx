@@ -20,24 +20,6 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         this.state = { };
     }
 
-    componentDidMount(): void {
-        // Needed to scroll div to bottom before displaying to the user
-        // setTimeout(() => {
-        //     const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement
-        //     chatDialog.scrollTop = chatDialog.scrollHeight
-        //     chatDialog.style.opacity = "1"
-        // }, 1)
-    }
-
-    // componentDidUpdate(prevProps: Readonly<ChatDialogProps>, prevState: Readonly<ChatDialogState>, snapshot?: any): void {
-    //     const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement
-    //     chatDialog.style.opacity = '0'
-    //     setTimeout(() => {
-    //         chatDialog.scrollTop = chatDialog.scrollHeight
-    //         chatDialog.style.opacity = "1"
-    //     }, 1)
-    // }
-
     render() {
         let dialogCells: JSX.Element[] = [<div key={-1} />] // Dummy item needed for content to align to bottom
         this.props.history.messages.forEach((msg, i) => {
@@ -58,7 +40,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                 if (segment.type === "text") {
                     return <MarkdownTextView key={index} rawText={segment.content} />;
                 } else if (segment.type === "image_url") {
-                    return <img key={index} src={segment.content}/>;
+                    return <img className='ai-image' key={index} src={segment.content}/>;
                 } else {
                     return null;
                 }
