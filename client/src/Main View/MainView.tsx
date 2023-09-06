@@ -61,7 +61,9 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
     render() { 
         if (this.state.tagList === undefined) {
-            return <div className='loading-state'><Loading /></div>}
+            return <Fragment />
+        }
+            // return <div className='loading-state'><Loading /></div>}
         let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
         switch (this.state.currentTabIndex) {
         case 0:
