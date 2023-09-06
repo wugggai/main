@@ -113,7 +113,9 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                     }}/>
                 } />
                 <Tags tags={this.props.currentTags} onSelect={this.props.onTagSelected} currentSelection={this.props.selectedTagIds}/>
-                { newTagPopover }
+                { this.state.newTagPopoverAnchor && <div style={{position: 'fixed', zIndex: 100, left: 0, right: 0, top: 0, bottom: 0, backgroundColor: '#00000020'}} onClick={(e) => {this.setState({ newTagPopoverAnchor: undefined }); e.stopPropagation()}}>
+                    {newTagPopover}
+                </div> }
             </div>
             <div className='bottom-section'>
                 <hr className='divider' />

@@ -33,12 +33,13 @@
 }
 
 .sidebar .tags .tag-item {
-    padding-left: 30px;
+    padding-left: 8px;
     height: 32px;
     display: flex;
     align-items: center;
     user-select: none;
     position: relative;
+    cursor: pointer;
 }
 
 .sidebar .tags .tag-item .tint {
@@ -55,9 +56,14 @@
     font-size: 14px;
     color: var(--text-color);
     z-index: 1;
+    user-select: none;
 }
 
-.sidebar .tags .tag-icon {
+.tag-item svg {
+    margin-right: 5px;
+}
+
+/* .sidebar .tags .tag-icon {
     margin-right: 10px;
     display: inline-block;
     height: 16px;
@@ -71,7 +77,7 @@
     border-bottom-left-radius: 1px;
     color: var(--text-color);
     width: 15px;
-}
+} */
 
 .sidebar .tags .tag-end {
     width: 0;
@@ -95,7 +101,7 @@
 
 .new-tag-popover {
     background-color: white;
-    border-radius: 5px;
+    border-radius: 6px;
     width: 280px;
     height: 175px;
     position: fixed;

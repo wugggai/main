@@ -63,7 +63,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         SERVER.get(`/users/${userId}/onboardinghistory/seen_onboarding_education`)
         .then(response => {
             this.setState({
-                showOnboardingScreen: response.data.count == 0
+                showOnboardingScreen: response.data.count === 0
             })
         })
     }
