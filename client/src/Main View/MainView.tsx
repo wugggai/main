@@ -72,6 +72,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             setTimeout(() => {
                 const sidebar = document.querySelector(".sidebar") as HTMLDivElement
                 sidebar.style.width = `${sidebar.clientWidth}px`
+                const mainContent = document.querySelector(".main-content") as HTMLDivElement
+                mainContent.style.width = `calc(100% - 4px - ${sidebar.clientWidth}px)`
             }, 100)
         })
         
@@ -119,6 +121,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                     // Fix sidebar width after drag ends
                     const sidebar = document.querySelector(".sidebar") as HTMLDivElement
                     sidebar.style.width = `${sidebar.clientWidth}px`
+                    const mainContent = document.querySelector(".main-content") as HTMLDivElement
+                    mainContent.style.width = `calc(100% - 4px - ${sidebar.clientWidth}px)`
                 }}
             >
                 <SideBar
@@ -151,7 +155,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                         this.forceUpdate()
                     }}
                 />
-                <div style={{position: 'relative'}}>
+                <div className='main-content' style={{position: 'relative'}}>
                     {contentView}
                 </div>
                 {/* {newTagPopover} */}
