@@ -30,8 +30,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
     // Initial sizes (percentages) of the splits
     splitSizes = [15, 85]
 
-    middlePaneSize?: number
-
+    chatSplitViewRef: { current: ChatSplitView | null } = { current: null }
     resizeTimer?: any
 
     constructor(props: MainViewProps) {
@@ -77,6 +76,9 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             }, 100)
         })
         
+        window.onresize = (ev: UIEvent) => {
+            this.chatSplitViewRef.current?.updateSplitStyles()
+        }
     }
 
     render() { 
@@ -87,12 +89,12 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
         switch (this.state.currentTabIndex) {
         case 0:
-            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} addNewTag={(tag: Tag) => {
+            contentView = <ChatSplitView ref={this.chatSplitViewRef} availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} addNewTag={(tag: Tag) => {
                 this.forceUpdate()
             }} />
             break
         case 1:
-            contentView = <ChatSplitView availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} addNewTag={(tag: Tag) => {
+            contentView = <ChatSplitView ref={this.chatSplitViewRef} availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={true} addNewTag={(tag: Tag) => {
                 this.forceUpdate()
             }} />
             break
@@ -116,13 +118,21 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 sizes={this.splitSizes}
                 snapOffset={0} gutterSize={4}
                 style={{...(this.state.showLoginScreen ? overlayStyles : {})}}
-                onDrag={sizes => this.splitSizes = sizes}
+                onDragStart={() => {
+                    this.chatSplitViewRef.current?.updateSplitStyles()
+                }}
+                onDrag={sizes => {
+                    this.splitSizes = sizes
+                    this.chatSplitViewRef.current?.updateSplitSizes()
+                }}
                 onDragEnd={() => {
                     // Fix sidebar width after drag ends
                     const sidebar = document.querySelector(".sidebar") as HTMLDivElement
                     sidebar.style.width = `${sidebar.clientWidth}px`
                     const mainContent = document.querySelector(".main-content") as HTMLDivElement
                     mainContent.style.width = `calc(100% - 4px - ${sidebar.clientWidth}px)`
+
+                    this.chatSplitViewRef.current?.updateSplitSizes()
                 }}
             >
                 <SideBar

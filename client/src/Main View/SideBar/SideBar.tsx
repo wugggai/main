@@ -99,7 +99,6 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                     <img src="/assets/plus.png" id="add-tag-button" onClick={(e) => {
                         e.stopPropagation()
                         const target = e.target as HTMLImageElement
-                        console.log(e)
                         // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })
                         if (this.state.newTagPopoverAnchor === undefined) {
                             let rect = localToGlobal(e.currentTarget)

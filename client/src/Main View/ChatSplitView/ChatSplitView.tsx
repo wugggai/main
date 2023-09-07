@@ -32,6 +32,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         this.state = {};
         this.newInteraction = this.newInteraction.bind(this);
         this.moveInteractionToTrash = this.moveInteractionToTrash.bind(this);
+        this.updateSplitSizes = this.updateSplitSizes.bind(this);
     }
 
     componentDidMount(): void {
@@ -62,6 +63,22 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             this.componentDidMount()
         }
     }
+
+    updateSplitSizes() {
+        const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
+        const splitView = document.querySelector(".main-content") as HTMLDivElement
+        
+        const leftSize = Math.round((chatSidebar.clientWidth + 2) / splitView.clientWidth * 100)
+        this.splitSizes = [leftSize, 100 - leftSize]
+    }
+
+    updateSplitStyles() {
+        const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
+        const chatContent = document.querySelector(".chat-content") as HTMLDivElement
+        chatSidebar.style.width = `${chatSidebar.clientWidth}px`
+        chatContent.style.width = `calc(100% - 4px - ${chatSidebar.clientWidth}px)`
+    }
+
     newInteraction() {
         this.setState({
             newInteractionMetadata: {
@@ -146,12 +163,8 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     // Constrain left split view width after drag ends
                     const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
                     const chatContent = document.querySelector(".chat-content") as HTMLDivElement
-                    const splitView = document.querySelector(".split") as HTMLDivElement
                     chatSidebar.style.width = `${chatSidebar.clientWidth}px`
                     chatContent.style.width = `calc(100% - 4px - ${chatSidebar.clientWidth}px)`
-                    
-                    const leftSize = Math.round((chatSidebar.clientWidth + 2) / splitView.clientWidth * 100)
-                    this.splitSizes = [leftSize, 100 - leftSize]
                 }
             }>
                 <div className='chat-sidebar'>
