@@ -64,6 +64,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         this.loadHistory = this.loadHistory.bind(this);
         this.autoGrowTextArea = this.autoGrowTextArea.bind(this);
         this.addNewTag = this.addNewTag.bind(this);
+        this.getModelDisplayName = this.getModelDisplayName.bind(this)
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -294,6 +295,11 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         return this.props.chatMetadata.interaction.ai_type
     }
 
+    getModelDisplayName() {
+        const compositeName = (this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type 
+        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"    
+    }
+
     addNewTag() {
         if (this.props.availableTags.findIndex(v => v.name === this.state.newTagName) !== -1) {
             alert(`Tag with name ${this.state.newTagName} is already defined.`)
@@ -447,7 +453,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     <span>Model:</span>
                     <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)} >
                         <button className='select-model-button'>
-                            {this.props.chatMetadata.interaction.ai_type || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"}
+                            {this.getModelDisplayName()}
                             <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
                         </button>
                     </Dropdown>
