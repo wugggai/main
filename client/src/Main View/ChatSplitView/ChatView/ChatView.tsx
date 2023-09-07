@@ -296,7 +296,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     }
 
     getModelDisplayName() {
-        const compositeName = (this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type 
+        const compositeName = this.props.chatMetadata.interaction.ai_type == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type)
         return compositeName || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"    
     }
 
