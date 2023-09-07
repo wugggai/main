@@ -43,9 +43,16 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             this.setState({
                 chatHistoryMetadata: response.data
             })
+            setTimeout(() => {
+                const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
+                chatSidebar.style.minWidth = `${chatSidebar.clientWidth}px`
+                chatSidebar.style.maxWidth = `${chatSidebar.clientWidth}px`
+            }, 100)
         }).catch(err => {
             this.setState({ chatHistoryMetadata: [] })
         })
+
+
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -132,8 +139,24 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
 
         return <Fragment>
-            <SplitView className='split' minSize={[280, 400]} maxSize={[448, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes}>
-                <div>
+            <SplitView className='split' minSize={[280, 400]} maxSize={[448, Infinity]} snapOffset={0} expandToMin sizes={this.splitSizes} gutterSize={4} style={{height: '100%'}} onDrag={newSizes => this.splitSizes = newSizes}
+                onDragStart={() => {
+                    // Removes width constraint for left split view when drag starts
+                    const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
+                    chatSidebar.style.minWidth = ""
+                    chatSidebar.style.maxWidth = ""
+
+                }}
+                onDragEnd={() => {
+                    // Constrain left split view width after drag ends
+                    const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
+                    const chatContent = document.querySelector(".chat-content") as HTMLDivElement
+                    chatSidebar.style.minWidth = `${chatSidebar.clientWidth}px`
+                    chatSidebar.style.maxWidth = `${chatSidebar.clientWidth}px`
+                    chatContent.style.width = `calc(100% - 4px - ${chatSidebar.clientWidth}px)`
+                }
+            }>
+                <div className='chat-sidebar'>
                     <ChatPreview
                         chatHistoryMetadata={this.state.chatHistoryMetadata}
                         newChatMetadata={this.state.newInteractionMetadata}
@@ -153,7 +176,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     />
                 </div>
                 
-                <div>
+                <div className='chat-content'>
                     {content}
                 </div>
             </SplitView>

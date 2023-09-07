@@ -28,7 +28,11 @@ interface MainViewState {
 class MainView extends React.Component<MainViewProps, MainViewState> {
 
     // Initial sizes (percentages) of the splits
-    splitSizes = [16, 84]
+    splitSizes = [15, 85]
+
+    middlePaneSize?: number
+
+    resizeTimer?: any
 
     constructor(props: MainViewProps) {
         super(props);
@@ -65,7 +69,12 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             this.setState({
                 showOnboardingScreen: response.data.count === 0
             })
+            setTimeout(() => {
+                const sidebar = document.querySelector(".sidebar") as HTMLDivElement
+                sidebar.style.width = `${sidebar.clientWidth}px`
+            }, 100)
         })
+        
     }
 
     render() { 
@@ -101,9 +110,16 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
             <SplitView className='center-screen split'
                 direction='horizontal'
                 minSize={[208, 496]}
-                maxSize={[320, Infinity]} sizes={this.splitSizes}
+                maxSize={[320, Infinity]}
+                sizes={this.splitSizes}
                 snapOffset={0} gutterSize={4}
                 style={{...(this.state.showLoginScreen ? overlayStyles : {})}}
+                onDrag={sizes => this.splitSizes = sizes}
+                onDragEnd={() => {
+                    // Fix sidebar width after drag ends
+                    const sidebar = document.querySelector(".sidebar") as HTMLDivElement
+                    sidebar.style.width = `${sidebar.clientWidth}px`
+                }}
             >
                 <SideBar
                     currentTabIndex={this.state.currentTabIndex}
