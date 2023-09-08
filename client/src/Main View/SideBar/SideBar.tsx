@@ -96,7 +96,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                 }
                 <hr className='divider' />
                 <SideBarItem name="Tags" icon="tags" isSelected={false} auxiliaryView={
-                    <img src="/assets/plus.png" id="add-tag-button" onClick={(e) => {
+                    <img src="/assets/plus.svg" id="add-tag-button" onClick={(e) => {
                         e.stopPropagation()
                         const target = e.target as HTMLImageElement
                         // this.props.onNewTagButtonTriggered({x: target.x, y: target.y })

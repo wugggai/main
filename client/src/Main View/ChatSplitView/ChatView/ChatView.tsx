@@ -347,7 +347,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             })
         }}>
             <img src='/assets/label.png' className='label-icon'/>
-            <img src='/assets/plus.png' className='plus-icon' />
+            <img src='/assets/plus.svg' className='plus-icon' />
         </div>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {

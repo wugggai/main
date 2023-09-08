@@ -1,7 +1,6 @@
 import React from 'react'
 import './AccountPage.css'
 import APIKeyInputBar, { APIKeysObject } from './APIKeyInputBar'
-import { Loading } from '../UI Components/Loading';
 import { SERVER, getUserId } from '../Constants';
 
 interface APIKeysPageProps {
@@ -54,7 +53,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
 
     render() {
         if (!this.state.isLoaded) {
-            return <Loading />
+            return <div></div>
         }
         return <div>
             <APIKeyInputBar

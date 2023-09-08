@@ -4,7 +4,6 @@ import SplitView from 'react-split'
 import './MainView.css'
 import { ChatMetadata, Tag } from '../Interfaces';
 import ChatSplitView from './ChatSplitView/ChatSplitView';
-import { Loading } from '../UI Components/Loading';
 import { SERVER, getUserId } from '../Constants';
 import Settings from '../Settings/Settings';
 import Login from '../Login/Login';
@@ -85,8 +84,7 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
         if (this.state.tagList === undefined) {
             return <Fragment />
         }
-            // return <div className='loading-state'><Loading /></div>}
-        let contentView: JSX.Element = <div className='loading-state'><Loading /></div>
+        let contentView: JSX.Element = <div></div>
         switch (this.state.currentTabIndex) {
         case 0:
             contentView = <ChatSplitView ref={this.chatSplitViewRef} availableTags={this.state.tagList} selectedTagIds={this.state.selectedTagIds} isTrash={false} addNewTag={(tag: Tag) => {

@@ -2,7 +2,6 @@ import React, { Fragment } from 'react'
 import { ChatMetadata, Tag, formatDate, getCurrentDateString } from '../../Interfaces';
 import SplitView from 'react-split'
 import ChatPreview from './ChatPreview/ChatPreview';
-import { Loading } from '../../UI Components/Loading';
 import ChatView from './ChatView/ChatView';
 import { SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
@@ -117,17 +116,17 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
 
         SERVER.put(`/interactions/${this.state.deletingChat.interaction.id}`, {
             deleted: true
-        }).then(response => {
+        }).then(_ => {
             if (this.state.selectedIndex !== undefined) {
                 this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
             }
             this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined, deletingChat: undefined })
         })
     }
-
+    
     render() {
         if (this.state.chatHistoryMetadata === undefined) {
-            return <div className='loading-state'><Loading /></div>
+            return <div></div>
         }
         
         let content: JSX.Element
