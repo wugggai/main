@@ -12,6 +12,7 @@ from wugserver.routers import (
     messages,
     password,
     tags,
+    prompts,
 )
 from wugserver.models.user_authentication import get_current_active_user
 
@@ -57,6 +58,7 @@ app.include_router(
     dependencies=[Depends(get_current_active_user)],
 )
 app.include_router(password.router, prefix=api_router_prefix)
+app.include_router(prompts.router, prefix=api_router_prefix)
 
 
 def start():
