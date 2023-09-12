@@ -19,6 +19,7 @@
 }
 
 .send-text-line {
+    position: relative;
     display: flex;
     padding: 16px 0px 16px 16px;
     gap: 8px;
@@ -32,9 +33,10 @@
 
 .send-message-button {
     position: absolute;
-    right: 40px;
-    width: 28px;
-    height: 28px;
+    right: 16px;
+    bottom: 16px;
+    width: 24px;
+    height: 24px;
     border-radius: 8px;
     background-color: var(--button-tint);
     display: flex;
@@ -45,6 +47,10 @@
     }
 }
 
+.send-icon {
+    width: 24px; 
+}
+
 .send-message-button:not(:disabled):hover {
     background-color: var(--button-tint-hover);
 }
@@ -52,6 +58,7 @@
 
 .text-area {
     padding: 0px;
+    padding-right: 48px;
     flex: 1;
     font-size: 1rem;
     line-height: 1.5rem;
