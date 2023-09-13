@@ -40,7 +40,7 @@ def get_tags_route(
     return get_tags_by_user_id(db=db, user_id=user_id)
 
 
-@router.put("tags/{tag_id}", response_model=Tag)
+@router.put("/tags/{tag_id}", response_model=Tag)
 def update_tag_route(
     tag_id: UUID,
     tag_update_params: TagCreate,
@@ -51,7 +51,7 @@ def update_tag_route(
     return update_tag(db=db, tag=tag, tag_update_params=tag_update_params)
 
 
-@router.delete("tags/{tag_id}", status_code=204)
+@router.delete("/tags/{tag_id}", status_code=204)
 def delete_tag_route(
     tag_id: UUID,
     db: Session = Depends(get_db),

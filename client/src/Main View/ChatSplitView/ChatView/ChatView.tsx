@@ -27,6 +27,7 @@ interface ChatViewState {
     editedTitle?: string
     chatHistory?: ChatHistory
     availableModels?: [{name: string, via_system_key: boolean}]
+    promptValue: string
     inputValue: string
     isWaitingForResponse: boolean
     addTagButtonPosition?: { x: number, y: number }
@@ -44,6 +45,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     constructor(props: ChatViewClassImplProps) {
         super(props);
         this.state = {
+            promptValue: '',
             inputValue: '',
             isWaitingForResponse: false,
             isUpdatingModel: true,
@@ -65,6 +67,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         this.autoGrowTextArea = this.autoGrowTextArea.bind(this);
         this.addNewTag = this.addNewTag.bind(this);
         this.getModelDisplayName = this.getModelDisplayName.bind(this)
+        this.handlePromptClick = this.handlePromptClick.bind(this)
+        this.setModel = this.setModel.bind(this)
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -195,7 +199,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         }
         const messageSegment: MessageSegment = {
             type: "text",
-            content: this.state.inputValue,
+            content: this.state.promptValue || this.state.inputValue,
         }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
@@ -223,7 +227,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 if (withMessage) {
                     const messageSegment: MessageSegment = {
                         type: "text",
-                        content: this.state.inputValue,
+                        content: this.state.promptValue || this.state.inputValue,
                     }
                     this.setState({
                         chatHistory: {messages: [
@@ -237,7 +241,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                             },
                             ...systemResponse
                         ]},
-                        inputValue: ''
+                        inputValue: '',
+                        promptValue: ''
                     })
                 } else if (this.state.chatHistory === undefined) {
                     this.setState({ chatHistory: {messages: []} })
@@ -327,6 +332,13 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.props.showNotification({title: "Something unexpected happened!", message: error.code})
 
         })
+    }
+
+    handlePromptClick(prompt: string, ai_type: AI | undefined) {
+        this.setState({ promptValue: prompt }, () => {
+            this.props.chatMetadata.interaction.ai_type = ai_type;
+            this.sendMessage()
+        });
     }
 
     render() {
@@ -464,7 +476,13 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
             </div>
             <hr className='divider'/>
-            <ChatDialogView history={this.state.chatHistory || {messages: []}} waitingForResponse={this.state.isWaitingForResponse} isTrash={this.props.isTrash} />
+            <ChatDialogView 
+                history={this.state.chatHistory || {messages: []}} 
+                waitingForResponse={this.state.isWaitingForResponse} 
+                isTrash={this.props.isTrash}
+                model={this.props.chatMetadata.interaction.ai_type}
+                onClickPrompt={this.handlePromptClick}
+            />
             {!this.props.isTrash && <>
             <div className='chat-input-container'>
                 <div className='send-text-line'>
