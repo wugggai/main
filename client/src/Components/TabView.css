@@ -26,8 +26,8 @@
 .tab-item-selected {
     background-color: var(--sidebar);
     border-bottom: 2px solid var(--button-tint);
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .view-container {

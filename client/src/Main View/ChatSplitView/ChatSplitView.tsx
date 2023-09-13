@@ -152,7 +152,9 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             addNewTag={this.props.addNewTag}
             />
         } else {
-            content = <div className='no-chat-empty-state'>No chat selected</div>
+            content = <div className='no-chat-empty-state'>
+                <img src="/assets/instructions.png" style={{width: "min(100%, 512px)"}} />
+            </div>
         }
 
         return <Fragment>

@@ -358,8 +358,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 addTagButtonPosition: { x: rect.left, y: rect.top }
             })
         }}>
-            <img src='/assets/label.png' className='label-icon'/>
-            <img src='/assets/plus.svg' className='plus-icon' />
+            <img src='/assets/add tag.svg' width={24}/>
         </div>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {

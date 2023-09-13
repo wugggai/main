@@ -47,7 +47,7 @@
     border-radius: 8px;
     position: absolute;
     left: 0px;
-    right: 10px;
+    right: 0px;
     height: 100%;
     transition-duration: 0.2s;
 }
@@ -57,10 +57,47 @@
     color: var(--text-color);
     z-index: 1;
     user-select: none;
+    flex-grow: 2;
 }
 
 .tag-item svg {
     margin-right: 5px;
+}
+
+.tag-item .tag-item-menu-icon {
+    display: none;
+}
+
+.tag-item:hover .tag-item-menu-icon {
+    display: block;
+    z-index: 10;
+}
+
+.tag-popup-menu {
+    position: fixed;
+    z-index: 11;
+    width: 80px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 2px 8px 2px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.tag-popup-menu button {
+    border-style: none;
+    display: block;
+    padding: 5px 8px;
+    box-sizing: border-box;
+    cursor: default;
+    font-size: 14px;
+    user-select: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.tag-popup-menu button:hover {
+    background-color: var(--selection-background);
 }
 
 /* .sidebar .tags .tag-icon {
