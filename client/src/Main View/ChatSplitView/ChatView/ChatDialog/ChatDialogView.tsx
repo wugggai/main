@@ -1,6 +1,6 @@
 import React from 'react'
 import './ChatDialogView.css'
-import { ChatHistory, formatDate } from '../../../../Interfaces';
+import { AI, ChatHistory, ChatHistoryItem, formatDate, getCurrentDateString } from '../../../../Interfaces';
 import MarkdownTextView from '../../../../UI Components/MarkdownTextView';
 import { Loading } from '../../../../UI Components/Loading';
 import { SERVER } from '../../../../Constants';
@@ -9,8 +9,8 @@ interface ChatDialogProps {
     history: ChatHistory
     waitingForResponse: boolean
     isTrash: boolean
-    model: string | undefined
-    onClickPrompt: (prompt: string) => void
+    model: AI | undefined
+    onClickPrompt: (prompt: string, ai_type: AI | undefined) => void
 }
  
 interface ChatDialogState {
@@ -19,28 +19,39 @@ interface ChatDialogState {
 }
 
 interface Prompt {
-    prompt: string
+    content: string
 }
  
 class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     constructor(props: ChatDialogProps) {
         super(props);
         this.state = { chatPrompts: [], textToImagePrompts: [] };
+        this.getPrompts.bind(this)
         this.getChatPrompts.bind(this)
         this.getTextToImagePrompts.bind(this)
 
         if (this.props.history.messages.length == 0) {
-            if (this.props.model === undefined) {
-                // TODO: add assistence text between prompts
-                this.getChatPrompts()
+            this.getPrompts(this.props.model)
+        }
+    }
+
+    componentWillReceiveProps(nextProps: ChatDialogProps) {
+        if (nextProps.model != this.props.model) {
+            this.getPrompts(nextProps.model)
+        }
+    }
+
+    getPrompts(model: AI | undefined) {
+        this.setState({ chatPrompts: [], textToImagePrompts: [] })
+        if (model === undefined) {
+            this.getChatPrompts()
+            this.getTextToImagePrompts()
+        } else {
+            // TODO: handle text/image difference gracefully
+            if (["midjourney-v4", "DALL-E2", "trial_DALL-E2", "stable-diffusion-v3"].includes(model)) {
                 this.getTextToImagePrompts()
             } else {
-                // TODO: handle text/image difference gracefully
-                if (["midjourney-v4", "DALL-E2", "trial_DALL-E2", "stable-diffusion-v3"].includes(this.props.model)) {
-                    this.getTextToImagePrompts()
-                } else {
-                    this.getChatPrompts()
-                }
+                this.getChatPrompts()
             }
         }
     }
@@ -57,24 +68,52 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         })
     }
 
+    renderFromHistoryItem(item : ChatHistoryItem, i: number): JSX.Element {
+        var iconAssetName = item.source
+        // TODO: get the image with an API call once backend store's the user's profile pic
+        if (iconAssetName.startsWith("user")) {
+            iconAssetName = "user"
+        }
+
+        const messageSegments = item.message.map((segment, index) => {
+            if (segment.type === "text") {
+                return <MarkdownTextView key={index} rawText={segment.content} />;
+            } else if (segment.type === "image_url") {
+                return <img className='ai-image' key={index} src={segment.content}/>;
+            } else {
+                return null;
+            }
+        });
+
+        return <div className='history-item' style={{ display: 'flex' }} key={i}>
+            <img src={`/assets/${iconAssetName}.png`} width={40} className='avatar' />
+            <div className='messageContainer'>{messageSegments}</div>
+        </div>
+    }
+
     render() {
         let dialogCells: JSX.Element[] = [] // Dummy item needed for content to align to bottom
         // <div key={-1} />
         let promptDisplay: JSX.Element[] = []
         if (this.props.history.messages.length == 0) {
             promptDisplay.push(<div> Getting stuck? Try one of the prompts below: </div>)
-            if (this.state.chatPrompts) {
+            if (this.state.chatPrompts.length > 0) {
                 promptDisplay.push(<div> Chat Prompt for GPT-3.5: </div>)
                 this.state.chatPrompts.forEach((prompt, index) => {
-                    let content = prompt.prompt
-                    promptDisplay.push(<button onClick={() => this.props.onClickPrompt(content)}> {content} </button>)
+                    let content = prompt.content
+                    promptDisplay.push(<button onClick={() => {
+                        this.props.onClickPrompt(content, this.props.model || "gpt-3.5-turbo-16k")
+                    }}> {content} </button>)
                 })
             }
-            if (this.state.textToImagePrompts) {
-                promptDisplay.push(<div> Text to Image Prompt for Midjourney-v4: </div>)
+            if (this.state.textToImagePrompts.length > 0) {
+                promptDisplay.push(<div> Text to Image Prompt for DALL-E2: </div>)
                 this.state.textToImagePrompts.forEach((prompt, index) => {
-                    let content = prompt.prompt
-                    promptDisplay.push(<button onClick={() => this.props.onClickPrompt(content)}> {content} </button>)
+                    let content = prompt.content
+                    promptDisplay.push(<button onClick={() => {
+                        dialogCells.push(<MarkdownTextView key={0} rawText={content} />)
+                        this.props.onClickPrompt(content, this.props.model || "DALL-E2")
+                    }}> {content} </button>)
                 })
             }
         } else {
@@ -86,26 +125,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                         </div>
                     </div>)
                 }
-                // TODO: get the image with an API call once backend store's the user's profile pic
-                var iconAssetName = msg.source
-                if (iconAssetName.startsWith("user")) {
-                    iconAssetName = "user"
-                }
-
-                const messageSegments = msg.message.map((segment, index) => {
-                    if (segment.type === "text") {
-                        return <MarkdownTextView key={index} rawText={segment.content} />;
-                    } else if (segment.type === "image_url") {
-                        return <img className='ai-image' key={index} src={segment.content}/>;
-                    } else {
-                        return null;
-                    }
-                });
-
-                dialogCells.push(<div className='history-item' style={{ display: 'flex' }} key={i}>
-                    <img src={`/assets/${iconAssetName}.png`} width={40} className='avatar' />
-                    <div className='messageContainer'>{messageSegments}</div>
-                </div>)
+                dialogCells.push(this.renderFromHistoryItem(msg, i))
             })
         }
 
@@ -117,7 +137,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                         <div style={{width: 20, height: '40px', position: 'relative'}}><Loading size={20}/></div>
                     </div>
                 </div>}
-                {this.props.history.messages ? dialogCells.reverse() : promptDisplay}
+                {(this.props.history.messages.length > 0 || this.props.waitingForResponse) ? dialogCells.reverse() : promptDisplay.reverse()}
             </div>
         </div>;
     }

@@ -82,7 +82,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         this.setState({
             newInteractionMetadata: {
                 interaction: {
-                    ai_type: 'echo', // todo: choose from popup button
+                    ai_type: undefined, // todo: choose from popup button
                     using_system_key: false,
                     id: '',
                     tag_ids: [],

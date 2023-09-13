@@ -12,8 +12,10 @@ def get_random_prompts(
     example_prompt_model: ExamplePromptModel = Depends(ExamplePromptModel),
 ):
     if type:
-        return example_prompt_model.sample_example_prompts_by_type(
+        prompts = example_prompt_model.sample_example_prompts_by_type(
             count=count,
             _type=type,
         )
-    return example_prompt_model.sample_example_prompts(count=count)
+    else:
+        prompts = example_prompt_model.sample_example_prompts(count=count)
+    return [Prompt(content=p.content) for p in prompts]
