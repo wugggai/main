@@ -46,9 +46,12 @@
         background-color: white;
     }
 }
+.send-loading-icon {
+    width: 24px; 
+}
 
 .send-icon {
-    width: 24px; 
+    width: 16px; 
 }
 
 .send-message-button:not(:disabled):hover {
