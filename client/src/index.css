@@ -74,6 +74,7 @@ hr {
   border: none;
   border-radius: 6px;
   transition-duration: 0.2s;
+  cursor: pointer;
 }
 
 .generic-button:disabled {
