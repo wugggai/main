@@ -29,14 +29,19 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         this.getPrompts.bind(this)
         this.getChatPrompts.bind(this)
         this.getTextToImagePrompts.bind(this)
+        this.shouldDisplayExamplePrompts.bind(this)
 
-        if (this.props.history.messages.length == 0) {
+        if (this.shouldDisplayExamplePrompts()) {
             this.getPrompts(this.props.model)
         }
     }
 
+    shouldDisplayExamplePrompts(): Boolean {
+        return this.props.history.messages.length == 0 && !this.props.isTrash
+    }
+
     componentWillReceiveProps(nextProps: ChatDialogProps) {
-        if (nextProps.model != this.props.model) {
+        if (nextProps.model != this.props.model && this.shouldDisplayExamplePrompts()) {
             this.getPrompts(nextProps.model)
         }
     }
