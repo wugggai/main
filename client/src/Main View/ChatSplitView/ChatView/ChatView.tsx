@@ -374,7 +374,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         const dropdownTags: JSX.Element = <div className='dropdown-tags' style={{
             display: this.state.addTagButtonPosition === undefined ? 'none' : 'block',
             left: this.state.addTagButtonPosition?.x,
-            top: (this.state.addTagButtonPosition?.y ?? 0) + 28
+            top: (this.state.addTagButtonPosition?.y ?? 0) + 28,
+            boxShadow: this.state.newTagName === undefined ? "none" : "0px 2px 8px 2px rgba(0, 0, 0, 0.1)"
         }}>
             {
             this.state.newTagName === undefined ? 
@@ -415,7 +416,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             })}
         </div>
 
-        return <div className='chat-view' onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })}>
+        return <div className='chat-view'>
+            <div style={{position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none"}} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })}/>
             <div className='heading'>
                 <div className='title'>
                     { this.state.editedTitle !== undefined ?

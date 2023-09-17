@@ -162,7 +162,8 @@
     z-index: 60;
     background-color: white;
     border: 1px solid var(--line);
-    border-radius: 3px;
+    border-radius: 4px;
+    /* box-shadow: 0px 2px 8px 2px rgba(0, 0, 0, 0.1); */
 }
 
 .dropdown-tags .tag-item {
@@ -250,8 +251,8 @@
 
 .add-new-tag {
     height: 170px;
-    box-shadow: 0px 2px 8px 2px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    z-index: 30;
 }
 
 .add-new-tag .tag-color-picker {
