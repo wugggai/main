@@ -142,7 +142,9 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                             this.setState({ selectedTagIds: new Set() })
                         }
                     }}
-                    onAddNewTag={(newTag) => this.setState({ tagList: this.state.tagList!.concat(newTag) })}
+                    onAddNewTag={(newTag) => {
+                        this.setState({ tagList: this.state.tagList!.concat(newTag) })
+                    }}
                     currentTags={this.state.tagList!}
                     selectedTagIds={this.state.selectedTagIds}
                     onTagSelected={(i, shifted) => {

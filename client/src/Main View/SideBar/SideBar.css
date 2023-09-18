@@ -62,14 +62,17 @@
 
 .tag-item svg {
     margin-right: 5px;
+    z-index: 2;
 }
 
 .tag-item .tag-item-menu-icon {
-    display: none;
+    pointer-events: none;
+    opacity: 0;
 }
 
 .tag-item:hover .tag-item-menu-icon {
-    display: block;
+    opacity: 1;
+    pointer-events: unset;
     z-index: 10;
 }
 
