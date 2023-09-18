@@ -4,6 +4,7 @@ import { AI, ChatHistory, ChatHistoryItem, formatDate, getCurrentDateString } fr
 import MarkdownTextView from '../../../../UI Components/MarkdownTextView';
 import { Loading } from '../../../../UI Components/Loading';
 import { SERVER } from '../../../../Constants';
+import ChatSuggestions, { Prompt } from '../../ChatSuggestions/ChatSuggestions';
 
 interface ChatDialogProps {
     history: ChatHistory
@@ -18,10 +19,6 @@ interface ChatDialogState {
     textToImagePrompts: Prompt[]
 }
 
-interface Prompt {
-    content: string
-}
- 
 class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     constructor(props: ChatDialogProps) {
         super(props);
@@ -93,41 +90,16 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
 
     render() {
         let dialogCells: JSX.Element[] = [] // Dummy item needed for content to align to bottom
-        // <div key={-1} />
-        let promptDisplay: JSX.Element[] = []
-        if (this.props.history.messages.length == 0) {
-            promptDisplay.push(<div> Getting stuck? Try one of the prompts below: </div>)
-            if (this.state.chatPrompts.length > 0) {
-                promptDisplay.push(<div> Chat Prompt for GPT-3.5: </div>)
-                this.state.chatPrompts.forEach((prompt, index) => {
-                    let content = prompt.content
-                    promptDisplay.push(<button onClick={() => {
-                        this.props.onClickPrompt(content, this.props.model || "gpt-3.5-turbo-16k")
-                    }}> {content} </button>)
-                })
+        this.props.history.messages.forEach((msg, i) => {
+            if (i === 0 || new Date(msg.timestamp).getTime() - new Date(this.props.history.messages[i - 1].timestamp).getTime() >= 600000) {
+                dialogCells.push(<div className='history-item' key={`${i} time`}>
+                    <div className='date-label'>
+                        {formatDate(msg.timestamp)}
+                    </div>
+                </div>)
             }
-            if (this.state.textToImagePrompts.length > 0) {
-                promptDisplay.push(<div> Text to Image Prompt for DALL-E2: </div>)
-                this.state.textToImagePrompts.forEach((prompt, index) => {
-                    let content = prompt.content
-                    promptDisplay.push(<button onClick={() => {
-                        dialogCells.push(<MarkdownTextView key={0} rawText={content} />)
-                        this.props.onClickPrompt(content, this.props.model || "DALL-E2")
-                    }}> {content} </button>)
-                })
-            }
-        } else {
-            this.props.history.messages.forEach((msg, i) => {
-                if (i === 0 || new Date(msg.timestamp).getTime() - new Date(this.props.history.messages[i - 1].timestamp).getTime() >= 600000) {
-                    dialogCells.push(<div className='history-item' key={`${i} time`}>
-                        <div className='date-label'>
-                            {formatDate(msg.timestamp)}
-                        </div>
-                    </div>)
-                }
-                dialogCells.push(this.renderFromHistoryItem(msg, i))
-            })
-        }
+            dialogCells.push(this.renderFromHistoryItem(msg, i))
+        })
 
         return <div className='dialog-container'>
             <div id='chat-dialog'>
@@ -137,7 +109,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
                         <div style={{width: 20, height: '40px', position: 'relative'}}><Loading size={20}/></div>
                     </div>
                 </div>}
-                {(this.props.history.messages.length > 0 || this.props.waitingForResponse) ? dialogCells.reverse() : promptDisplay.reverse()}
+                {(this.props.history.messages.length > 0 || this.props.waitingForResponse) ? dialogCells.reverse() : <ChatSuggestions chatPrompts={this.state.chatPrompts} textToImagePrompts={this.state.textToImagePrompts} onClickPrompt={this.props.onClickPrompt} model={this.props.model}/>}
             </div>
         </div>;
     }
