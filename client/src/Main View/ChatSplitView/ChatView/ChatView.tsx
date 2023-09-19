@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { AI, ChatHistory, ChatMetadata, MessageSegment, Tag, getCurrentDateString, localToGlobal } from '../../../Interfaces';
+import { AI, ChatHistory, ChatHistoryItem, ChatMetadata, MessageSegment, Tag, getCurrentDateString, localToGlobal } from '../../../Interfaces';
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
@@ -201,6 +201,21 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             type: "text",
             content: this.state.promptValue || this.state.inputValue,
         }
+        if (withMessage) {
+            this.setState({
+                chatHistory: {
+                    messages: [{
+                        message: [messageSegment],
+                        source: 'user',
+                        id: 'tmp',
+                        timestamp: getCurrentDateString(),
+                        offset: 0
+                    }]
+                },
+                inputValue: '',
+                promptValue: ''
+            })
+        }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
             initial_message: withMessage ? {
@@ -213,7 +228,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 const metadata = response.data as ChatMetadata
                 this.props.chatMetadata.interaction.id = metadata.interaction.id
                 this.props.chatMetadata.interaction.title = metadata.interaction.title
-                let systemResponse = []
+                let systemResponse: ChatHistoryItem[] = []
                 console.log("response from create interaction:", metadata)
                 if (metadata.last_message) {
                     systemResponse.push({
@@ -229,21 +244,12 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                         type: "text",
                         content: this.state.promptValue || this.state.inputValue,
                     }
-                    this.setState({
+                    this.setState(prevState => ({
                         chatHistory: {messages: [
-                            {
-                                message: [messageSegment],
-                                source: 'user',
-                                timestamp: getCurrentDateString(),
-                                id: response.data.id,
-                                interaction_id: this.props.chatMetadata.interaction.id,
-                                offset: 0 
-                            },
+                            ...(prevState.chatHistory ? prevState.chatHistory.messages : []),
                             ...systemResponse
-                        ]},
-                        inputValue: '',
-                        promptValue: ''
-                    })
+                        ]}
+                    }))
                 } else if (this.state.chatHistory === undefined) {
                     this.setState({ chatHistory: {messages: []} })
                 }
@@ -297,6 +303,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 200)
         }
+        this.setState({})
         return this.props.chatMetadata.interaction.ai_type
     }
 

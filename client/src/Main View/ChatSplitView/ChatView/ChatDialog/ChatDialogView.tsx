@@ -109,7 +109,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         return <div className='dialog-container'>
             <div id='chat-dialog'>
                 {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex', minHeight: '70px' }} key={-1}>
-                    <img src={`/assets/gpt-3.5-turbo.png`} width={40} className='avatar' />
+                    <img src={`/assets/${this.props.model}.png`} width={40} className='avatar' />
                     <div className='message'>
                         <div style={{width: 20, height: '40px', position: 'relative'}}><Loading size={20}/></div>
                     </div>
