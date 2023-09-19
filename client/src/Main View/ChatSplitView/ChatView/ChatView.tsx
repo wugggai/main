@@ -303,6 +303,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 200)
         }
+        this.setState({})
         return this.props.chatMetadata.interaction.ai_type
     }
 

@@ -37,9 +37,8 @@ class ChatSuggestions extends React.Component<ChatSuggestionsProps, ChatSuggesti
                     this.props.onClickPrompt(content, this.props.model || "DALL-E2")
                 }}> {content} </button>)
             })
-        
-        return <div className="suggestion-container">{promptDisplay}</div>
         }
+        return <div className="suggestion-container">{promptDisplay}</div>
     }
 }
 export default ChatSuggestions;
