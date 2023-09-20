@@ -68,12 +68,18 @@
 .tag-item .tag-item-menu-icon {
     pointer-events: none;
     opacity: 0;
+    margin-right: 2px;
+    border-radius: 100px;
 }
 
 .tag-item:hover .tag-item-menu-icon {
     opacity: 1;
     pointer-events: unset;
     z-index: 10;
+}
+
+.tag-item:hover .tag-item-menu-icon:hover {
+    background-color: var(--tag-icon-highlight);
 }
 
 .tag-popup-menu {

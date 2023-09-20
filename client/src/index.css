@@ -19,6 +19,7 @@ code {
 
 :root {
   --sidebar: #dadaf2;
+  --tag-icon-highlight: #d1d1ef;
   --line: #e8e8e8;
   --text-color: #101010;
   --lighter-text-color: #6d6d6d;

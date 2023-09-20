@@ -61,7 +61,12 @@ export function Tags(props: TagProps) {
                     setEditingRow(undefined)
                     updateTag(tag, tagNameRefs.current![i]!.innerText)
                 }}>{tag.name}</span>
-                <img src="/assets/menu-dots.png" width={25} ref={(e) => menuImgRefs.current[i] = e} className='tag-item-menu-icon' style={{display: popupMenuRow === i ? "block": undefined}} onClick={e => {
+                <img src="/assets/menu-dots.png" width={25} ref={(e) => menuImgRefs.current[i] = e} className='tag-item-menu-icon' style={{
+                    display: popupMenuRow === i ? "block": undefined,
+                    opacity: popupMenuRow === i ? 1 : undefined,
+                    backgroundColor: popupMenuRow === i ? 'var(--tag-icon-highlight)' : undefined
+                }} onClick={e => {
+                    e.stopPropagation()
                     setPopupMenuRow(popupMenuRow === undefined ? i : undefined)
                     if (popupMenuRow === undefined) {
                         const position = localToGlobal(menuImgRefs.current![i]!)
