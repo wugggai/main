@@ -10,6 +10,7 @@ import Cookies from 'react-cookies'
 import { TwitterPicker } from 'react-color';
 import { useNotification } from '../../../Components/Notification/NotificationContext';
 import { NotificationProps } from '../../../Components/Notification/Notification';
+import ChatChooseModelMenu from './ChatChooseModelMenu/ChatChooseModelMenu';
 
 interface ChatViewProps {
     chatMetadata: ChatMetadata
@@ -288,17 +289,11 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         }
     }
 
-    setModel(name: string | undefined) {
+    setModel(name: string | undefined, is_via_system: boolean) {
         if (!name) {
             return name
         }
-        // hacky solution
-        if (name.startsWith("trial_")) {
-            this.props.chatMetadata.interaction.using_system_key = true
-            name = name.substring(6)
-        } else {
-            this.props.chatMetadata.interaction.using_system_key = false
-        }
+        this.props.chatMetadata.interaction.using_system_key = is_via_system
 
         this.props.chatMetadata.interaction.ai_type = name as AI
         if (!this.props.isNewInteraction) {
@@ -311,7 +306,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     getModelDisplayName() {
         const compositeName = this.props.chatMetadata.interaction.ai_type == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type)
-        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"
+        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source, false) || "Choose Model"
     }
 
     addNewTag() {
@@ -417,19 +412,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
         </div>
 
-        const chooseModelMenu = <div className='dropdown-models'>
-            {SUPPORTED_MODELS.map((modelName) => {
-                return <button key={modelName} disabled={(this.state.availableModels?.map((model) => model.name) || []).indexOf(modelName) === -1}>
-                    {modelName}
-                </button>
-            })}
-            {(this.state.availableModels ?? []).filter((model) => model.via_system_key == true).map((model) => {
-                const modelName = "trial_" + model.name
-                return <button key={modelName}>
-                    {modelName}
-                </button>
-            })}
-        </div>
+        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel}/></div>
 
         return <div className='chat-view'>
             <div style={{ position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none" }} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })} />
@@ -479,7 +462,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 </div>
                 {<div className='subtitle'>
                     <span>Model:</span>
-                    <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)} >
+                    <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up">
                         <button className='select-model-button'>
                             {this.getModelDisplayName()}
                             <img src="/assets/down.svg" width="12" style={{ marginLeft: '5px' }} />
