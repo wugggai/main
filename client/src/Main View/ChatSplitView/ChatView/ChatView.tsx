@@ -21,12 +21,12 @@ interface ChatViewProps {
     isTrash: boolean
 }
 
-type ChatViewClassImplProps = ChatViewProps & {showNotification: ((_: NotificationProps) => void)}
- 
+type ChatViewClassImplProps = ChatViewProps & { showNotification: ((_: NotificationProps) => void) }
+
 interface ChatViewState {
     editedTitle?: string
     chatHistory?: ChatHistory
-    availableModels?: [{name: string, via_system_key: boolean}]
+    availableModels?: [{ name: string, via_system_key: boolean }]
     promptValue: string
     inputValue: string
     isWaitingForResponse: boolean
@@ -36,7 +36,7 @@ interface ChatViewState {
     isAddingTag: boolean
     isUpdatingModel: boolean
 }
- 
+
 class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatViewState> {
     chatSplitSizes = [70, 30]
     isInitialRender = true
@@ -64,13 +64,14 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         this.getModelDisplayName = this.getModelDisplayName.bind(this)
         this.handlePromptClick = this.handlePromptClick.bind(this)
         this.setModel = this.setModel.bind(this)
+        this.cannotSendMessage = this.cannotSendMessage.bind(this)
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
         if (super.componentDidUpdate) super.componentDidUpdate(prevProps, prevState, snapshot)
         this.props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
-            this.setState({chatHistory: undefined})
+            this.setState({ chatHistory: undefined })
             this.loadHistory()
             this.setState({ inputValue: '', isWaitingForResponse: false })
         }
@@ -112,7 +113,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 }, 5);
             })
         } else {
-            this.setState({ chatHistory: { messages: []} })
+            this.setState({ chatHistory: { messages: [] } })
             setTimeout(() => {
                 const input = document.querySelector('#chat-input') as HTMLTextAreaElement
                 input?.focus()
@@ -158,7 +159,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 timestamp: getCurrentDateString()
             }
             this.props.onChatInfoUpdated()
-            this.setState({ inputValue: ''})
+            this.setState({ inputValue: '' })
             const requestMessageSegment: MessageSegment = {
                 type: "text",
                 content: this.state.inputValue,
@@ -169,7 +170,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
                 model_config: {}
             },
-            { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
+                { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
             ).then(response => {
                 this.state.chatHistory?.messages.push(response.data)
                 this.setState({
@@ -181,7 +182,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
             }).catch((error) => {
-                this.props.showNotification({title: "Something unexpected happened!", message: error.code})
+                this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
             }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
@@ -220,42 +221,44 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
             } : undefined
         }).then(response => {
-                const metadata = response.data as ChatMetadata
-                this.props.chatMetadata.interaction.id = metadata.interaction.id
-                this.props.chatMetadata.interaction.title = metadata.interaction.title
-                let systemResponse: ChatHistoryItem[] = []
-                console.log("response from create interaction:", metadata)
-                if (metadata.last_message) {
-                    systemResponse.push({
-                        message: metadata.last_message.message,
-                        id: metadata.last_message.id,
-                        timestamp: metadata.last_message.timestamp,
-                        offset: metadata.last_message.offset,
-                        source: metadata.last_message.source as ("echo" | AI)
-                    })
+            const metadata = response.data as ChatMetadata
+            this.props.chatMetadata.interaction.id = metadata.interaction.id
+            this.props.chatMetadata.interaction.title = metadata.interaction.title
+            let systemResponse: ChatHistoryItem[] = []
+            console.log("response from create interaction:", metadata)
+            if (metadata.last_message) {
+                systemResponse.push({
+                    message: metadata.last_message.message,
+                    id: metadata.last_message.id,
+                    timestamp: metadata.last_message.timestamp,
+                    offset: metadata.last_message.offset,
+                    source: metadata.last_message.source as (AI)
+                })
+            }
+            if (withMessage) {
+                const messageSegment: MessageSegment = {
+                    type: "text",
+                    content: this.state.promptValue || this.state.inputValue,
                 }
-                if (withMessage) {
-                    const messageSegment: MessageSegment = {
-                        type: "text",
-                        content: this.state.promptValue || this.state.inputValue,
-                    }
-                    this.setState(prevState => ({
-                        chatHistory: {messages: [
+                this.setState(prevState => ({
+                    chatHistory: {
+                        messages: [
                             ...(prevState.chatHistory ? prevState.chatHistory.messages : []),
                             ...systemResponse
-                        ]}
-                    }))
-                } else if (this.state.chatHistory === undefined) {
-                    this.setState({ chatHistory: {messages: []} })
-                }
-                if (this.state.editedTitle) {
-                    this.props.chatMetadata.interaction.title = this.state.editedTitle
-                    this.props.chatMetadata.last_message = metadata.last_message
-                }
-                this.props.onChatInfoUpdated()
-                this.setState({ isWaitingForResponse: false});
+                        ]
+                    }
+                }))
+            } else if (this.state.chatHistory === undefined) {
+                this.setState({ chatHistory: { messages: [] } })
+            }
+            if (this.state.editedTitle) {
+                this.props.chatMetadata.interaction.title = this.state.editedTitle
+                this.props.chatMetadata.last_message = metadata.last_message
+            }
+            this.props.onChatInfoUpdated()
+            this.setState({ isWaitingForResponse: false });
         }).catch((error) => {
-            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
         })
     }
 
@@ -304,7 +307,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     getModelDisplayName() {
         const compositeName = this.props.chatMetadata.interaction.ai_type == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type)
-        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"    
+        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source) || "Choose Model"
     }
 
     addNewTag() {
@@ -331,7 +334,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 isAddingTag: false
             })
         }).catch((error) => {
-            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
 
         })
     }
@@ -341,6 +344,10 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.props.chatMetadata.interaction.ai_type = ai_type;
             this.sendMessage()
         });
+    }
+
+    cannotSendMessage() {
+        return this.state.isWaitingForResponse || !this.state.inputValue || this.props.chatMetadata.interaction.ai_type === undefined
     }
 
     render() {
@@ -360,7 +367,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 addTagButtonPosition: { x: rect.left, y: rect.top }
             })
         }}>
-            <img src='/assets/add tag.svg' width={24}/>
+            <img src='/assets/add tag.svg' width={24} />
         </div>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {
@@ -380,38 +387,40 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             boxShadow: this.state.newTagName === undefined ? "none" : "0px 2px 8px 2px rgba(0, 0, 0, 0.1)"
         }}>
             {
-            this.state.newTagName === undefined ? 
-                [this.props.availableTags.map((value, i) => {
-                    return this.props.chatMetadata.interaction.tag_ids.indexOf(value.id) === -1 ? <div key={i} onClick={() => this.addTag(value)} className='tag-item'>
-                        {value.name}
-                    </div> : <Fragment />
-                }),
-                <div key={-1} className='tag-item' onClick={(e) => {
-                    this.setState({ newTagName: '' })
-                    e.stopPropagation()
-            }}>Add New Tag...</div>]
-            :
-            <div className='add-new-tag' onClick={e => e.stopPropagation()}>
-                <input type="text" placeholder='New Tag Name' className='textfield new-tag-textfield' value={this.state.newTagName} onChange={(e) => this.setState({ newTagName: e.target.value })} />
-                <TwitterPicker triangle='hide' className='tag-color-picker' color={this.state.newTagColor || 'fff'} onChange={(c) => this.setState({ newTagColor: c.hex })} styles={{default: {
-                    body: {
-                        padding: '8px',
-                        paddingLeft: '12px'
-                    },
-                }}}/>
-                <button className='generic-button' disabled={!this.state.newTagName || this.state.isAddingTag} onClick={this.addNewTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
-            </div>
+                this.state.newTagName === undefined ?
+                    [this.props.availableTags.map((value, i) => {
+                        return this.props.chatMetadata.interaction.tag_ids.indexOf(value.id) === -1 ? <div key={i} onClick={() => this.addTag(value)} className='tag-item'>
+                            {value.name}
+                        </div> : <Fragment />
+                    }),
+                    <div key={-1} className='tag-item' onClick={(e) => {
+                        this.setState({ newTagName: '' })
+                        e.stopPropagation()
+                    }}>Add New Tag...</div>]
+                    :
+                    <div className='add-new-tag' onClick={e => e.stopPropagation()}>
+                        <input type="text" placeholder='New Tag Name' className='textfield new-tag-textfield' value={this.state.newTagName} onChange={(e) => this.setState({ newTagName: e.target.value })} />
+                        <TwitterPicker triangle='hide' className='tag-color-picker' color={this.state.newTagColor || 'fff'} onChange={(c) => this.setState({ newTagColor: c.hex })} styles={{
+                            default: {
+                                body: {
+                                    padding: '8px',
+                                    paddingLeft: '12px'
+                                },
+                            }
+                        }} />
+                        <button className='generic-button' disabled={!this.state.newTagName || this.state.isAddingTag} onClick={this.addNewTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
+                    </div>
             }
         </div>
 
         const chooseModelMenu = <div className='dropdown-models'>
-            {SUPPORTED_MODELS.map( (modelName) => {
+            {SUPPORTED_MODELS.map((modelName) => {
                 return <button key={modelName} disabled={(this.state.availableModels?.map((model) => model.name) || []).indexOf(modelName) === -1}>
                     {modelName}
                 </button>
             })}
-            {(this.state.availableModels ?? []).filter((model) => model.via_system_key == true).map( (model) => {
-                const modelName =  "trial_" + model.name
+            {(this.state.availableModels ?? []).filter((model) => model.via_system_key == true).map((model) => {
+                const modelName = "trial_" + model.name
                 return <button key={modelName}>
                     {modelName}
                 </button>
@@ -419,10 +428,10 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         </div>
 
         return <div className='chat-view'>
-            <div style={{position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none"}} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })}/>
+            <div style={{ position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none" }} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })} />
             <div className='heading'>
                 <div className='title'>
-                    { this.state.editedTitle !== undefined ?
+                    {this.state.editedTitle !== undefined ?
                         <input type="text"
                             placeholder="Conversation Name"
                             className='textfield'
@@ -445,7 +454,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                                 this.setState({ editedTitle: undefined })
                                 this.saveMetadata()
                                 this.props.onChatInfoUpdated()
-                            }}/>
+                            }} />
                         :
                         <span style={{cursor: "default"}} onDoubleClick={(e) => {
                             e.stopPropagation()
@@ -457,8 +466,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                             }, 1)
                         }}>{this.props.chatMetadata.interaction.title}</span>
                     }
-                    { this.state.editedTitle === undefined ?
-                        <img src="/assets/edit.png" width={20} style={{margin: '0 5px'}} onClick={(e) => {
+                    {this.state.editedTitle === undefined ?
+                        <img src="/assets/edit.png" width={20} style={{ margin: '0 5px' }} onClick={(e) => {
                             e.stopPropagation()
                             this.setState({ editedTitle: this.props.chatMetadata.interaction.title })
                             setTimeout(() => {
@@ -477,43 +486,43 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     <Dropdown trigger={['click']} overlay={chooseModelMenu} animation="slide-up" onOverlayClick={(e) => this.setModel((e.target as HTMLDivElement).innerText)} >
                         <button className='select-model-button'>
                             {this.getModelDisplayName()}
-                            <img src="/assets/down.svg" width="12" style={{marginLeft: '5px'}}/>
+                            <img src="/assets/down.svg" width="12" style={{ marginLeft: '5px' }} />
                         </button>
                     </Dropdown>
-                    {this.state.isUpdatingModel && <div style={{padding: '1px 5px 0px', display: 'inline-block', position: 'relative', height: '15px'}}>
+                    {this.state.isUpdatingModel && <div style={{ padding: '1px 5px 0px', display: 'inline-block', position: 'relative', height: '15px' }}>
                         <Loading size={15} />
                     </div>}
                 </div>}
-                <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction}/>
+                <img src="/assets/trash.png" className='trash-button' width={20} onClick={this.props.onDeleteInteraction} />
             </div>
-            <hr className='divider'/>
-            <ChatDialogView 
-                history={this.state.chatHistory || {messages: []}} 
-                waitingForResponse={this.state.isWaitingForResponse} 
+            <hr className='divider' />
+            <ChatDialogView
+                history={this.state.chatHistory || { messages: [] }}
+                waitingForResponse={this.state.isWaitingForResponse}
                 isTrash={this.props.isTrash}
                 model={this.props.chatMetadata.interaction.ai_type}
                 onClickPrompt={this.handlePromptClick}
             />
             {!this.props.isTrash && <>
-            <div className='chat-input-container'>
-                <div className='send-text-line'>
-                    <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })} 
-                    onKeyDown={e => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault()
-                            if (!this.state.isWaitingForResponse) {
-                                this.sendMessage()
-                            }
-                        }
-                    }}
-                    onInput={(e) => this.autoGrowTextArea(e)}
-                    />
-                    <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.state.isWaitingForResponse || !this.state.inputValue} onClick={this.sendMessage}>
-                        <img className={this.state.isWaitingForResponse ? 'send-loading-icon' : 'send-icon'} src={this.state.isWaitingForResponse ? "/assets/send-loading.svg" : "/assets/send.svg"}/>
-                    </button>
+                <div className='chat-input-container'>
+                    <div className='send-text-line'>
+                        <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault()
+                                    if (!this.cannotSendMessage()) {
+                                        this.sendMessage()
+                                    }
+                                }
+                            }}
+                            onInput={(e) => this.autoGrowTextArea(e)}
+                        />
+                        <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.cannotSendMessage()} onClick={this.sendMessage}>
+                            <img className={this.state.isWaitingForResponse ? 'send-loading-icon' : 'send-icon'} src={this.state.isWaitingForResponse ? "/assets/send-loading.svg" : "/assets/send.svg"} />
+                        </button>
+                    </div>
+                    <div className='input-prompt'>Press Shift + Enter to start new line.</div>
                 </div>
-                <div className='input-prompt'>Press Shift + Enter to start new line.</div>
-            </div>
             </>}
         </div>;
     }
@@ -521,6 +530,6 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
 export function ChatView(props: ChatViewProps) {
     const showNotification = useNotification();
-    return <ChatViewClassImpl {...props} showNotification={showNotification}/>
+    return <ChatViewClassImpl {...props} showNotification={showNotification} />
 };
 export default ChatView;
