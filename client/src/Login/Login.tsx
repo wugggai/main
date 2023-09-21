@@ -27,6 +27,7 @@ interface LoginState {
     passwordWarning?: string
     confirmWarning?: string
     resetDone: boolean
+    isProcessingLogin: boolean
 }
 
  
@@ -47,7 +48,8 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
             password: '',
             confirmPassword: '',
             showInstructions: false,
-            resetDone: false
+            resetDone: false,
+            isProcessingLogin: false
         };
         
         this.login = this.login.bind(this);
@@ -58,6 +60,7 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
     }
 
     login() {
+        this.setState({isProcessingLogin: true})
         axios.postForm(API_BASE + '/token', {
             grant_type: 'password',
             username: this.state.username,
@@ -72,10 +75,12 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
                     Cookies.save("user_id", response.data.id, { expires: new Date(Date.now() + 30 * 86400 * 1000) })
                     window.location.reload()
                 }).catch(err => {
+                    this.setState({isProcessingLogin: false})
                     this.props.showNotification({title: "Something unexpected happened!", message: err.code})
                 })
             }
         }).catch(err => {
+            this.setState({isProcessingLogin: false})
             if (err.response?.status === 401) {
                 this.props.showNotification({title: "Login error!", message: "Incorrect username/password combination."})
             } else if (err.response?.status === 422) {
@@ -156,7 +161,12 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
                     <a href='#' id="forgot-password" onClick={() => this.setState({ mode: 'reset' })}>Forgot Password</a>
                 </div>
             </fieldset>
-            <button className='login-button generic-button' onClick={this.login}>Log In</button>
+            <div className='login-button-container'>
+                {this.state.isProcessingLogin ? 
+                    <button disabled className='login-processing-button'><img src="/assets/login-loading.svg"></img></button> :
+                    <button className='login-button generic-button' onClick={this.login}>Log In</button>
+                }
+            </div>
             <div className='signup-message'>Don't have an account?<a href='#' onClick={() => this.setState({
                 mode: 'sign up',
                 password: ''
@@ -302,10 +312,8 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
             <div className='left'>
                 <div className='container'>
                     <img src="/assets/logo.png" width="100px" />
-                    <h1>Wug.ai</h1>
-                    <div>a lorem ipsum dolor for yorem ipsum dolor sit, using sorem ipsum dolor sit amet </div>
-
-                    <p>Product Description</p>
+                    <h1>Yuse.ai</h1>
+                    <div>Welcome to Yuse.ai, where you can use AIs productively and communicate with AIs seamlessly</div>
                 </div>
             </div>
             <div className='right' onKeyDown={this.handleEnter}>
