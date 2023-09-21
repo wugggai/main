@@ -63,6 +63,8 @@
 .tag-item svg {
     margin-right: 5px;
     z-index: 2;
+    transform: scale(0.9);
+    padding-top: 1px;
 }
 
 .tag-item .tag-item-menu-icon {
