@@ -7,10 +7,11 @@ interface SideBarItemProps {
     isSelected: boolean
     onSelected?: () => void
     auxiliaryView?: ReactElement
+    disableHoverState?: boolean
 }
  
 function SideBarItem(props: SideBarItemProps) {
-    return <div className={`item ${props.isSelected ? 'selected' : ''}`} onMouseDown={props.onSelected}>
+    return <div className={`item ${props.isSelected ? 'selected' : ''} ${!!props.disableHoverState ? '' : 'has-hover'}`} onMouseDown={props.onSelected}>
         <img className='sidebar-icon' src={`/assets/${props.icon}.png`} alt={props.icon} width={20} height={20} />
         {props.name}
         <div style={{position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)'}}>
