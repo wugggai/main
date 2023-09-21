@@ -53,11 +53,6 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             newTagColor: '#ffffff'
         };
         this.createInteraction = this.createInteraction.bind(this);
-        if (this.props.isNewInteraction) {
-            console.log("Starting new interaction")
-        } else { 
-            console.log(`Resuming existing interaction`, this.props.chatMetadata.interaction)
-        }
         props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         this.sendMessage = this.sendMessage.bind(this);
         this.addTag = this.addTag.bind(this);
@@ -452,7 +447,15 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                                 this.props.onChatInfoUpdated()
                             }}/>
                         :
-                        <span>{this.props.chatMetadata.interaction.title}</span>
+                        <span style={{cursor: "default"}} onDoubleClick={(e) => {
+                            e.stopPropagation()
+                            this.setState({ editedTitle: this.props.chatMetadata.interaction.title })
+                            setTimeout(() => {
+                                // This code needs to execute after page refresh
+                                const tf = document.querySelector('#conversation-name') as HTMLInputElement
+                                tf.select()
+                            }, 1)
+                        }}>{this.props.chatMetadata.interaction.title}</span>
                     }
                     { this.state.editedTitle === undefined ?
                         <img src="/assets/edit.png" width={20} style={{margin: '0 5px'}} onClick={(e) => {

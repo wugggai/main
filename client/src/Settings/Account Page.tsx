@@ -62,7 +62,6 @@ class AccountPage extends React.Component<AccountPageProps, AccountPageState> {
         SERVER.patch(`/users/${userId}/password`, {
             new_password: this.state.password
         }).then(response => {
-            console.log(response)
             this.setState({ passwordFieldsExpanded: false, password: '', confirmPassword: '', passwordUpdating: false })
         }).catch(err => {
             alert("Error: " + err.response)
