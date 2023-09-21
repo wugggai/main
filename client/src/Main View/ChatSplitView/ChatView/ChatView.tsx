@@ -69,6 +69,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         this.getModelDisplayName = this.getModelDisplayName.bind(this)
         this.handlePromptClick = this.handlePromptClick.bind(this)
         this.setModel = this.setModel.bind(this)
+        this.cannotSendMessage = this.cannotSendMessage.bind(this)
     }
 
     componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
@@ -350,7 +351,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         });
     }
 
-    canSendMessage() {
+    cannotSendMessage() {
         return this.state.isWaitingForResponse || !this.state.inputValue || this.props.chatMetadata.interaction.ai_type === undefined
     }
 
@@ -506,14 +507,14 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                             onKeyDown={e => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault()
-                                    if (this.canSendMessage()) {
+                                    if (!this.cannotSendMessage()) {
                                         this.sendMessage()
                                     }
                                 }
                             }}
                             onInput={(e) => this.autoGrowTextArea(e)}
                         />
-                        <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.canSendMessage()} onClick={this.sendMessage}>
+                        <button className={`generic-button send-message-button ${this.state.isWaitingForResponse && 'is-loading'}`} disabled={this.cannotSendMessage()} onClick={this.sendMessage}>
                             <img className={this.state.isWaitingForResponse ? 'send-loading-icon' : 'send-icon'} src={this.state.isWaitingForResponse ? "/assets/send-loading.svg" : "/assets/send.svg"} />
                         </button>
                     </div>
