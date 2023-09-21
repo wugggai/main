@@ -41,11 +41,16 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
                 return undefined
             }
 
+            let preview_image_model = "gpt-3.5-turbo"
+            if (metadata.last_message) {
+                preview_image_model = metadata.last_message.source
+            }
+
             return <li key={i} style={{backgroundColor: this.props.selectedIndex === i ? 'var(--selection-background)' : 'white'}} className='chat-preview-cell' onMouseDown={(event) => {
                 event.stopPropagation();
                 this.props.selectionChanged(i)
             }  }>
-                <img src="/assets/gpt-3.5-turbo.png" />
+                <img id="preview-image" src={`/assets/${preview_image_model}.png`} />
                 <div className='chat-preview-title'>{metadata.interaction.title}</div>
                 <div className='chat-preview-content'>{metadata.last_message && metadata.last_message.message.length > 0 && metadata.last_message.message[0].content || <em>No message</em>}</div>
                 <div className='chat-preview-date'>{formatDate(metadata.interaction.last_updated)}</div>
