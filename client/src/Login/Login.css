@@ -84,14 +84,12 @@
     text-decoration: underline;
 }
 
-.login-screen .login-button {
+.login-button {
     border-style: none;
     font-size: 15px;
     border-radius: 25px;
     padding: 12px 10px;
     width: 180px;
-    /* margin: 0 auto; */
-    margin: 20px calc((100% - 200px) / 2) 10px;
 }
 
 .login-fields .reset-button {
@@ -157,7 +155,23 @@
     margin-bottom: 15px;
 }
 
-.login-screen .password-warning-container {
+.password-warning-container {
     margin-left: 12px;
     margin-top: 2px;
+}
+
+.login-processing-button {
+    background: transparent;
+    border: transparent;
+    height: 40px;
+}
+
+.login-processing-button > img {
+    height: 40px;
+}
+
+.login-button-container {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0px;
 }
