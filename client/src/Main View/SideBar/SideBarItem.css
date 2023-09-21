@@ -10,7 +10,7 @@
     position: relative;
 }
 
-.item:hover {
+.has-hover:hover {
     background-color: #EDEDF970;
 }
 
