@@ -108,13 +108,15 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
 
         return <div className='dialog-container'>
             <div id='chat-dialog'>
-                {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex', minHeight: '70px' }} key={-1}>
+                {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex', minHeight: '55px' }} key={-1}>
                     <img src={`/assets/${this.props.model}.png`} width={40} className='avatar' />
-                    <div className='message'>
-                        <div style={{width: 20, height: '40px', position: 'relative'}}><Loading size={20}/></div>
+                    <div className='message' style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ width: 20, height: '40px', margin: '0 auto' }}>
+                            <Loading size={20} />
+                        </div>
                     </div>
                 </div>}
-                {(this.props.history.messages.length > 0 || this.props.waitingForResponse) ? dialogCells.reverse() : <ChatSuggestions chatPrompts={this.state.chatPrompts} textToImagePrompts={this.state.textToImagePrompts} onClickPrompt={this.props.onClickPrompt} model={this.props.model}/>}
+                {(!this.shouldDisplayExamplePrompts() || this.props.waitingForResponse) ? dialogCells.reverse() : <ChatSuggestions chatPrompts={this.state.chatPrompts} textToImagePrompts={this.state.textToImagePrompts} onClickPrompt={this.props.onClickPrompt} model={this.props.model}/>}
             </div>
         </div>;
     }
