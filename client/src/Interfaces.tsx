@@ -36,7 +36,7 @@ export interface ChatMetadata {
 export interface ChatHistoryItem {
     id: string
     interaction_id?: string
-    source: 'user' | 'echo' | AI
+    source: 'user' | AI
     message: MessageSegment[]
     offset: number
     timestamp: string
