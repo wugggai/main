@@ -57,7 +57,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
             let newTag = response.data as Tag
             this.props.onAddNewTag(newTag)
         }).catch((error) => {
-            this.props.showNotification({title: "Something unexpected happened!", message: "Unexpected error."})
+            this.props.showNotification({title: "Something unexpected happened!", message: error.response.data.detail})
 
         })
     }

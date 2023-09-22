@@ -74,7 +74,7 @@ class APIKeyInputBarImpl extends React.Component<APIKeyInputBarImplProps, APIKey
                 apiKeySuccessMsg: createSuccessMsg,
             })
         }).catch((error) => {
-            this.props.showNotification({title: "Something unexpected happened!", message: error.code})
+            this.props.showNotification({title: "Something unexpected happened!", message: error.response.data.detail})
             this.setState({
                 isUpdatingAPIKey: false,
                 apiKeyErrMsg: createErrMsg,

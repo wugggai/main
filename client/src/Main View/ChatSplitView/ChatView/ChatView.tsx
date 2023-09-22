@@ -183,7 +183,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
             }).catch((error) => {
-                this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+                this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
             }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
@@ -222,6 +222,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
             } : undefined
         }).then(response => {
+            console.log(response)
             const metadata = response.data as ChatMetadata
             this.props.chatMetadata.interaction.id = metadata.interaction.id
             this.props.chatMetadata.interaction.title = metadata.interaction.title
@@ -259,7 +260,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.props.onChatInfoUpdated()
             this.setState({ isWaitingForResponse: false });
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
         })
     }
 
@@ -329,7 +330,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 isAddingTag: false
             })
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
 
         })
     }

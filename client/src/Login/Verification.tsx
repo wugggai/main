@@ -42,8 +42,8 @@ class VerificationImpl extends React.Component<VerificationImplProps, Verificati
                 alert(err)
             })
 
-        }).catch(err => {
-            this.props.showNotification({title: "Verification error!", message: err.code})
+        }).catch(error => {
+            this.props.showNotification({title: "Verification error!", message: error.response.data.detail})
             this.setState({ verified: false })
         })
     }
