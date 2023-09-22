@@ -132,34 +132,19 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 type: "text",
                 content: this.state.inputValue,
             }
-            if (this.state.chatHistory) {
-                this.state.chatHistory.messages.push({
-                    message: [messageSegment],
-                    source: 'user',
-                    id: 'tmp',
-                    timestamp: getCurrentDateString(),
-                    offset: this.state.chatHistory.messages.length
-                })
-            } else {
-                this.setState({
-                    chatHistory: {
-                        messages: [{
-                            message: [messageSegment],
-                            source: 'user',
-                            id: 'tmp',
-                            timestamp: getCurrentDateString(),
-                            offset: 0
-                        }]
-                    }
-                })
+            if (!this.state.chatHistory) {
+                this.setState({ chatHistory: { messages: [] } })
             }
-            this.props.chatMetadata.last_message = {
-                id: "tmp",
-                message: [{ type: "text", content: this.state.inputValue }],
-                offset: (this.props.chatMetadata.last_message?.offset ?? -1) + 1,
-                source: "user",
-                timestamp: getCurrentDateString()
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: this.state.chatHistory!.messages.length
             }
+
+            this.state.chatHistory!.messages.push(new_message)
+            this.props.chatMetadata.last_message = new_message
             this.props.onChatInfoUpdated()
             this.setState({ inputValue: '' })
             const requestMessageSegment: MessageSegment = {
@@ -183,7 +168,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 this.props.chatMetadata.last_message = response.data
                 this.props.onChatInfoUpdated()
             }).catch((error) => {
-                this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+                this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
             }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
@@ -199,19 +184,22 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             content: this.state.promptValue || this.state.inputValue,
         }
         if (withMessage) {
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: 0
+            }
             this.setState({
                 chatHistory: {
-                    messages: [{
-                        message: [messageSegment],
-                        source: 'user',
-                        id: 'tmp',
-                        timestamp: getCurrentDateString(),
-                        offset: 0
-                    }]
+                    messages: [new_message]
                 },
                 inputValue: '',
                 promptValue: ''
             })
+            this.props.chatMetadata.last_message = new_message
+            this.props.onChatInfoUpdated()
         }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
@@ -222,6 +210,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
             } : undefined
         }).then(response => {
+            console.log(response)
             const metadata = response.data as ChatMetadata
             this.props.chatMetadata.interaction.id = metadata.interaction.id
             this.props.chatMetadata.interaction.title = metadata.interaction.title
@@ -235,6 +224,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     offset: metadata.last_message.offset,
                     source: metadata.last_message.source as (AI)
                 })
+                this.props.chatMetadata.last_message = metadata.last_message
+                this.props.onChatInfoUpdated()
             }
             if (withMessage) {
                 const messageSegment: MessageSegment = {
@@ -259,7 +250,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.props.onChatInfoUpdated()
             this.setState({ isWaitingForResponse: false });
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
         })
     }
 
@@ -329,7 +320,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 isAddingTag: false
             })
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
 
         })
     }
@@ -408,7 +399,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
         </div>
 
-        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel}/></div>
+        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel} disableAllModels={this.state.isWaitingForResponse}/></div>
 
         return <div className='chat-view'>
             <div style={{ position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none" }} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })} />
@@ -482,6 +473,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             <ChatDialogView
                 history={this.state.chatHistory || { messages: [] }}
                 waitingForResponse={this.state.isWaitingForResponse}
+                isNewInteraction={this.props.isNewInteraction}
                 isTrash={this.props.isTrash}
                 model={this.props.chatMetadata.interaction.ai_type}
                 onClickPrompt={this.handlePromptClick}
