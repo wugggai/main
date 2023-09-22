@@ -41,6 +41,10 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
     }
 
     addTag() {
+        if (this.props.currentTags.some(tag => tag.name === this.state.newTagName)) {
+            this.props.showNotification({ title: "Tag name already used", message: "" })
+            return
+        }
         this.setState({ isAddingTag: true })
         const userId = getUserId()
         SERVER.post(`/users/${userId}/tags`, {

@@ -123,6 +123,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     }
 
     sendMessage() {
+        const chatId = this.props.chatMetadata.interaction.id
         this.setState({ isWaitingForResponse: true })
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
@@ -170,9 +171,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 model: this.props.chatMetadata.interaction.ai_type,
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
                 model_config: {}
-            },
-                { headers: { "Authorization": `Bearer ${Cookies.load('access_token')}` } }
-            ).then(response => {
+            }).then(response => {
+                if (this.props.chatMetadata.interaction.id !== chatId) { return }
                 this.state.chatHistory?.messages.push(response.data)
                 this.setState({
                     isWaitingForResponse: false
