@@ -4,10 +4,14 @@ import "./ChatChooseModelMenu.css"
 interface ChatChooseModelMenuProps {
     availableModels?: [{ name: string, via_system_key: boolean }]
     onChooseModel: (name: string | undefined, is_via_system: boolean) => void
+    disableAllModels: boolean
 }
 
 export function ChatChooseModelMenu(props: ChatChooseModelMenuProps) {
     function shouldDisableModel(modelName: string) {
+        if (props.disableAllModels) {
+            return true
+        }
         if (props.availableModels == undefined) {
             return false;
         }
