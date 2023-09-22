@@ -9,6 +9,7 @@ import ChatSuggestions, { Prompt } from '../../ChatSuggestions/ChatSuggestions';
 interface ChatDialogProps {
     history: ChatHistory
     waitingForResponse: boolean
+    isNewInteraction: boolean
     isTrash: boolean
     model: AI | undefined
     onClickPrompt: (prompt: string, ai_type: AI | undefined) => void
@@ -34,7 +35,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     }
 
     shouldDisplayExamplePrompts(): Boolean {
-        return this.props.history.messages.length == 0 && !this.props.isTrash
+        return this.props.isNewInteraction && this.props.history.messages.length == 0 && !this.props.isTrash
     }
 
     componentWillReceiveProps(nextProps: ChatDialogProps) {

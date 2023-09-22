@@ -483,6 +483,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             <ChatDialogView
                 history={this.state.chatHistory || { messages: [] }}
                 waitingForResponse={this.state.isWaitingForResponse}
+                isNewInteraction={this.props.isNewInteraction}
                 isTrash={this.props.isTrash}
                 model={this.props.chatMetadata.interaction.ai_type}
                 onClickPrompt={this.handlePromptClick}
