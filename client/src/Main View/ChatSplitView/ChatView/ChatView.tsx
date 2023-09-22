@@ -131,34 +131,19 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 type: "text",
                 content: this.state.inputValue,
             }
-            if (this.state.chatHistory) {
-                this.state.chatHistory.messages.push({
-                    message: [messageSegment],
-                    source: 'user',
-                    id: 'tmp',
-                    timestamp: getCurrentDateString(),
-                    offset: this.state.chatHistory.messages.length
-                })
-            } else {
-                this.setState({
-                    chatHistory: {
-                        messages: [{
-                            message: [messageSegment],
-                            source: 'user',
-                            id: 'tmp',
-                            timestamp: getCurrentDateString(),
-                            offset: 0
-                        }]
-                    }
-                })
+            if (!this.state.chatHistory) {
+                this.setState({ chatHistory: { messages: [] } })
             }
-            this.props.chatMetadata.last_message = {
-                id: "tmp",
-                message: [{ type: "text", content: this.state.inputValue }],
-                offset: (this.props.chatMetadata.last_message?.offset ?? -1) + 1,
-                source: "user",
-                timestamp: getCurrentDateString()
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: this.state.chatHistory!.messages.length
             }
+
+            this.state.chatHistory!.messages.push(new_message)
+            this.props.chatMetadata.last_message = new_message
             this.props.onChatInfoUpdated()
             this.setState({ inputValue: '' })
             const requestMessageSegment: MessageSegment = {
@@ -199,19 +184,22 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             content: this.state.promptValue || this.state.inputValue,
         }
         if (withMessage) {
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: 0
+            }
             this.setState({
                 chatHistory: {
-                    messages: [{
-                        message: [messageSegment],
-                        source: 'user',
-                        id: 'tmp',
-                        timestamp: getCurrentDateString(),
-                        offset: 0
-                    }]
+                    messages: [new_message]
                 },
                 inputValue: '',
                 promptValue: ''
             })
+            this.props.chatMetadata.last_message = new_message
+            this.props.onChatInfoUpdated()
         }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
@@ -236,6 +224,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     offset: metadata.last_message.offset,
                     source: metadata.last_message.source as (AI)
                 })
+                this.props.chatMetadata.last_message = metadata.last_message
+                this.props.onChatInfoUpdated()
             }
             if (withMessage) {
                 const messageSegment: MessageSegment = {
