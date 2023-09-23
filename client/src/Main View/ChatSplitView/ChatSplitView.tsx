@@ -81,6 +81,11 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     newInteraction() {
+        if (this.state.newInteractionMetadata?.interaction.id !== undefined) {
+            this.setState({
+                chatHistoryMetadata: [this.state.newInteractionMetadata, ...this.state.chatHistoryMetadata ?? []]
+            })
+        }
         this.setState({
             newInteractionMetadata: {
                 interaction: {
@@ -90,8 +95,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     tag_ids: [],
                     creator_user_id: `${getUserId()}`,
                     last_updated: getCurrentDateString(),
-                    title: this.state.newInteractionMetadata?.interaction.title ?? "Untitled Conversation"
-                    
+                    title: "Untitled Conversation"
                 },
                 last_message: null
             },
