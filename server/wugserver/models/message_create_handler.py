@@ -100,8 +100,6 @@ def handle_message_create_request(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=f"bad input: {e}")
 
-    print(requested_model)
-
     interaction_context = []
     if requested_model.requires_context():
         interaction_context = message_model.get_interaction_all_messages(
@@ -116,7 +114,7 @@ def handle_message_create_request(
     except Exception as e:
         raise HTTPException(
             status_code=503,
-            detail=f"cannot send message to {message_create_params.model}: {e}",
+            detail=f"cannot get response from {message_create_params.model}: {e}. Please double check your API key's payment setting.",
         )
 
     message_model.create_message(

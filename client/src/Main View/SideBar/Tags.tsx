@@ -5,6 +5,7 @@ import { SERVER } from '../../Constants'
 interface TagProps {
     tags: Tag[]
     onSelect: (index: number, shifted: boolean) => void
+    onTagDeleted: (tagId: string) => void
     currentSelection: Set<string>
 }
 
@@ -19,25 +20,21 @@ export function Tags(props: TagProps) {
     function updateTag(tag: Tag, newName: string) {
         SERVER.put(`/tags/${tag.id}`, { name: newName, color: tag.color }).then(response => {
             console.log(response.data)
-        }).catch(err => {
-            console.log(err)
         })
     }
 
     function deleteTag(tag: Tag, index: number) {
-        console.log("delete", tag)
         SERVER.delete(`/tags/${tag.id}`).then(response => {
             console.log(response.data)
         }).then(_ => {
             const newDeletedRows = [...deletedRows]
             newDeletedRows[index] = true
             setDeletedRows(newDeletedRows)
+            props.onTagDeleted(tag.id)
         }).catch(err => {
             console.log(err)
         })
     }
-
-    console.log(deletedRows)
 
     return <div className='tags'>
         {props.tags.map((tag, i) => {

@@ -164,6 +164,10 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                         }
                         this.forceUpdate()
                     }}
+                    onTagDeleted={(tagId: string) => {
+                        this.state.selectedTagIds.delete(tagId)
+                        this.chatSplitViewRef.current?.componentDidMount()
+                    }}
                 />
                 <div className='main-content' style={{position: 'relative'}}>
                     {contentView}

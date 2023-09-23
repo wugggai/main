@@ -144,34 +144,19 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 type: "text",
                 content: this.state.inputValue,
             }
-            if (this.state.chatHistory) {
-                this.state.chatHistory.messages.push({
-                    message: [messageSegment],
-                    source: 'user',
-                    id: 'tmp',
-                    timestamp: getCurrentDateString(),
-                    offset: this.state.chatHistory.messages.length
-                })
-            } else {
-                this.setState({
-                    chatHistory: {
-                        messages: [{
-                            message: [messageSegment],
-                            source: 'user',
-                            id: 'tmp',
-                            timestamp: getCurrentDateString(),
-                            offset: 0
-                        }]
-                    }
-                })
+            if (!this.state.chatHistory) {
+                this.setState({ chatHistory: { messages: [] } })
             }
-            this.props.chatMetadata.last_message = {
-                id: "tmp",
-                message: [{ type: "text", content: this.state.inputValue }],
-                offset: (this.props.chatMetadata.last_message?.offset ?? -1) + 1,
-                source: "user",
-                timestamp: getCurrentDateString()
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: this.state.chatHistory!.messages.length
             }
+
+            this.state.chatHistory!.messages.push(new_message)
+            this.props.chatMetadata.last_message = new_message
             this.props.onChatInfoUpdated()
             this.setState({ inputValue: '' })
             delete this.props.unsavedStates[this.props.chatMetadata.interaction.id]
@@ -199,7 +184,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 }
                 this.props.onChatInfoUpdated()
             }).catch((error) => {
-                this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+                this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
             }).finally(() => this.setState({ isWaitingForResponse: false }))
         }
     }
@@ -217,15 +202,16 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             content: this.state.promptValue || this.state.inputValue,
         }
         if (withMessage) {
+            let new_message: ChatHistoryItem = {
+                message: [messageSegment],
+                source: 'user',
+                id: 'tmp',
+                timestamp: getCurrentDateString(),
+                offset: 0
+            }
             this.setState({
                 chatHistory: {
-                    messages: [{
-                        message: [messageSegment],
-                        source: 'user',
-                        id: 'tmp',
-                        timestamp: getCurrentDateString(),
-                        offset: 0
-                    }]
+                    messages: [new_message]
                 },
                 inputValue: '',
                 promptValue: ''
@@ -255,40 +241,50 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 })
                 metadataBackup.last_message = metadata.last_message
             }
-            if (withMessage) {
-                const messageSegment: MessageSegment = {
-                    type: "text",
-                    content: this.state.promptValue || this.state.inputValue,
-                }
-                this.setState(prevState => ({
-                    chatHistory: {
-                        messages: [
-                            ...(prevState.chatHistory ? prevState.chatHistory.messages : []),
-                            ...systemResponse
-                        ]
-                    }
-                }))
-            } else if (this.state.chatHistory === undefined) {
-                this.setState({ chatHistory: { messages: [] } })
-            }
             if (this.state.editedTitle) {
-                this.props.chatMetadata.interaction.title = this.state.editedTitle
-                this.props.chatMetadata.last_message = metadata.last_message
+                metadataBackup.interaction.title = this.state.editedTitle
+                metadataBackup.last_message = metadata.last_message
             }
             this.props.onChatInfoUpdated()
-            this.setState({ isWaitingForResponse: false });
+
+            // Only update state of current chat view if the current chat is the same as the request chat
+            if (this.props.chatMetadata.interaction.id === metadataBackup.interaction.id) {
+                if (withMessage) {
+                    const messageSegment: MessageSegment = {
+                        type: "text",
+                        content: this.state.promptValue || this.state.inputValue,
+                    }
+                    this.setState(prevState => ({
+                        chatHistory: {
+                            messages: [
+                                ...(prevState.chatHistory ? prevState.chatHistory.messages : []),
+                                ...systemResponse
+                            ]
+                        },
+                        isWaitingForResponse: false
+                    }))
+                } else if (this.state.chatHistory === undefined) {
+                    this.setState({
+                        chatHistory: { messages: [] },
+                        isWaitingForResponse: false
+                    })
+                }
+            }
+            
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
         })
     }
 
     addTag(tag: Tag) {
         this.props.chatMetadata.interaction.tag_ids.push(tag.id)
         this.saveMetadata()
+        this.setState({ addTagButtonPosition: undefined })
     }
 
     removeTag(index: number) {
         this.props.chatMetadata.interaction.tag_ids.splice(index, 1)
+        this.setState({})
     }
 
     saveMetadata() {
@@ -348,7 +344,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 isAddingTag: false
             })
         }).catch((error) => {
-            this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
+            this.props.showNotification({ title: "Something unexpected happened!", message: error.response.data.detail })
 
         })
     }
@@ -427,7 +423,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
         </div>
 
-        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel}/></div>
+        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel} disableAllModels={this.state.isWaitingForResponse}/></div>
 
         return <div className='chat-view'>
             <div style={{ position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none" }} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })} />
@@ -501,6 +497,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             <ChatDialogView
                 history={this.state.chatHistory || { messages: [] }}
                 waitingForResponse={this.state.isWaitingForResponse}
+                isNewInteraction={this.props.isNewInteraction}
                 isTrash={this.props.isTrash}
                 model={this.props.chatMetadata.interaction.ai_type}
                 onClickPrompt={this.handlePromptClick}

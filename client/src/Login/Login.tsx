@@ -74,9 +74,9 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
                 }).then(response => {
                     Cookies.save("user_id", response.data.id, { expires: new Date(Date.now() + 30 * 86400 * 1000) })
                     window.location.reload()
-                }).catch(err => {
+                }).catch(error => {
                     this.setState({isProcessingLogin: false})
-                    this.props.showNotification({title: "Something unexpected happened!", message: err.code})
+                    this.props.showNotification({title: "Something unexpected happened!", message: error.response.data.detail})
                 })
             }
         }).catch(err => {
@@ -126,8 +126,8 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
     reset() {
         axios.post(API_BASE + '/users/forgetpassword', {
             email: this.state.username
-        }).catch(err => {
-            this.props.showNotification({title: "Something unexpected happened!", message: err})
+        }).catch(error => {
+            this.props.showNotification({title: "Something unexpected happened!", message: error.response.data.detail})
         }).finally(() => {
             this.setState({ resetDone: true })
         })

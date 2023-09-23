@@ -135,8 +135,10 @@ class DreamboothT2IModel(StableDiffusionT2IModel):
         res = requests.post(
             url="https://stablediffusionapi.com/api/v4/dreambooth",
             data=req_params,
-        )
-        return res.json()["output"]
+        ).json()
+        if "output" in res:
+            return res["output"]
+        raise Exception(res["message"])
 
 
 class DreamboothMidJourneyT2IModel(DreamboothT2IModel):
