@@ -20,6 +20,7 @@ interface ChatViewProps {
     addNewTag: (tag: Tag) => void
     availableTags: Tag[]
     isTrash: boolean
+    unsavedStates: Record<string, string>
 }
 
 type ChatViewClassImplProps = ChatViewProps & { showNotification: ((_: NotificationProps) => void) }
@@ -47,7 +48,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         super(props);
         this.state = {
             promptValue: '',
-            inputValue: '',
+            inputValue: this.props.unsavedStates[this.props.chatMetadata.interaction.id] ?? "",
             isWaitingForResponse: false,
             isUpdatingModel: true,
             isAddingTag: false,
@@ -74,7 +75,10 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
             this.setState({ chatHistory: undefined })
             this.loadHistory()
-            this.setState({ inputValue: '', isWaitingForResponse: false })
+            this.setState({
+                inputValue: this.props.unsavedStates[this.props.chatMetadata.interaction.id] ?? "",
+                isWaitingForResponse: false 
+            })
         }
     }
 
@@ -105,25 +109,33 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     }
 
     loadHistory() {
-        if (!this.props.isNewInteraction) {
+        if (!this.props.isNewInteraction || this.props.chatMetadata.interaction.id !== '') {
             SERVER.get(`/interactions/${this.props.chatMetadata.interaction.id}/messages?limit=1000&from_latest=false`).then(response => {
-                this.setState({ chatHistory: { messages: response.data } })
-                setTimeout(() => {
-                    const input = document.querySelector('#chat-input') as HTMLTextAreaElement | undefined
-                    input?.focus()
-                }, 5);
+                this.setState({ chatHistory: { messages: response.data } }, () => {
+                    setTimeout(() => {
+                        const input = document.querySelector('#chat-input') as HTMLTextAreaElement | undefined
+                        if (input) {
+                            input.focus()
+                            input.setSelectionRange(input.value.length, input.value.length);
+                        }
+                    }, 10);
+                })
             })
         } else {
-            this.setState({ chatHistory: { messages: [] } })
-            setTimeout(() => {
-                const input = document.querySelector('#chat-input') as HTMLTextAreaElement
-                input?.focus()
-            }, 1);
+            this.setState({ chatHistory: { messages: [] } }, () => {
+                setTimeout(() => {
+                    const input = document.querySelector('#chat-input') as HTMLTextAreaElement | undefined
+                    if (input) {
+                        input.focus()
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }, 10);
+            })
         }
     }
 
     sendMessage() {
-        const chatId = this.props.chatMetadata.interaction.id
+        const metadataBackup = this.props.chatMetadata
         this.setState({ isWaitingForResponse: true })
         if (this.props.isNewInteraction) {
             this.createInteraction(true)
@@ -162,6 +174,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
             this.props.onChatInfoUpdated()
             this.setState({ inputValue: '' })
+            delete this.props.unsavedStates[this.props.chatMetadata.interaction.id]
             const requestMessageSegment: MessageSegment = {
                 type: "text",
                 content: this.state.inputValue,
@@ -172,15 +185,18 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
                 model_config: {}
             }).then(response => {
-                if (this.props.chatMetadata.interaction.id !== chatId) { return }
-                this.state.chatHistory?.messages.push(response.data)
-                this.setState({
-                    isWaitingForResponse: false
-                }, () => {
-                    const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement
-                    chatDialog.scrollTop = chatDialog.scrollHeight
-                })
-                this.props.chatMetadata.last_message = response.data
+                if (this.props.chatMetadata.interaction.id === metadataBackup.interaction.id) {
+                    this.state.chatHistory?.messages.push(response.data)
+                    this.setState({
+                        isWaitingForResponse: false
+                    }, () => {
+                        const chatDialog = document.querySelector("#chat-dialog") as HTMLDivElement
+                        chatDialog.scrollTop = chatDialog.scrollHeight
+                    })
+                    this.props.chatMetadata.last_message = response.data
+                } else {
+                    metadataBackup.last_message = response.data
+                }
                 this.props.onChatInfoUpdated()
             }).catch((error) => {
                 this.props.showNotification({ title: "Something unexpected happened!", message: error.code })
@@ -188,7 +204,9 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         }
     }
 
+    // A locally-initialized new interaction has an id of ''
     createInteraction(withMessage: boolean) {
+        const metadataBackup = this.props.chatMetadata
         const userId = getUserId()
         if (userId === undefined) {
             alert("Not logged in")
@@ -212,6 +230,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 inputValue: '',
                 promptValue: ''
             })
+            delete this.props.unsavedStates[metadataBackup.interaction.id]
         }
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
@@ -223,10 +242,9 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             } : undefined
         }).then(response => {
             const metadata = response.data as ChatMetadata
-            this.props.chatMetadata.interaction.id = metadata.interaction.id
-            this.props.chatMetadata.interaction.title = metadata.interaction.title
+            metadataBackup.interaction.id = metadata.interaction.id
+            metadataBackup.interaction.title = metadata.interaction.title
             let systemResponse: ChatHistoryItem[] = []
-            console.log("response from create interaction:", metadata)
             if (metadata.last_message) {
                 systemResponse.push({
                     message: metadata.last_message.message,
@@ -235,6 +253,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                     offset: metadata.last_message.offset,
                     source: metadata.last_message.source as (AI)
                 })
+                metadataBackup.last_message = metadata.last_message
             }
             if (withMessage) {
                 const messageSegment: MessageSegment = {
@@ -489,7 +508,10 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             {!this.props.isTrash && <>
                 <div className='chat-input-container'>
                     <div className='send-text-line'>
-                        <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => this.setState({ inputValue: e.target.value })}
+                        <textarea className='text-area' id='chat-input' placeholder='Write something...' value={this.state.inputValue} onChange={(e) => {
+                            this.setState({ inputValue: e.target.value })
+                            this.props.unsavedStates[this.props.chatMetadata.interaction.id] = e.target.value
+                        }}
                             onKeyDown={e => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault()

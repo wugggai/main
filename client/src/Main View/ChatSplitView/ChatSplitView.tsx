@@ -26,6 +26,8 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     // Initial sizes (percentages) of the splits
     splitSizes = [28, 72]
 
+    unsavedStates: Record<string, string> = {}
+
     constructor(props: ChatViewProps) {
         super(props);
         this.state = {};
@@ -93,7 +95,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 },
                 last_message: null
             },
-            selectedIndex: undefined
+            selectedIndex: 0
         })
     }
 
@@ -130,17 +132,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
         
         let content: JSX.Element
-        if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.map(id => this.props.selectedTagIds.has(id)).includes(true))) {
-            let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
-            content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
-                this.forceUpdate()
-            }}
-            isNewInteraction={false} onDeleteInteraction={() => {
-                this.setState({ deletingChat: metadata })}
-            }
-            addNewTag={this.props.addNewTag}
-            />
-        } else if (this.state.newInteractionMetadata !== undefined) {
+        if (this.state.newInteractionMetadata !== undefined && this.state.selectedIndex === 0) {
             content = <ChatView chatMetadata={this.state.newInteractionMetadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.setState({
                     chatHistoryMetadata: [this.state.newInteractionMetadata!, ...this.state.chatHistoryMetadata!],
@@ -150,6 +142,18 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             }}
             isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })}
             addNewTag={this.props.addNewTag}
+            unsavedStates={this.unsavedStates}
+            />
+        } else if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.some(id => this.props.selectedTagIds.has(id)))) {
+            let metadata = this.state.chatHistoryMetadata[this.state.newInteractionMetadata === undefined ? this.state.selectedIndex : this.state.selectedIndex - 1]
+            content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
+                this.forceUpdate()
+            }}
+            isNewInteraction={false} onDeleteInteraction={() => {
+                this.setState({ deletingChat: metadata })}
+            }
+            addNewTag={this.props.addNewTag}
+            unsavedStates={this.unsavedStates}
             />
         } else {
             if (this.props.isTrash) {
@@ -181,13 +185,24 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                         selectionChanged={(i) => {
                             if (i === undefined) {
                                 this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
-                            } else if (this.state.newInteractionMetadata && i !== 0) {
-                                this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
                             } else if (i !== this.state.selectedIndex) {
-                                this.setState({ selectedIndex: i })
+                                if (this.state.newInteractionMetadata && this.state.newInteractionMetadata.interaction.ai_type === undefined && this.unsavedStates[this.state.newInteractionMetadata.interaction.id] === undefined && i !== 0) {
+                                    this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
+                                } else {
+                                    this.setState({ selectedIndex: i })
+                                }
                             }
+                            // if (i === undefined) {
+                            //     this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
+                            // } else if (this.state.newInteractionMetadata && i !== 0 && this.state.newInteractionMetadata.interaction.ai_type === undefined) {
+                            //     this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
+                            // } else if (this.state.newInteractionMetadata && i !== 0 && this.state.newInteractionMetadata.interaction.ai_type !== undefined) {
+                            //     this.setState({ selectedIndex: i-1})
+                            // } else if (i !== this.state.selectedIndex) {
+                            //     this.setState({ selectedIndex: i })
+                            // }
                         }}
-                        selectedIndex={this.state.newInteractionMetadata ? 0 : this.state.selectedIndex}
+                        selectedIndex={this.state.selectedIndex}
                         onCreateNewInteraction={this.newInteraction}
                         filterByTags={this.props.selectedTagIds}
                         isTrash={this.props.isTrash}
