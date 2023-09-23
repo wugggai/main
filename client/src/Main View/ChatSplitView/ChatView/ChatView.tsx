@@ -257,10 +257,12 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     addTag(tag: Tag) {
         this.props.chatMetadata.interaction.tag_ids.push(tag.id)
         this.saveMetadata()
+        this.setState({ addTagButtonPosition: undefined })
     }
 
     removeTag(index: number) {
         this.props.chatMetadata.interaction.tag_ids.splice(index, 1)
+        this.setState({})
     }
 
     saveMetadata() {
