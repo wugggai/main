@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { AI, ChatHistory, ChatHistoryItem, ChatMetadata, MessageSegment, Tag, getCurrentDateString, localToGlobal } from '../../../Interfaces';
+import { AI, ChatHistory, ChatHistoryItem, ChatMetadata, MessageSegment, ModelAndKey, Tag, getCurrentDateString, localToGlobal } from '../../../Interfaces';
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
@@ -28,7 +28,7 @@ type ChatViewClassImplProps = ChatViewProps & { showNotification: ((_: Notificat
 interface ChatViewState {
     editedTitle?: string
     chatHistory?: ChatHistory
-    availableModels?: [{ name: string, via_system_key: boolean }]
+    availableModels?: ModelAndKey[]
     promptValue: string
     inputValue: string
     isWaitingForResponse: boolean
@@ -284,6 +284,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     removeTag(index: number) {
         this.props.chatMetadata.interaction.tag_ids.splice(index, 1)
+        this.saveMetadata()
         this.setState({})
     }
 
@@ -300,13 +301,13 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         }
     }
 
-    setModel(name: string | undefined, is_via_system: boolean) {
-        if (!name) {
-            return name
+    setModel(modelAndKey: ModelAndKey): string {
+        if (!modelAndKey.name) {
+            return ""
         }
-        this.props.chatMetadata.interaction.using_system_key = is_via_system
+        this.props.chatMetadata.interaction.using_system_key = modelAndKey.via_system_key
 
-        this.props.chatMetadata.interaction.ai_type = name as AI
+        this.props.chatMetadata.interaction.ai_type = modelAndKey.name
         if (!this.props.isNewInteraction) {
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 200)
@@ -317,7 +318,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     getModelDisplayName() {
         const compositeName = this.props.chatMetadata.interaction.ai_type == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type)
-        return compositeName || this.setModel(this.props.chatMetadata.last_message?.source, false) || "Choose Model"
+        return compositeName || this.setModel({name: this.props.chatMetadata.last_message?.source as AI, via_system_key: false}) || "Choose Model"
     }
 
     addNewTag() {
@@ -349,9 +350,10 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         })
     }
 
-    handlePromptClick(prompt: string, ai_type: AI | undefined) {
+    handlePromptClick(prompt: string, modelAndKey: ModelAndKey) {
         this.setState({ promptValue: prompt }, () => {
-            this.props.chatMetadata.interaction.ai_type = ai_type;
+            this.props.chatMetadata.interaction.ai_type = modelAndKey.name;
+            this.props.chatMetadata.interaction.using_system_key = modelAndKey.via_system_key
             this.sendMessage()
         });
     }
@@ -499,7 +501,8 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 waitingForResponse={this.state.isWaitingForResponse}
                 isNewInteraction={this.props.isNewInteraction}
                 isTrash={this.props.isTrash}
-                model={this.props.chatMetadata.interaction.ai_type}
+                modelAndKey={{name: this.props.chatMetadata.interaction.ai_type, via_system_key: this.props.chatMetadata.interaction.using_system_key}}
+                availableModels={this.state.availableModels}
                 onClickPrompt={this.handlePromptClick}
             />
             {!this.props.isTrash && <>

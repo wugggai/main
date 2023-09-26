@@ -1,74 +1,32 @@
 import React from 'react'
 import './ChatDialogView.css'
-import { AI, ChatHistory, ChatHistoryItem, formatDate, getCurrentDateString } from '../../../../Interfaces';
+import { AI, ChatHistory, ChatHistoryItem, ModelAndKey, formatDate, getCurrentDateString } from '../../../../Interfaces';
 import MarkdownTextView from '../../../../UI Components/MarkdownTextView';
 import { Loading } from '../../../../UI Components/Loading';
-import { SERVER } from '../../../../Constants';
-import ChatSuggestions, { Prompt } from '../../ChatSuggestions/ChatSuggestions';
+import ChatSuggestions from './ChatSuggestions/ChatSuggestions';
 
 interface ChatDialogProps {
+    availableModels: ModelAndKey[] | undefined
     history: ChatHistory
     waitingForResponse: boolean
     isNewInteraction: boolean
     isTrash: boolean
-    model: AI | undefined
-    onClickPrompt: (prompt: string, ai_type: AI | undefined) => void
+    modelAndKey: ModelAndKey
+    onClickPrompt: (prompt: string, modelAndKey: ModelAndKey) => void
 }
  
 interface ChatDialogState {
-    chatPrompts: Prompt[]
-    textToImagePrompts: Prompt[]
 }
 
 class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     constructor(props: ChatDialogProps) {
         super(props);
         this.state = { chatPrompts: [], textToImagePrompts: [] };
-        this.getPrompts.bind(this)
-        this.getChatPrompts.bind(this)
-        this.getTextToImagePrompts.bind(this)
         this.shouldDisplayExamplePrompts.bind(this)
-
-        if (this.shouldDisplayExamplePrompts()) {
-            this.getPrompts(this.props.model)
-        }
     }
 
     shouldDisplayExamplePrompts(): Boolean {
         return this.props.isNewInteraction && this.props.history.messages.length == 0 && !this.props.isTrash
-    }
-
-    componentWillReceiveProps(nextProps: ChatDialogProps) {
-        if (nextProps.model != this.props.model && this.shouldDisplayExamplePrompts()) {
-            this.getPrompts(nextProps.model)
-        }
-    }
-
-    getPrompts(model: AI | undefined) {
-        this.setState({ chatPrompts: [], textToImagePrompts: [] })
-        if (model === undefined) {
-            this.getChatPrompts()
-            this.getTextToImagePrompts()
-        } else {
-            // TODO: handle text/image difference gracefully
-            if (["midjourney-v4", "DALL-E2", "trial_DALL-E2", "stable-diffusion-v3"].includes(model)) {
-                this.getTextToImagePrompts()
-            } else {
-                this.getChatPrompts()
-            }
-        }
-    }
-
-    getChatPrompts() {
-        SERVER.get(`/example_prompts?type=chat`).then(res => {
-            this.setState({chatPrompts: res.data})
-        })
-    }
-
-    getTextToImagePrompts() {
-        SERVER.get(`/example_prompts?type=text_to_image`).then(res => {
-            this.setState({textToImagePrompts: res.data})
-        })
     }
 
     renderFromHistoryItem(item : ChatHistoryItem, i: number): JSX.Element {
@@ -95,7 +53,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     }
 
     render() {
-        let dialogCells: JSX.Element[] = [] // Dummy item needed for content to align to bottom
+        let dialogCells: JSX.Element[] = []
         this.props.history.messages.forEach((msg, i) => {
             if (i === 0 || new Date(msg.timestamp).getTime() - new Date(this.props.history.messages[i - 1].timestamp).getTime() >= 600000) {
                 dialogCells.push(<div className='history-item' key={`${i} time`}>
@@ -110,14 +68,20 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
         return <div className='dialog-container'>
             <div id='chat-dialog'>
                 {this.props.waitingForResponse && <div className='history-item' style={{ display: 'flex', minHeight: '55px' }} key={-1}>
-                    <img src={`/assets/${this.props.model}.png`} width={40} className='avatar' />
+                    <img src={`/assets/${this.props.modelAndKey.name}.png`} width={40} className='avatar' />
                     <div className='message' style={{ display: 'flex', alignItems: 'center' }}>
                         <div style={{ width: 20, height: '40px', margin: '0 auto' }}>
                             <Loading size={20} />
                         </div>
                     </div>
                 </div>}
-                {(!this.shouldDisplayExamplePrompts() || this.props.waitingForResponse) ? dialogCells.reverse() : <ChatSuggestions chatPrompts={this.state.chatPrompts} textToImagePrompts={this.state.textToImagePrompts} onClickPrompt={this.props.onClickPrompt} model={this.props.model}/>}
+                {(!this.shouldDisplayExamplePrompts() || this.props.waitingForResponse)
+                    ? dialogCells.reverse()
+                    : <ChatSuggestions
+                        onClickPrompt={this.props.onClickPrompt}
+                        modelAndKey={this.props.modelAndKey}
+                        availableModels={this.props.availableModels}
+                    />}
             </div>
         </div>;
     }

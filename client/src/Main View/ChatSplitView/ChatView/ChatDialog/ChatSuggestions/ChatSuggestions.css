@@ -1,0 +1,49 @@
+.suggestion-container {
+    justify-content: flex-start;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.suggestion-button {
+    text-align: start;
+    background-color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    border-width: 1px;
+    border-color: #6B6B6B;
+    cursor: pointer;
+    font-family: "Manrope";
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.grayed-out-text {
+    color: #999;
+}
+
+.grayed-out-bold {
+    color: #999;
+    font-weight: bold;
+}
+
+.error-display {
+    background: #F9DFDD;
+    top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    border-radius: 8px;
+    z-index: 100;
+    transition-duration: 0.3s;
+    
+    padding-top: 15px;
+    padding-right: 25px;
+    padding-bottom: 15px;
+    padding-left: 25px;
+}
