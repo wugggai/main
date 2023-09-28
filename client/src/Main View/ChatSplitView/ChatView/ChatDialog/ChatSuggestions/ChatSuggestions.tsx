@@ -32,7 +32,7 @@ class ChatSuggestions extends React.Component<ChatSuggestionsProps, ChatSuggesti
     }
 
     componentWillReceiveProps(nextProps: ChatSuggestionsProps) {
-        if (nextProps.modelAndKey != this.props.modelAndKey || (this.props.availableModels === undefined && nextProps.availableModels !== undefined)) {
+        if (nextProps.modelAndKey.name != this.props.modelAndKey.name || (this.props.availableModels === undefined && nextProps.availableModels !== undefined)) {
             this.getPrompts(nextProps.modelAndKey.name)
         }
     }
