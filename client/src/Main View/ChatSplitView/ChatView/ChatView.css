@@ -132,12 +132,11 @@
 }
 
 .add-tag-button {
-    display: inline-block;
     position: relative;
-    width: 24px;
     height: 24px;
-    border-radius: 14px;
     background-color: var(--selection-background);
+    border: none;
+    border-radius: 3px;
 }
 
 .add-tag-button:hover {
@@ -179,26 +178,24 @@
 }
 
 .chat-view .inline-tag-item {
-    display: inline-block;
+    display: inline-flex;
+    height: 24px;
     border-radius: 3px;
     background-color: var(--selection-background);
-    padding: 5px 5px;
-    padding-right: 18px;
     margin: 0px 2px;
     cursor: default;
     align-items: center;
     font-size: 13px;
     font-weight: 500;
     position: relative;
+    gap: 4px;
+    padding: 0px 4px;
 }
 
 .chat-view .inline-tag-item > img {
     cursor: pointer;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 4px;
     opacity: 0.9;
+    padding-top: 2px;
 }
 
 .chat-view .select-model-button {

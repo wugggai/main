@@ -367,7 +367,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             return <div className='loading-spinner'><Loading /></div>
         }
 
-        const addTagButton: JSX.Element = <div className='add-tag-button' onClick={(e) => {
+        const addTagButton: JSX.Element = <button className='add-tag-button' onClick={(e) => {
             e.stopPropagation()
             if (this.state.addTagButtonPosition != undefined) {
                 this.setState({ addTagButtonPosition: undefined })
@@ -379,15 +379,15 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 addTagButtonPosition: { x: rect.left, y: rect.top }
             })
         }}>
-            <img src='/assets/add tag.svg' width={24} />
-        </div>
+            add tag
+        </button>
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {
             if (this.tagMap[tagId] === undefined) {
                 console.log("WARNING:", tagId)
             }
-            return <div className='inline-tag-item' key={i}>
-                {this.tagMap[tagId].name}
+            return <div className='inline-tag-item' key={i} style={{backgroundColor: this.tagMap[tagId].color}}>
+                <span>{this.tagMap[tagId].name}</span>
                 <img src='/assets/cross.svg' width={8} onClick={() => this.removeTag(i)} />
             </div>
         })
