@@ -208,7 +208,9 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
                 <div className='terms'>
                     By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
                 </div>
-                <button className='login-button generic-button' disabled={!enableButton} onClick={this.signUp}>Sign Up</button>
+                <div className='login-button-container'>
+                    <button className='login-button generic-button' disabled={!enableButton} onClick={this.signUp}>Sign Up</button>
+                </div>
                 <div style={{textAlign: 'center'}} className='signup-message'>
                     Or<a href='#' onClick={() => this.setState({ mode: 'login' })}>Return to Login</a>
                 </div>
