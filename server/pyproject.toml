@@ -25,6 +25,7 @@ black = "^23.3.0"
 pymysql = "^1.0.3"
 mysql-connector-python = "^8.0.33"
 requests = "^2.31.0"
+llamaapi = "^0.1.36"
 
 [tool.poetry.scripts]
 start = "wugserver.main:start"

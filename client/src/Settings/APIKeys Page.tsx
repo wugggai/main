@@ -14,6 +14,7 @@ interface APIKeysPageState {
 class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
     initialOpenAIKey: string
     initialStableDiffusionKey: string
+    initialLlamaKey: string
 
     constructor(props: APIKeysPageProps) {
         super(props);
@@ -22,6 +23,7 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
         };
         this.initialOpenAIKey = ''
         this.initialStableDiffusionKey = ''
+        this.initialLlamaKey = ''
     }
 
     componentDidMount(): void {
@@ -41,6 +43,8 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                     this.initialOpenAIKey = e.api_key
                 } else if (e.provider === "stable_diffusion") {
                     this.initialStableDiffusionKey = e.api_key
+                } else if (e.provider === "llama") {
+                    this.initialLlamaKey = e.api_key
                 }
             })
         })
@@ -71,6 +75,14 @@ class APIKeysPage extends React.Component<APIKeysPageProps, APIKeysPageState> {
                 keyManagementLink='https://stablediffusionapi.com/settings/api'
                 keyManagementSiteName='stablediffusionapi.com'
                 initialKey={this.initialStableDiffusionKey}
+            ></APIKeyInputBar>
+            <div className="spacer"></div>
+            <APIKeyInputBar
+                provider='llama'
+                title='Llama API Key'
+                keyManagementLink='https://www.llama-api.com/account/api-token'
+                keyManagementSiteName='https://www.llama-api.com/'
+                initialKey={this.initialLlamaKey}
             ></APIKeyInputBar>
         </div>
     }
