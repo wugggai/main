@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from wugserver.constants import ENV, Environment, Provider, get_provider_by_name
 from wugserver.models.ai_models.abstract_model import AIModel
 from wugserver.models.ai_models.echo_model import EchoModel
+from wugserver.models.ai_models.llama_model import LlamaModel
 from wugserver.models.ai_models.openai_model import GPTModel, DALLET2IModel
 from wugserver.models.ai_models.stable_diffusion_model import (
     StableDiffusionV3T2IModel,
@@ -27,6 +28,7 @@ model_name_to_model: dict[str, AIModel] = {}
 provider_to_model: dict[Provider, list[AIModel]] = defaultdict(list)
 supported_models: list[AIModel] = [
     GPTModel(),
+    LlamaModel(),
     DALLET2IModel(),
     StableDiffusionV3T2IModel(),
 ]

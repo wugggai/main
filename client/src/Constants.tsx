@@ -20,7 +20,7 @@ SERVER.interceptors.response.use(
   }
 )
 
-export const SUPPORTED_MODELS = ["gpt-3.5-turbo-16k", "gpt-4", "DALL-E2", "stable-diffusion-v3", "midjourney-v4"]
+export const SUPPORTED_MODELS = ["gpt-3.5-turbo-16k", "gpt-4", "llama", "DALL-E2", "stable-diffusion-v3", "midjourney-v4"]
 
 export const SYNTAX_THEME = {
     "code[class*=\"language-\"]": {

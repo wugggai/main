@@ -7,6 +7,7 @@ class Provider(str, Enum):
     openai = "openai"
     stable_diffusion = "stable_diffusion"
     none = "none"
+    llama = "llama"
 
 
 def get_provider_by_name(name: str) -> Provider:

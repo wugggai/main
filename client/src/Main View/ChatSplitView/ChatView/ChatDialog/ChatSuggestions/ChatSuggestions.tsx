@@ -38,7 +38,7 @@ class ChatSuggestions extends React.Component<ChatSuggestionsProps, ChatSuggesti
     }
 
     isChatModel(modelName: AI | undefined): boolean {
-        return modelName !== undefined && ["gpt-3.5-turbo-16k", "gpt-4"].includes(modelName)
+        return modelName !== undefined && ["gpt-3.5-turbo-16k", "gpt-4", "llama"].includes(modelName)
     }
 
     isImageModel(modelName: AI | undefined): boolean {
