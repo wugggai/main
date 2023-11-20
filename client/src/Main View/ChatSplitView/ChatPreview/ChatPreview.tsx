@@ -31,16 +31,24 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
             combinedMetadata.push(this.props.newChatMetadata)
         }
         combinedMetadata.push(...this.props.chatHistoryMetadata)
+        console.log("index: ", this.props.selectedIndex)
         
+        let firstDisplayableConversation: number | undefined = undefined
+        let selectedUnavailable: boolean = false
         const rows = combinedMetadata.map((metadata, i) => {
             if (this.props.filterByTags.size > 0 && !metadata.interaction.tag_ids.map(tag => this.props.filterByTags.has(tag)).includes(true)) {
+                if (i == this.props.selectedIndex) { selectedUnavailable = true }
                 return undefined
             }
 
             if (this.state.searchString !== '' && !metadata.interaction.title.toLocaleLowerCase().includes(this.state.searchString.toLowerCase())) {
+                if (i == this.props.selectedIndex) { selectedUnavailable = true }
                 return undefined
             }
 
+            if (!firstDisplayableConversation) {
+                firstDisplayableConversation = i
+            }
             let preview_image_model = "gpt-3.5-turbo-16k"
             if (metadata.last_message) {
                 preview_image_model = metadata.last_message.source
@@ -56,7 +64,10 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
                 <div className='chat-preview-date'>{formatDate(metadata.interaction.last_updated)}</div>
             </li>
         })
-        
+        if (selectedUnavailable && firstDisplayableConversation) {
+            this.props.selectionChanged(firstDisplayableConversation)
+        }
+
         const emptyMessage = 
             <div className='empty-conversation-list'>
                 No conversations.

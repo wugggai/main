@@ -34,6 +34,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         this.newInteraction = this.newInteraction.bind(this);
         this.moveInteractionToTrash = this.moveInteractionToTrash.bind(this);
         this.updateSplitSizes = this.updateSplitSizes.bind(this);
+        this.newestInteractionIfExists = this.newestInteractionIfExists.bind(this);
     }
 
     componentDidMount(): void {
@@ -43,7 +44,12 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
         SERVER.get(`/users/${userId}/interactions` + (this.props.isTrash ? "/deleted" : "")).then(response => {
             this.setState({
-                chatHistoryMetadata: response.data
+                chatHistoryMetadata: response.data,
+            }, () => {
+                this.setState({
+                    selectedIndex: this.newestInteractionIfExists(),
+                }, () => console.log(this.state.selectedIndex))
+                
             })
             setTimeout(() => {
                 const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
@@ -103,6 +109,15 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         })
     }
 
+    // Return the correct selectedIndex state to display:
+    // 0 if there's at least one interaction available, undefined otherwise
+    newestInteractionIfExists() {
+        if (this.state.chatHistoryMetadata && this.state.chatHistoryMetadata.length > 0) {
+            return 0
+        }
+        return undefined
+    }
+
     moveInteractionToTrash() {
         if (this.state.deletingChat === undefined || this.state.selectedIndex === undefined) {
             return
@@ -115,7 +130,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             SERVER.delete(`/interactions/${this.state.deletingChat.interaction.id}`).then(response => {
                 if (response.status === 200) {
                     this.state.chatHistoryMetadata!.splice(index, 1)
-                    this.setState({ selectedIndex: undefined, deletingChat: undefined })
+                    this.setState({ selectedIndex: this.newestInteractionIfExists(), deletingChat: undefined })
                 }
             })
         }
@@ -126,7 +141,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             if (this.state.selectedIndex !== undefined) {
                 this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
             }
-            this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined, deletingChat: undefined })
+            this.setState({ selectedIndex: this.newestInteractionIfExists(), newInteractionMetadata: undefined, deletingChat: undefined })
         })
     }
     
@@ -196,15 +211,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                                     this.setState({ selectedIndex: i })
                                 }
                             }
-                            // if (i === undefined) {
-                            //     this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
-                            // } else if (this.state.newInteractionMetadata && i !== 0 && this.state.newInteractionMetadata.interaction.ai_type === undefined) {
-                            //     this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
-                            // } else if (this.state.newInteractionMetadata && i !== 0 && this.state.newInteractionMetadata.interaction.ai_type !== undefined) {
-                            //     this.setState({ selectedIndex: i-1})
-                            // } else if (i !== this.state.selectedIndex) {
-                            //     this.setState({ selectedIndex: i })
-                            // }
                         }}
                         selectedIndex={this.state.selectedIndex}
                         onCreateNewInteraction={this.newInteraction}

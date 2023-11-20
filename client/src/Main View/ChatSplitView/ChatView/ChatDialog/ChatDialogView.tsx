@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './ChatDialogView.css'
 import { AI, ChatHistory, ChatHistoryItem, ModelAndKey, formatDate, getCurrentDateString } from '../../../../Interfaces';
 import MarkdownTextView from '../../../../UI Components/MarkdownTextView';
@@ -16,6 +16,33 @@ interface ChatDialogProps {
 }
  
 interface ChatDialogState {
+}
+
+interface AIImageComponentState {
+    src: string
+}
+
+interface AIImageComponentProps {
+    src: string,
+    index: number,
+}
+
+class AIImageComponent extends React.Component<AIImageComponentProps, AIImageComponentState> {
+    constructor(props: AIImageComponentProps) {
+        super(props);
+        this.state = { src: props.src };
+        this.handleError = this.handleError.bind(this);
+    }
+
+    handleError() {
+        console.log("handling error")
+        this.setState({ src: "/assets/expired.png" })
+        console.log(this.state)
+    }
+
+    render() {
+        return <img className='ai-image' key={this.props.index} src={this.state.src} onError={this.handleError} />;
+    }
 }
 
 class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
@@ -40,7 +67,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
             if (segment.type === "text") {
                 return <MarkdownTextView key={index} rawText={segment.content} />;
             } else if (segment.type === "image_url") {
-                return <img className='ai-image' key={index} src={segment.content}/>;
+                return <AIImageComponent index={index} src={segment.content}/>
             } else {
                 return null;
             }
