@@ -1,5 +1,12 @@
-import re
+from email_validator import validate_email, EmailNotValidError
 
 
-def is_valid_email(raw_email: str) -> bool:
-    return re.fullmatch(r"^[\w\.-]+@[\w\.-]+\.\w+$", raw_email)
+def normalize_email(raw_email: str) -> str:
+    try:
+        emailinfo = validate_email(raw_email, check_deliverability=False)
+
+        return emailinfo.normalized
+
+    except EmailNotValidError as e:
+        print(str(e))
+        raise e
