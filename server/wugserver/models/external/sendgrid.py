@@ -59,7 +59,7 @@ def _verify_email_template(verification_path: str) -> str:
         + (
             """
         ">Verify my email</a></div>
-        <p>Or directly copy this link to your browser if the button doesn't work: 
+        <p>Or copy this link to your browser directly: 
         """
         )
         + verification_path
