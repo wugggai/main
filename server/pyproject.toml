@@ -26,6 +26,7 @@ pymysql = "^1.0.3"
 mysql-connector-python = "^8.0.33"
 requests = "^2.31.0"
 llamaapi = "^0.1.36"
+email-validator = "^2.1.0.post1"
 
 [tool.poetry.scripts]
 start = "wugserver.main:start"

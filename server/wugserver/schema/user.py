@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import Optional
-from wugserver.types.validators.email_validator import is_valid_email
+from wugserver.types.validators.email_validator import normalize_email
 from wugserver.types.validators.password_validator import is_valid_password
 
 
@@ -10,8 +10,7 @@ class UserBase(BaseModel):
     @validator("email", each_item=True)
     def check_email(cls, email):
         if email:
-            assert is_valid_email(email), f"{email} is not a valid email"
-            return email
+            return normalize_email(email)
 
 
 class UserCreate(UserBase):

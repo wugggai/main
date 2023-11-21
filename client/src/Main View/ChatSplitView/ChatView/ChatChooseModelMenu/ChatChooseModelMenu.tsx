@@ -21,14 +21,14 @@ export function ChatChooseModelMenu(props: ChatChooseModelMenuProps) {
     return <div>
             {/* disable a list of supported models. enable ones according to the backend. */}
             {SUPPORTED_MODELS.map((modelName) => {
-                return <button disabled={shouldDisableModel(modelName)} onClick={() => props.onChooseModel({name: modelName as AI, via_system_key: false})}>
-                    {modelName}
+                return <button className='model-button' disabled={shouldDisableModel(modelName)} onClick={() => props.onChooseModel({name: modelName as AI, via_system_key: false})}>
+                    <span className="model-tag user-api-key-tag">API</span>{modelName}
                 </button>
             })}
             {/* only show trial models if backend returns them */}
             {(props.availableModels ?? []).filter((modelAndKey) => modelAndKey.via_system_key == true).map((modelAndKey) => {
-                return <button onClick={() => props.onChooseModel(modelAndKey)}>
-                    <span className="trial-tag">Trial</span>{modelAndKey.name}
+                return <button className='model-button' onClick={() => props.onChooseModel(modelAndKey)}>
+                    <span className="model-tag system-api-key-tag">YUSE</span>{modelAndKey.name}
                 </button>
             })}
         </div>

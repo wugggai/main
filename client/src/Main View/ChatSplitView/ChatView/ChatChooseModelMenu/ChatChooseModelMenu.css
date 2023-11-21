@@ -1,8 +1,32 @@
-.trial-tag {
+.model-tag {
+    text-align: center;
+    display: block;
+    width: 32px;
     margin-right: 4px;
-    background-color: #F7AECA;
-    padding: 2px;
+    padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
     color: white;
+}
+
+.system-api-key-tag {
+    background-color: #d2d297;
+}
+
+.user-api-key-tag {
+    background-color: #8787c5;
+}
+
+.model-button {
+    display: flex;
+    align-items: center;
+    border-style: none;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    cursor: default;
+    font-size: 14px;
+    user-select: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
 }
