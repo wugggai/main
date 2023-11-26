@@ -23,7 +23,7 @@ export interface Interaction {
     tag_ids: string[]
     last_updated: string
     creator_user_id: string
-    ai_type: AI | undefined
+    source: AI | undefined
     using_system_key: boolean
 }
 

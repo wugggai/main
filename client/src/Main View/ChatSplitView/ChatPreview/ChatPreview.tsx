@@ -5,7 +5,6 @@ import './ChatPreview.css'
 
 interface ChatPreviewProps {
     chatHistoryMetadata: ChatMetadata[]
-    newChatMetadata?: ChatMetadata
     selectionChanged: (index?: number) => void
     selectedIndex?: number
     onCreateNewInteraction: () => void
@@ -25,17 +24,10 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
         };
     }
 
-    render() {
-        let combinedMetadata: ChatMetadata[] = []
-        if (this.props.newChatMetadata) {
-            combinedMetadata.push(this.props.newChatMetadata)
-        }
-        combinedMetadata.push(...this.props.chatHistoryMetadata)
-        console.log("index: ", this.props.selectedIndex)
-        
+    render() {        
         let firstDisplayableConversation: number | undefined = undefined
         let selectedUnavailable: boolean = false
-        const rows = combinedMetadata.map((metadata, i) => {
+        const rows = this.props.chatHistoryMetadata.map((metadata, i) => {
             if (this.props.filterByTags.size > 0 && !metadata.interaction.tag_ids.map(tag => this.props.filterByTags.has(tag)).includes(true)) {
                 if (i == this.props.selectedIndex) { selectedUnavailable = true }
                 return undefined

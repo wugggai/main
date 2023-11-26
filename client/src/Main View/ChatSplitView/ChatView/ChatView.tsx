@@ -166,7 +166,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
             SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
                 message: [requestMessageSegment],
-                model: this.props.chatMetadata.interaction.ai_type,
+                model: this.props.chatMetadata.interaction.source,
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
                 model_config: {}
             }).then(response => {
@@ -223,7 +223,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             initial_message: withMessage ? {
                 message: [messageSegment],
                 model_config: {},
-                model: this.props.chatMetadata.interaction.ai_type,
+                model: this.props.chatMetadata.interaction.source,
                 using_system_key: this.props.chatMetadata.interaction.using_system_key,
             } : undefined
         }).then(response => {
@@ -307,17 +307,17 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         }
         this.props.chatMetadata.interaction.using_system_key = modelAndKey.via_system_key
 
-        this.props.chatMetadata.interaction.ai_type = modelAndKey.name
+        this.props.chatMetadata.interaction.source = modelAndKey.name
         if (!this.props.isNewInteraction) {
             this.setState({ isUpdatingModel: true })
             setTimeout(() => this.setState({ isUpdatingModel: false }), 200)
         }
         this.setState({})
-        return this.props.chatMetadata.interaction.ai_type
+        return this.props.chatMetadata.interaction.source
     }
 
     getModelDisplayName() {
-        const compositeName = this.props.chatMetadata.interaction.ai_type == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.ai_type)
+        const compositeName = this.props.chatMetadata.interaction.source == undefined ? undefined : ((this.props.chatMetadata.interaction.using_system_key ? "trial-" : "") + this.props.chatMetadata.interaction.source)
         return compositeName || this.setModel({name: this.props.chatMetadata.last_message?.source as AI, via_system_key: false}) || "Choose Model"
     }
 
@@ -352,14 +352,14 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     handlePromptClick(prompt: string, modelAndKey: ModelAndKey) {
         this.setState({ promptValue: prompt }, () => {
-            this.props.chatMetadata.interaction.ai_type = modelAndKey.name;
+            this.props.chatMetadata.interaction.source = modelAndKey.name;
             this.props.chatMetadata.interaction.using_system_key = modelAndKey.via_system_key
             this.sendMessage()
         });
     }
 
     cannotSendMessage() {
-        return this.state.isWaitingForResponse || !this.state.inputValue || this.props.chatMetadata.interaction.ai_type === undefined
+        return this.state.isWaitingForResponse || !this.state.inputValue || this.props.chatMetadata.interaction.source === undefined
     }
 
     render() {
@@ -501,7 +501,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 waitingForResponse={this.state.isWaitingForResponse}
                 isNewInteraction={this.props.isNewInteraction}
                 isTrash={this.props.isTrash}
-                modelAndKey={{name: this.props.chatMetadata.interaction.ai_type, via_system_key: this.props.chatMetadata.interaction.using_system_key}}
+                modelAndKey={{name: this.props.chatMetadata.interaction.source, via_system_key: this.props.chatMetadata.interaction.using_system_key}}
                 availableModels={this.state.availableModels}
                 onClickPrompt={this.handlePromptClick}
             />
