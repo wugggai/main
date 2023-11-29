@@ -34,7 +34,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         this.newInteraction = this.newInteraction.bind(this);
         this.moveInteractionToTrash = this.moveInteractionToTrash.bind(this);
         this.updateSplitSizes = this.updateSplitSizes.bind(this);
-        this.newestInteractionIfExists = this.newestInteractionIfExists.bind(this);
     }
 
     componentDidMount(): void {
@@ -47,7 +46,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 chatHistoryMetadata: response.data,
             }, () => {
                 this.setState({
-                    selectedIndex: this.newestInteractionIfExists(),
+                    selectedIndex: undefined,
                 }, () => console.log(this.state.selectedIndex))
                 
             })
@@ -98,20 +97,11 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 this.setState({
                     selectedIndex: 0
                 })
-            }).then(err => {
+            }).catch(err => {
                 console.log(err)
                 alert("Sorry, an error has occurred. Please refresh the page and try again.")
             })
         }
-    }
-
-    // Return the correct selectedIndex state to display:
-    // 0 if there's at least one interaction available, undefined otherwise
-    newestInteractionIfExists() {
-        if (this.state.chatHistoryMetadata && this.state.chatHistoryMetadata.length > 0) {
-            return 0
-        }
-        return undefined
     }
 
     moveInteractionToTrash() {
@@ -126,7 +116,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             SERVER.delete(`/interactions/${this.state.deletingChat.interaction.id}`).then(response => {
                 if (response.status === 200) {
                     this.state.chatHistoryMetadata!.splice(index, 1)
-                    this.setState({ selectedIndex: this.newestInteractionIfExists(), deletingChat: undefined })
+                    this.setState({ selectedIndex: undefined, deletingChat: undefined })
                 }
             })
         }
@@ -137,7 +127,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             if (this.state.selectedIndex !== undefined) {
                 this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
             }
-            this.setState({ selectedIndex: this.newestInteractionIfExists(), deletingChat: undefined })
+            this.setState({ selectedIndex: undefined, deletingChat: undefined })
         })
     }
     
