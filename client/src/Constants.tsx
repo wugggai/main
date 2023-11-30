@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Cookies from 'react-cookies'
 
-export const API_BASE = "http://localhost:4000/api"
+export const API_BASE = "/api"
 export const SERVER = axios.create({
   baseURL: API_BASE,
   headers: { Authorization: `Bearer ${Cookies.load('access_token')}` }
