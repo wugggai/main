@@ -43,6 +43,6 @@ def post_user_forget_password(
         user_password_model.initiate_password_reset(initiate_password_reset.email)
     except Exception as e:
         raise HTTPException(
-            status_code=500,
+            status_code=401,
             detail=e,
         )
