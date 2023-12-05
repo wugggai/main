@@ -8,7 +8,7 @@ from wugserver.models.external.sendgrid import send_password_reset_email
 from wugserver.models.user_model import UserModel
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-PASSWORD_RESET_EXPIRATION_DELTA_IN_SECONDS = 15 * 60 * 60
+PASSWORD_RESET_EXPIRATION_DELTA_IN_SECONDS = 12 * 60 * 60
 
 
 class UserPasswordModel:
