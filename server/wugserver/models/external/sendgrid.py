@@ -24,20 +24,53 @@ def send_verification_email(email: str, token: str):
 
 
 def send_password_reset_email(email: str, token: str):
+    path = domain + "/set_new_password" + "?token=" + token
     from_email = Email("hello.yuse.ai@gmail.com")
     to_email = To(email)
     subject = "Reset Password"
-    email_html = (
-        '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><p>'
-        + token
-        + "</p></body></html>"
-    )
+    email_html = _reset_password_template(path)
     content = Content("text/html", email_html)
     mail = Mail(from_email, to_email, subject, content)
 
     mail_json = mail.get()
 
     return sg.client.mail.send.post(request_body=mail_json)
+
+
+def _reset_password_template(path: str) -> str:
+    return (
+        (
+            """
+        <!DOCTYPE html>
+        <html>
+            <head>
+            </head>
+            <body style="display: flex; justify-content: center; align-items: center; font-size: 16px; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">
+                <div style="width: 480px;">
+                    <h4>Password Reset</h4>
+                    <p>We have received your request to reset your password, please use the link below to complete the process. Note that this link will expire after 12 hours.</p>
+                    <div style="display: flex; justify-content: center; align-items: center;"><a style="border-style: none; font-size: 14px; border-radius: 4px; padding: 16px 8px; color: white; background-color: #7878c3; font-family: inherit; cursor: pointer;" href="
+        """
+        )
+        + path
+        + (
+            """
+        ">Reset my password</a></div>
+        <p>Or copy this link to your browser directly: 
+        """
+        )
+        + path
+        + (
+            """  
+                    </p>
+                    <p>Thanks,</p>
+                    <p>The Yuse.ai team</p>
+                </div>
+            </body>
+        </html>
+    """
+        )
+    )
 
 
 def _verify_email_template(verification_path: str) -> str:

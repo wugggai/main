@@ -5,6 +5,7 @@ import ChatPreview from './ChatPreview/ChatPreview';
 import ChatView from './ChatView/ChatView';
 import { SERVER, getUserId } from '../../Constants';
 import AlertSheet from '../../Components/AlertSheet/AlertSheet';
+import Cookies from "react-cookies"
 import './ChatSplitView.css'
 
 interface ChatViewProps {
@@ -17,7 +18,6 @@ interface ChatViewProps {
 
 interface ChatViewState {
     chatHistoryMetadata?: ChatMetadata[]
-    newInteractionMetadata?: ChatMetadata
     selectedIndex?: number
     deletingChat?: ChatMetadata
 }
@@ -34,7 +34,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         this.newInteraction = this.newInteraction.bind(this);
         this.moveInteractionToTrash = this.moveInteractionToTrash.bind(this);
         this.updateSplitSizes = this.updateSplitSizes.bind(this);
-        this.newestInteractionIfExists = this.newestInteractionIfExists.bind(this);
     }
 
     componentDidMount(): void {
@@ -47,7 +46,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 chatHistoryMetadata: response.data,
             }, () => {
                 this.setState({
-                    selectedIndex: this.newestInteractionIfExists(),
+                    selectedIndex: undefined,
                 }, () => console.log(this.state.selectedIndex))
                 
             })
@@ -87,35 +86,22 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
     }
 
     newInteraction() {
-        if (this.state.newInteractionMetadata?.interaction.id !== undefined) {
-            this.setState({
-                chatHistoryMetadata: [this.state.newInteractionMetadata, ...this.state.chatHistoryMetadata ?? []]
+        const userId = Cookies.load("user_id")
+        if (userId !== undefined) {
+            SERVER.post(`/users/${userId}/interactions`, {}).then(response => {
+                console.log(response.data)
+                this.state.chatHistoryMetadata?.unshift({
+                    last_message: null,
+                    interaction: response.data.interaction
+                })
+                this.setState({
+                    selectedIndex: 0
+                })
+            }).catch(err => {
+                console.log(err)
+                alert("Sorry, an error has occurred. Please refresh the page and try again.")
             })
         }
-        this.setState({
-            newInteractionMetadata: {
-                interaction: {
-                    ai_type: undefined, // todo: choose from popup button
-                    using_system_key: false,
-                    id: '',
-                    tag_ids: [],
-                    creator_user_id: `${getUserId()}`,
-                    last_updated: getCurrentDateString(),
-                    title: "Untitled Conversation"
-                },
-                last_message: null
-            },
-            selectedIndex: 0
-        })
-    }
-
-    // Return the correct selectedIndex state to display:
-    // 0 if there's at least one interaction available, undefined otherwise
-    newestInteractionIfExists() {
-        if (this.state.chatHistoryMetadata && this.state.chatHistoryMetadata.length > 0) {
-            return 0
-        }
-        return undefined
     }
 
     moveInteractionToTrash() {
@@ -130,7 +116,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             SERVER.delete(`/interactions/${this.state.deletingChat.interaction.id}`).then(response => {
                 if (response.status === 200) {
                     this.state.chatHistoryMetadata!.splice(index, 1)
-                    this.setState({ selectedIndex: this.newestInteractionIfExists(), deletingChat: undefined })
+                    this.setState({ selectedIndex: undefined, deletingChat: undefined })
                 }
             })
         }
@@ -141,7 +127,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             if (this.state.selectedIndex !== undefined) {
                 this.state.chatHistoryMetadata!.splice(this.state.selectedIndex, 1)
             }
-            this.setState({ selectedIndex: this.newestInteractionIfExists(), newInteractionMetadata: undefined, deletingChat: undefined })
+            this.setState({ selectedIndex: undefined, deletingChat: undefined })
         })
     }
     
@@ -151,20 +137,8 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         }
         
         let content: JSX.Element
-        if (this.state.newInteractionMetadata !== undefined && this.state.selectedIndex === 0) {
-            content = <ChatView chatMetadata={this.state.newInteractionMetadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
-                this.setState({
-                    chatHistoryMetadata: [this.state.newInteractionMetadata!, ...this.state.chatHistoryMetadata!],
-                    selectedIndex: 0,
-                    newInteractionMetadata: undefined
-                })
-            }}
-            isNewInteraction onDeleteInteraction={() => this.setState({ newInteractionMetadata: undefined })}
-            addNewTag={this.props.addNewTag}
-            unsavedStates={this.unsavedStates}
-            />
-        } else if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.some(id => this.props.selectedTagIds.has(id)))) {
-            let metadata = this.state.chatHistoryMetadata[this.state.newInteractionMetadata === undefined ? this.state.selectedIndex : this.state.selectedIndex - 1]
+        if (this.state.selectedIndex !== undefined && (this.props.selectedTagIds.size == 0 || this.state.chatHistoryMetadata[this.state.selectedIndex].interaction.tag_ids.some(id => this.props.selectedTagIds.has(id)))) {
+            let metadata = this.state.chatHistoryMetadata[this.state.selectedIndex]
             content = <ChatView chatMetadata={metadata} isTrash={this.props.isTrash} availableTags={this.props.availableTags} onChatInfoUpdated={() => {
                 this.forceUpdate()
             }}
@@ -200,16 +174,11 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                 <div className='chat-sidebar'>
                     <ChatPreview
                         chatHistoryMetadata={this.state.chatHistoryMetadata}
-                        newChatMetadata={this.state.newInteractionMetadata}
                         selectionChanged={(i) => {
                             if (i === undefined) {
-                                this.setState({ selectedIndex: undefined, newInteractionMetadata: undefined })
+                                this.setState({ selectedIndex: undefined })
                             } else if (i !== this.state.selectedIndex) {
-                                if (this.state.newInteractionMetadata && this.state.newInteractionMetadata.interaction.ai_type === undefined && this.unsavedStates[this.state.newInteractionMetadata.interaction.id] === undefined && i !== 0) {
-                                    this.setState({ selectedIndex: i-1, newInteractionMetadata: undefined })
-                                } else {
-                                    this.setState({ selectedIndex: i })
-                                }
+                                this.setState({ selectedIndex: i })
                             }
                         }}
                         selectedIndex={this.state.selectedIndex}
