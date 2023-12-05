@@ -63,9 +63,10 @@ def _get_model_list_from_providers(keys: list[Key], is_system_key: bool) -> list
             continue
         for model in models:
             supported_model_names = model.get_user_models_list(key.key)
+            uses_context = model.requires_context()
             available_models.extend(
                 [
-                    Model(name=name, via_system_key=is_system_key)
+                    Model(name=name, uses_context=uses_context, via_system_key=is_system_key)
                     for name in supported_model_names
                 ]
             )
@@ -102,5 +103,5 @@ def get_user_available_models(
     )
 
     if ENV != Environment.production:
-        available_models.append(Model(name="echo", via_system_key=False))
+        available_models.append(Model(name="echo", uses_context=True, via_system_key=False))
     return available_models
