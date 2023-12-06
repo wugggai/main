@@ -236,12 +236,12 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
                     </div>
                 </Fragment>
                 :
-                <Fragment>
+                <div style={{margin: "10px 0px 20px", display: "flex", justifyContent: "center", alignItems: "center"}}>
                     <button disabled={!this.state.username} className='login-button reset-button' onClick={this.reset}>Reset Password</button>
                     <span style={{fontSize: '13px'}}>
                         Or <a href='#' onClick={() => this.setState({ mode: 'login', resetDone: false })}>Cancel</a>
                     </span>
-                </Fragment>
+                </div>
             }
         </div>
 

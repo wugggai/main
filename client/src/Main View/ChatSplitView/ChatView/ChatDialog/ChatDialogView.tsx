@@ -53,7 +53,7 @@ class ChatDialogView extends React.Component<ChatDialogProps, ChatDialogState> {
     }
 
     shouldDisplayExamplePrompts(): Boolean {
-        return this.props.isNewInteraction && this.props.history.messages.length == 0 && !this.props.isTrash
+        return this.props.history.messages.length == 0 && !this.props.isTrash
     }
 
     renderFromHistoryItem(item : ChatHistoryItem, i: number): JSX.Element {
