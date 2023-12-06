@@ -425,7 +425,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             }
         </div>
 
-        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel} disableAllModels={this.state.isWaitingForResponse}/></div>
+        const chooseModelMenu = <div className='dropdown-models'><ChatChooseModelMenu availableModels={this.state.availableModels} onChooseModel={this.setModel} chatHistory={this.state.chatHistory} disableAllModels={this.state.isWaitingForResponse}/></div>
 
         return <div className='chat-view'>
             <div style={{ position: 'fixed', left: 0, top: 0, right: 0, bottom: 0, zIndex: 20, display: this.state.addTagButtonPosition ? "block" : "none" }} onClick={() => this.setState({ addTagButtonPosition: undefined, newTagName: undefined })} />

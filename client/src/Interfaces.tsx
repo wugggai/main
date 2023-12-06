@@ -7,6 +7,16 @@ dayjs.extend(timezone);
 
 export type AI = 'gpt-4' | "gpt-3.5-turbo-16k" | "llama" | "DALL-E2" | "stable-diffusion-v3" | "midjourney-v4"
 
+export var modelUsesContext = {
+    "gpt-4": true,
+    "gpt-3.5-turbo-16k": true,
+    "llama": true,
+
+    "DALL-E2": false,
+    "stable-diffusion-v3": false,
+    "midjourney-v4": false,
+}
+
 export interface ModelAndKey {
     name: AI | undefined
     via_system_key: boolean
