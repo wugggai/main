@@ -49,7 +49,7 @@ def create_interaction_route(
         current_user_id=current_user.id, user_id=creator_user_id
     )
     initial_message = interaction_create_params.initial_message
-    auto_title = "Untitled Conversation"
+    auto_title = "New Conversation"
     if initial_message is not None:
         for segment in initial_message.message:
             if segment.type == MessageTypes.text:
