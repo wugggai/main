@@ -3,7 +3,7 @@ import { AI, ChatHistory, ChatHistoryItem, ChatMetadata, MessageSegment, ModelAn
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
-import { SERVER, SUPPORTED_MODELS, getUserId } from '../../../Constants';
+import { SERVER, SUPPORTED_MODELS, TAG_PALETTE, getUserId } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
@@ -419,7 +419,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                                     paddingLeft: '12px'
                                 },
                             }
-                        }} />
+                        }} colors={TAG_PALETTE} />
                         <button className='generic-button' disabled={!this.state.newTagName || this.state.isAddingTag} onClick={this.addNewTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
                     </div>
             }

@@ -6,7 +6,7 @@ import { Color, TwitterPicker } from 'react-color'
 import { Tag, localToGlobal } from '../../Interfaces'
 import axios from 'axios'
 import * as uuid from "uuid"
-import { SERVER, getUserId } from '../../Constants'
+import { SERVER, TAG_PALETTE, getUserId } from '../../Constants'
 import { useNotification } from '../../Components/Notification/NotificationContext'
 import { NotificationProps } from '../../Components/Notification/Notification'
 
@@ -79,7 +79,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                         padding: '8px',
                         paddingLeft: '12px'
                     },
-                }}}/>
+                }}} colors={TAG_PALETTE}/>
                 <button className='generic-button' disabled={this.state.newTagName.length === 0 || this.state.newTagColor === undefined || this.state.isAddingTag} onClick={this.addTag}>{this.state.isAddingTag ? "Adding Tag..." : "Add Tag"}</button>
             </div>
         }
