@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from wugserver.constants import Provider, get_provider_by_name
 from wugserver.models.ai_model_model import get_any_model_of_provider, get_model_by_name
 from wugserver.models.api_key_model import ApiKeyModel
-from wugserver.models.db.interaction_model import (
+from wugserver.models.interaction_model import (
     InteractionRecord,
-    set_interaction_update_time_and_commit,
+    InteractionModel,
 )
 from wugserver.models.message_model import MessageModel
 from wugserver.models.system_key_model import SystemKeyModel
@@ -55,12 +55,12 @@ def _get_correct_api_key_for_model(
 
 
 def handle_message_create_request(
-    db: Session,
     user_id: int,
     interaction: InteractionRecord,
     message_create_params: MessageCreate,
-    message_model: MessageModel,
     api_key_model: ApiKeyModel,
+    interaction_model: InteractionModel,
+    message_model: MessageModel,
     system_key_usage_model: SystemKeyUsageModel,
     system_key_model: SystemKeyModel,
 ):
@@ -129,7 +129,7 @@ def handle_message_create_request(
     )
 
     # set the interaction's latest update time
-    set_interaction_update_time_and_commit(db=db, interaction=interaction)
+    interaction_model.set_interaction_update_time(interaction=interaction)
     return MessageModel.db_message_to_pydantic_message(ai_message)
 
 

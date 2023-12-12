@@ -23,15 +23,12 @@ We'll enforce below trust context isolation on the code level:
 In other words, all authorization happens on the controller level, or under /routers in practice
 """
 
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from wugserver.models.db.interaction_model import (
-    get_interaction_by_id,
-    get_interaction_owner,
-)
-from wugserver.models.db.tag_model import get_tag_by_id, get_tag_owner
+from wugserver.models.interaction_model import InteractionModel
+from wugserver.models.tag_model import TagModel
 
 
 def authorize_by_matching_user_id(current_user_id: int, user_id: int):
@@ -40,13 +37,14 @@ def authorize_by_matching_user_id(current_user_id: int, user_id: int):
 
 
 def authorized_get_interaction(
-    db: Session,
     current_user_id: int,
     interaction_id: UUID,
     include_deleted: bool = True,
+    interaction_model: InteractionModel = Depends(InteractionModel),
 ):
-    interaction = get_interaction_by_id(
-        db=db, interaction_id=interaction_id, include_deleted=include_deleted
+    interaction = interaction_model.get_interaction_by_id(
+        interaction_id=interaction_id,
+        include_deleted=include_deleted,
     )
     # 403 is returned instead of 404 if a nonexisting resource is requested
     # so that an unauthorized user cannot gain information from the call
@@ -56,17 +54,21 @@ def authorized_get_interaction(
         )
     authorize_by_matching_user_id(
         current_user_id=current_user_id,
-        user_id=get_interaction_owner(interaction=interaction),
+        user_id=interaction_model.get_interaction_owner(interaction=interaction),
     )
     return interaction
 
 
-def authorized_get_tag(db: Session, current_user_id: int, tag_id: UUID):
-    tag = get_tag_by_id(db=db, tag_id=tag_id)
+def authorized_get_tag(
+    current_user_id: int,
+    tag_id: UUID,
+    tag_model: TagModel = Depends(TagModel)
+):
+    tag = tag_model.get_tag_by_id(tag_id=tag_id)
     if tag is None:
         raise HTTPException(status_code=403, detail=f"user cannot access tag {tag_id}")
     authorize_by_matching_user_id(
         current_user_id=current_user_id,
-        user_id=get_tag_owner(db=db, tag=tag),
+        user_id=tag_model.get_tag_owner(tag=tag),
     )
     return tag
