@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy import UUID
 from wugserver.models.db.message_db_model import MessageDbModel, MessageRecord
-from wugserver.models.db.interaction_model import InteractionRecord
+from wugserver.models.db.interaction_db_model import InteractionRecord
 from wugserver.models.db.message_favorite_db_model import MessageFavoriteDbModel
 from wugserver.schema.message import Message, MessageSegment, MessageTypes
 
