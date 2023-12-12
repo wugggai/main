@@ -63,6 +63,17 @@ class TagDbModel:
             .all()
     )
 
+    def get_tag_by_name(self, user_id: int, name: str):
+        filters = [
+            TagRecord.creator_user_id == user_id,
+            TagRecord.name == name,
+        ]
+        return (
+            self.db.query(TagRecord)
+            .filter(*filters)
+            .one_or_none()
+        )
+
     def get_tag_by_id(self, tag_id: UUID):
         return self.db.query(TagRecord).filter(TagRecord.id == tag_id).one_or_none()
 

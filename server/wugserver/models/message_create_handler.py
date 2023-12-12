@@ -129,6 +129,11 @@ def handle_message_create_request(
     )
 
     # set the interaction's latest update time
+    interaction_model.ensure_tag_by_name(
+        user_id=user_id,
+        interaction=interaction,
+        name=message_create_params.model,
+    )
     interaction_model.set_interaction_update_time(interaction=interaction)
     return MessageModel.db_message_to_pydantic_message(ai_message)
 

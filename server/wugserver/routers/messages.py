@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends
 from wugserver.dependencies import get_db
 from wugserver.models.db.user_db_model import UserRecord
 from wugserver.models.api_key_model import ApiKeyModel
+from wugserver.models.interaction_model import InteractionModel
 from wugserver.models.message_model import MessageModel
 from wugserver.models.system_key_model import SystemKeyModel
 from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
@@ -26,19 +27,22 @@ def create_message_route(
     current_user: UserRecord = Depends(get_current_active_user),
     message_model: MessageModel = Depends(MessageModel),
     api_key_model: ApiKeyModel = Depends(ApiKeyModel),
+    interaction_model: InteractionModel = Depends(InteractionModel),
     system_key_usage_model: SystemKeyUsageModel = Depends(SystemKeyUsageModel),
     system_key_model: SystemKeyModel = Depends(SystemKeyModel),
 ):
     interaction = authorized_get_interaction(
-        db=db, current_user_id=current_user.id, interaction_id=interaction_id
+        current_user_id=current_user.id,
+        interaction_id=interaction_id,
+        interaction_model=interaction_model,
     )
     return handle_message_create_request(
-        db=db,
         user_id=current_user.id,
         interaction=interaction,
         message_create_params=message_create_params,
-        message_model=message_model,
         api_key_model=api_key_model,
+        interaction_model=interaction_model,
+        message_model=message_model,
         system_key_usage_model=system_key_usage_model,
         system_key_model=system_key_model,
     )
@@ -52,10 +56,13 @@ def get_messages_route(
     from_latest: bool = True,
     db: Session = Depends(get_db),
     current_user: UserRecord = Depends(get_current_active_user),
+    interaction_model: InteractionModel = Depends(InteractionModel),
     message_model: MessageModel = Depends(MessageModel),
 ):
     interaction = authorized_get_interaction(
-        db=db, current_user_id=current_user.id, interaction_id=interaction_id
+        current_user_id=current_user.id,
+        interaction_id=interaction_id,
+        interaction_model=interaction_model,
     )
     raw_messages = message_model.get_interaction_messages(
         interaction=interaction,

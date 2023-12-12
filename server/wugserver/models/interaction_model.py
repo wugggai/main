@@ -20,6 +20,8 @@ from wugserver.models.db.interaction_tag_association import (
 )
 from wugserver.models.db.interaction_db_model import InteractionDbModel, InteractionRecord
 from wugserver.models.db.tag_db_model import TagRecord, TagDbModel
+from wugserver.models.tag_model import TagModel
+from wugserver.models.tag_model import TagModel
 from wugserver.schema.interaction import InteractionCreate, InteractionUpdate
 
 
@@ -28,10 +30,12 @@ class InteractionModel:
     def __init__(
         self,
         interaction_db_model: InteractionDbModel = Depends(InteractionDbModel),
-        tag_db_model: TagDbModel = Depends(TagDbModel)
+        tag_db_model: TagDbModel = Depends(TagDbModel),
+        tag_model: TagModel = Depends(TagModel),
     ):
         self.interaction_db_model = interaction_db_model
         self.tag_db_model = tag_db_model
+        self.tag_model = tag_model
 
     def get_interaction_owner(self, interaction: InteractionRecord):
         return self.interaction_db_model.get_interaction_owner(interaction)
@@ -108,3 +112,21 @@ class InteractionModel:
         self, interaction_id: UUID,
     ):
         return self.interaction_db_model.delete_interaction(interaction_id)
+
+    def ensure_tag_by_name(
+        self,
+        user_id: int,
+        interaction: InteractionRecord,
+        name: str,
+    ):
+        for tag_record in interaction.tags:
+            if tag_record.name == name:
+                return
+        new_tag = self.tag_model.get_or_create_tag_by_name(user_id, name)
+        interaction.tags.append(new_tag)
+        self.interaction_db_model.update_interaction(
+            interaction,
+            interaction.tags,
+            interaction.title,
+            interaction.deleted,
+        )
