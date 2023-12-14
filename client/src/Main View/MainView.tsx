@@ -96,7 +96,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                 this.forceUpdate()
             }} />
             break
-        case 2:
+        case 3:
+            // Setting lives under the discord tab
             contentView = <Settings />
             break
         default:
