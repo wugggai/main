@@ -3,7 +3,7 @@ import { AI, ChatHistory, ChatHistoryItem, ChatMetadata, MessageSegment, ModelAn
 import './ChatView.css'
 import ChatDialogView from './ChatDialog/ChatDialogView';
 import { Loading } from '../../../UI Components/Loading';
-import { SERVER, SUPPORTED_MODELS, TAG_PALETTE, getUserId } from '../../../Constants';
+import { SERVER, SUPPORTED_MODELS, TAG_PALETTE, getUserId, isDark, textColorFromHex } from '../../../Constants';
 import Dropdown from 'rc-dropdown'
 import 'rc-dropdown/assets/index.css';
 import Cookies from 'react-cookies'
@@ -68,10 +68,13 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
         this.setModel = this.setModel.bind(this)
         this.cannotSendMessage = this.cannotSendMessage.bind(this)
     }
-
+    shouldComponentUpdate(nextProps: Readonly<ChatViewClassImplProps>, nextState: Readonly<ChatViewState>, nextContext: any): boolean {
+        this.tagMap = {}
+        nextProps.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
+        return super.shouldComponentUpdate?.(nextProps, nextState, nextContext) ?? true
+    }
     componentDidUpdate(prevProps: Readonly<ChatViewClassImplProps>, prevState: Readonly<ChatViewState>, snapshot?: any): void {
         if (super.componentDidUpdate) super.componentDidUpdate(prevProps, prevState, snapshot)
-        this.props.availableTags.forEach(tag => this.tagMap[tag.id] = tag)
         if (this.props.chatMetadata.interaction.id !== prevProps.chatMetadata.interaction.id) {
             this.setState({ chatHistory: undefined })
             this.loadHistory()
@@ -384,11 +387,12 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
         const usedTagList: JSX.Element[] = (this.props.chatMetadata.interaction.tag_ids || []).map((tagId, i) => {
             if (this.tagMap[tagId] === undefined) {
-                console.log("WARNING:", tagId)
+                console.log("WARNING: this tag doesn't exist in available tag list", tagId)
+                return <Fragment />
             }
-            return <div className='inline-tag-item' key={i} style={{backgroundColor: this.tagMap[tagId].color}}>
-                <span>{this.tagMap[tagId].name}</span>
-                <img src='/assets/cross.svg' width={8} onClick={() => this.removeTag(i)} />
+            return <div className='inline-tag-item' key={tagId} style={{backgroundColor: this.tagMap[tagId].color}}>
+                <span style={{color: textColorFromHex(this.tagMap[tagId].color)}}>{this.tagMap[tagId].name}</span>
+                <img src='/assets/cross.svg' style={{filter: isDark(this.tagMap[tagId].color) ? "invert(1)" : ""}} width={8} onClick={() => this.removeTag(i)} />
             </div>
         })
 

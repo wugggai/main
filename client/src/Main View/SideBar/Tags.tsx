@@ -10,7 +10,6 @@ interface TagProps {
 }
 
 export function Tags(props: TagProps) {
-    const [deletedRows, setDeletedRows] = useState<boolean[]>(Array(props.tags.length).fill(false));
     const [editingRow, setEditingRow] = useState<number | undefined>(undefined);
     const [popupMenuRow, setPopupMenuRow] = useState<number | undefined>(undefined);
     const [menuPosition, setMenuPosition] = useState([0, 0]);
@@ -27,9 +26,6 @@ export function Tags(props: TagProps) {
         SERVER.delete(`/tags/${tag.id}`).then(response => {
             console.log(response.data)
         }).then(_ => {
-            const newDeletedRows = [...deletedRows]
-            newDeletedRows[index] = true
-            setDeletedRows(newDeletedRows)
             props.onTagDeleted(tag.id)
         }).catch(err => {
             console.log(err)
@@ -38,9 +34,6 @@ export function Tags(props: TagProps) {
 
     return <div className='tags'>
         {props.tags.map((tag, i) => {
-            if (deletedRows[i]) {
-                return <Fragment key={i} />
-            }
             return <Fragment key={i}>
                 <div className='tag-item' onClick={(e) => props.onSelect(i, e.shiftKey) } key={i}>
                 <div className='tint' style={{opacity: props.currentSelection.has(tag.id) ? 1 : 0}} />

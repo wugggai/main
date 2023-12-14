@@ -166,7 +166,8 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
                     }}
                     onTagDeleted={(tagId: string) => {
                         this.state.selectedTagIds.delete(tagId)
-                        this.chatSplitViewRef.current?.componentDidMount()
+                        this.setState({ tagList: this.state.tagList!.filter(tag => tag.id !== tagId) })
+                        // this.chatSplitViewRef.current?.componentDidMount()
                     }}
                 />
                 <div className='main-content' style={{position: 'relative'}}>
