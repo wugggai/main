@@ -218,3 +218,36 @@ export const SYNTAX_THEME = {
 export function getUserId(): number | undefined {
   return Cookies.load('user_id')
 }
+
+export function hexToRgb(hex: string) {
+  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+    return r + r + g + g + b + b;
+  });
+
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      }
+    : null;
+}
+
+/** Returns whether the color is dark (i.e. suitable for white text).*/
+export function isDark(hex: string) {
+  const rgb = hexToRgb(hex)
+  if (rgb !== null) {
+    const { r, g, b } = rgb
+    const sRGBLuma = r * 0.2126 + g * 0.7152 + b * 0.0722
+    return sRGBLuma / 255 < 0.6
+  } else {
+    return false
+  }
+}
+
+export function textColorFromHex(hex: string) {
+  return isDark(hex) ? "white" : "black"
+}
