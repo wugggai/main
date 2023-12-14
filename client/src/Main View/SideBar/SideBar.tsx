@@ -85,7 +85,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
         }
 
         const topTabs = ["Chats", "Trash"]
-        const bottomTabs = ["Settings"]
+        const bottomTabs = ["Discord", "Settings"]
         return <div className='sidebar' onClick={() => this.setState({ newTagPopoverAnchor: undefined })}>
             <div className='top-section'>
                 {
@@ -130,6 +130,7 @@ class SideBarImpl extends React.Component<SideBarImplProps, SideBarState> {
                             icon={tab.toLowerCase()}
                             isSelected={this.props.currentTabIndex===i + topTabs.length}
                             key={i}
+                            href={(tab == "Discord" ? "https://discord.gg/PwCSdCcWd4" : undefined)}
                             onSelected={() => this.props.onTabChange(i + topTabs.length)}
                         />
                     })
