@@ -179,25 +179,10 @@ class MainView extends React.Component<MainViewProps, MainViewState> {
 
             {this.state.showLoginScreen && <Login resetToken={this.props.resetPasswordToken} verificationToken={this.props.verificationToken} />}
             {this.state.showOnboardingScreen && !this.state.showLoginScreen &&
-            <OnboardingScreen
-                show={true}
-                onExit={() => {
-                    this.setState({ showOnboardingScreen: false })
-                    SERVER.put(`/users/${getUserId()}/onboardinghistory/seen_onboarding_education`)
-                }}
-            >
-                <div>
-                    <h1>Page 1</h1>
-                    <p>Welcome to LLM platform</p>
-                    <br />
-                    <img src="/assets/logo.png" width="100px" />
-                </div>
-                
-                <div>
-                    <h1>Page 2</h1>
-                </div>
-                <div><h1>Page 3</h1></div>
-            </OnboardingScreen>}
+            <OnboardingScreen show={true} onExit={() => {
+                this.setState({ showOnboardingScreen: false })
+                SERVER.put(`/users/${getUserId()}/onboardinghistory/seen_onboarding_education`)
+            }} goToSettings={() => this.setState({ currentTabIndex: 3, showOnboardingScreen: false })}/>}
         </Fragment>
     }
 }
