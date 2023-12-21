@@ -133,7 +133,7 @@ To give you a taste of what we offer, we are also providing you 50 free messages
                         backgroundColor: "#EDEDF9B2", left: 0, right: 0, top: 0, height: 248, position: "relative",
                         display: "flex", columnGap: 20, justifyContent: "center"
                     }}>
-                        <div className='center-content'>TODO</div>
+                        <img src="/assets/onboarding/keys.jpg" width={520} style={{objectFit: "contain"}} />
                     </div>
 
                     <div style={{margin: "30px"}}>
