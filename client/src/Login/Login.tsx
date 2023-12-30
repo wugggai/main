@@ -313,7 +313,7 @@ class LoginImpl extends React.Component<LoginImplProps, LoginState> {
         return <div className='center-screen login-screen'>
             <div className='left'>
                 <div className='container'>
-                    <img src="/assets/logo.png" width="100px" />
+                    <img src="/assets/logo.svg" width="100px" />
                     <h1>Yuse.ai</h1>
                     <div>Welcome to Yuse.ai, where you can use AIs productively and communicate with AIs seamlessly</div>
                 </div>
