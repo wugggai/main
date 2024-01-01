@@ -20,7 +20,12 @@ class OpenAIModel(AIModel):
 
 
 class GPTModel(OpenAIModel):
-    supported_model_names = ["gpt-3.5-turbo-16k", "gpt-4"]
+
+    model_screen_name_to_underlying = {
+        "gpt-3.5": "gpt-3.5-turbo-1106",
+        "gpt-4": "gpt-4-1106-preview",
+    }
+    supported_model_names = ["gpt-3.5", "gpt-4"]
 
     @classmethod
     def get_user_models_list(cls, key: str):
@@ -28,16 +33,16 @@ class GPTModel(OpenAIModel):
             response = openai.Model.list(api_key=key)
             api_supported_models = [model["id"] for model in response["data"]]
         except Exception:
-            api_supported_models = ["gpt-3.5-turbo-16k"]
+            api_supported_models = ["gpt-3.5"]
         return [
             model
             for model in cls.supported_model_names
-            if model in api_supported_models
+            if cls.model_screen_name_to_underlying[model] in api_supported_models
         ]
 
     @classmethod
     def get_user_verification_model(cls, key: str):
-        return "gpt-3.5-turbo-16k"
+        return "gpt-3.5"
 
     @classmethod
     def requires_context(cls) -> bool:
@@ -63,7 +68,7 @@ class GPTModel(OpenAIModel):
         # As of 4/29/2023 GPT3.5 doesn't accept parameters. Disregard messageCreateParams.model_config
         response = openai.ChatCompletion.create(
             api_key=api_key,
-            model=message_create_params.model,
+            model=self.model_screen_name_to_underlying[message_create_params.model],
             messages=previous_messages,
         )
         return self.wrap_text_message(response["choices"][0]["message"]["content"])
