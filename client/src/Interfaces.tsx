@@ -5,11 +5,11 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone); 
 
-export type AI = 'gpt-4' | "gpt-3.5-turbo-16k" | "llama" | "DALL-E2" | "stable-diffusion-v3" | "midjourney-v4"
+export type AI = 'gpt-4' | "gpt-3.5" | "llama" | "DALL-E2" | "stable-diffusion-v3" | "midjourney-v4"
 
 export var modelUsesContext = {
     "gpt-4": true,
-    "gpt-3.5-turbo-16k": true,
+    "gpt-3.5": true,
     "llama": true,
 
     "DALL-E2": false,

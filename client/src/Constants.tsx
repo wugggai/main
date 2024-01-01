@@ -20,7 +20,7 @@ SERVER.interceptors.response.use(
   }
 )
 
-export const SUPPORTED_MODELS = ["gpt-3.5-turbo-16k", "gpt-4", "llama", "DALL-E2", "stable-diffusion-v3", "midjourney-v4"]
+export const SUPPORTED_MODELS = ["gpt-3.5", "gpt-4", "llama", "DALL-E2", "stable-diffusion-v3", "midjourney-v4"]
 
 export const TAG_PALETTE = ["#CA5690", "#F7AECA", "#FCDFBA", "#DCB36E", "#E59769", "#83B19E", "#52A1BE", "#63A5F7", "#5850B6", "#1C406D"]
 
