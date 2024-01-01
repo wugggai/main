@@ -22,10 +22,10 @@ class OpenAIModel(AIModel):
 class GPTModel(OpenAIModel):
 
     model_screen_name_to_underlying = {
-        "gpt-3.5": "gpt-3.5-turbo-1106",
+        "gpt-3.5-turbo-16k": "gpt-3.5-turbo-1106",
         "gpt-4": "gpt-4-1106-preview",
     }
-    supported_model_names = ["gpt-3.5", "gpt-4"]
+    supported_model_names = ["gpt-3.5-turbo-16k", "gpt-4"]
 
     @classmethod
     def get_user_models_list(cls, key: str):
@@ -33,7 +33,7 @@ class GPTModel(OpenAIModel):
             response = openai.Model.list(api_key=key)
             api_supported_models = [model["id"] for model in response["data"]]
         except Exception:
-            api_supported_models = ["gpt-3.5"]
+            api_supported_models = ["gpt-3.5-turbo-16k"]
         return [
             model
             for model in cls.supported_model_names
@@ -42,7 +42,7 @@ class GPTModel(OpenAIModel):
 
     @classmethod
     def get_user_verification_model(cls, key: str):
-        return "gpt-3.5"
+        return "gpt-3.5-turbo-16k"
 
     @classmethod
     def requires_context(cls) -> bool:

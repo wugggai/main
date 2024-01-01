@@ -41,7 +41,7 @@ class ChatPreview extends React.Component<ChatPreviewProps, ChatPreviewState> {
             if (!firstDisplayableConversation) {
                 firstDisplayableConversation = i
             }
-            let preview_image_model = "gpt-3.5"
+            let preview_image_model = "gpt-3.5-turbo-16k"
             if (metadata.last_message) {
                 preview_image_model = metadata.last_message.source
             }
