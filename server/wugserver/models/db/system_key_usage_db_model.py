@@ -57,6 +57,12 @@ class SystemKeyUsageDbModel:
             .first()
         )
 
-        record.counter += 1
+        if record is None:
+            record = self.create_system_key_usage(
+                user_id=user_id,
+                provider=provider,
+            )
+        else:
+            record.counter += 1
         self.db.commit()
         self.db.refresh(record)
