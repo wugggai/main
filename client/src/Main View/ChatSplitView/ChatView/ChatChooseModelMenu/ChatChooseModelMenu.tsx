@@ -35,7 +35,7 @@ export function ChatChooseModelMenu(props: ChatChooseModelMenuProps) {
             })}
             {/* only show trial models if backend returns them */}
             {(props.availableModels ?? []).filter((modelAndKey) => modelAndKey.via_system_key == true).map((modelAndKey) => {
-                return <button className='model-button' disabled={shouldDisableModel(modelAndKey.name!)} onClick={() => props.onChooseModel(modelAndKey)}>
+                return <button className='model-button' disabled={false} onClick={() => props.onChooseModel(modelAndKey)}>
                     <span className="model-tag system-api-key-tag">YUSE</span>{modelAndKey.name}
                 </button>
             })}

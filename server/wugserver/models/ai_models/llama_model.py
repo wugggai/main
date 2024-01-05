@@ -10,6 +10,7 @@ from wugserver.schema.message import (
 )
 from wugserver.constants import Provider
 
+
 class LlamaModel(AIModel):
     provider = Provider.llama
     supported_model_names = ["llama"]
@@ -46,11 +47,15 @@ class LlamaModel(AIModel):
         llama_api = LlamaAPI(api_key)
 
         # As of 11/11/2023 llama doesn't accept parameters. Disregard messageCreateParams.model_config
-        response = llama_api.run({
-            "messages": previous_messages,
-            "stream": False,
-        })
-        return self.wrap_text_message(response.json()["choices"][0]["message"]["content"])
+        response = llama_api.run(
+            {
+                "messages": previous_messages,
+                "stream": False,
+            }
+        )
+        return self.wrap_text_message(
+            response.json()["choices"][0]["message"]["content"]
+        )
 
     def new_user_llama_message(self, message: str):
         return {"role": "user", "content": message}

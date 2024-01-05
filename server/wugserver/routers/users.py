@@ -5,7 +5,7 @@ from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.db.system_key_usage_db_model import SystemKeyUsageDbModel
 from wugserver.models.onboarding_history_model import OnboardingHistoryModel
 from wugserver.models.system_key_model import SystemKeyModel
-from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
+from wugserver.models.system_key_usage_model import SystemKeyUsageModel
 from wugserver.models.user_authentication import get_current_active_user, register_user
 from wugserver.models.user_model import UserModel
 from wugserver.models.user_password_model import UserPasswordModel

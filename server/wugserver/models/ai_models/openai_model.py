@@ -20,7 +20,6 @@ class OpenAIModel(AIModel):
 
 
 class GPTModel(OpenAIModel):
-
     model_screen_name_to_underlying = {
         "gpt-3.5-turbo-16k": "gpt-3.5-turbo-1106",
         "gpt-4": "gpt-4-1106-preview",

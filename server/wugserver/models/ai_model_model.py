@@ -15,7 +15,7 @@ from wugserver.models.db.api_key_db_model import ApiKeyRecord
 from wugserver.models.db.system_key_db_model import SystemKeyRecord
 from wugserver.models.db.system_key_usage_db_model import SystemKeyUsageDbModel
 from wugserver.models.system_key_model import SystemKeyModel
-from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
+from wugserver.models.system_key_usage_model import SystemKeyUsageModel
 from wugserver.schema.model_list import Model
 
 """
@@ -66,7 +66,11 @@ def _get_model_list_from_providers(keys: list[Key], is_system_key: bool) -> list
             uses_context = model.requires_context()
             available_models.extend(
                 [
-                    Model(name=name, uses_context=uses_context, via_system_key=is_system_key)
+                    Model(
+                        name=name,
+                        uses_context=uses_context,
+                        via_system_key=is_system_key,
+                    )
                     for name in supported_model_names
                 ]
             )
@@ -103,5 +107,7 @@ def get_user_available_models(
     )
 
     if ENV != Environment.production:
-        available_models.append(Model(name="echo", uses_context=True, via_system_key=False))
+        available_models.append(
+            Model(name="echo", uses_context=True, via_system_key=False)
+        )
     return available_models

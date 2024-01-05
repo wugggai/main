@@ -5,7 +5,7 @@ from wugserver.models.db.user_db_model import UserRecord
 from wugserver.models.api_key_model import ApiKeyModel
 from wugserver.models.message_model import MessageModel
 from wugserver.models.system_key_model import SystemKeyModel
-from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
+from wugserver.models.system_key_usage_model import SystemKeyUsageModel
 from wugserver.models.user_authentication import get_current_active_user
 from wugserver.models.message_create_handler import handle_message_create_request
 from wugserver.routers.authorization import (

@@ -139,13 +139,12 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
     sendMessage() {
         const metadataBackup = this.props.chatMetadata
-        this.setState({ isWaitingForResponse: true })
-        if (this.props.isNewInteraction) {
-            this.createInteraction(true)
-        } else if (this.state.inputValue) {
+        let messageValue = this.state.promptValue || this.state.inputValue
+        if (messageValue) {
+            this.setState({ isWaitingForResponse: true })
             const messageSegment: MessageSegment = {
                 type: "text",
-                content: this.state.inputValue,
+                content: messageValue,
             }
             if (!this.state.chatHistory) {
                 this.setState({ chatHistory: { messages: [] } })
@@ -161,11 +160,14 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
             this.state.chatHistory!.messages.push(new_message)
             this.props.chatMetadata.last_message = new_message
             this.props.onChatInfoUpdated()
-            this.setState({ inputValue: '' })
+            this.setState({
+                inputValue: '',
+                promptValue: '',
+            })
             delete this.props.unsavedStates[this.props.chatMetadata.interaction.id]
             const requestMessageSegment: MessageSegment = {
                 type: "text",
-                content: this.state.inputValue,
+                content: messageValue,
             }
             SERVER.post(`/interactions/${this.props.chatMetadata.interaction.id}/messages`, {
                 message: [requestMessageSegment],
@@ -193,57 +195,22 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
     }
 
     // A locally-initialized new interaction has an id of ''
-    createInteraction(withMessage: boolean) {
+    createInteraction() {
         const metadataBackup = this.props.chatMetadata
         const userId = getUserId()
         if (userId === undefined) {
             alert("Not logged in")
             return
         }
-        const messageSegment: MessageSegment = {
-            type: "text",
-            content: this.state.promptValue || this.state.inputValue,
-        }
-        if (withMessage) {
-            let new_message: ChatHistoryItem = {
-                message: [messageSegment],
-                source: 'user',
-                id: 'tmp',
-                timestamp: getCurrentDateString(),
-                offset: 0
-            }
-            this.setState({
-                chatHistory: {
-                    messages: [new_message]
-                },
-                inputValue: '',
-                promptValue: ''
-            })
-            delete this.props.unsavedStates[metadataBackup.interaction.id]
-        }
+
         SERVER.post(`/users/${userId}/interactions`, {
             title: this.state.editedTitle,
-            initial_message: withMessage ? {
-                message: [messageSegment],
-                model_config: {},
-                model: this.props.chatMetadata.interaction.source,
-                using_system_key: this.props.chatMetadata.interaction.using_system_key,
-            } : undefined
+            initial_message: undefined
         }).then(response => {
             const metadata = response.data as ChatMetadata
             metadataBackup.interaction.id = metadata.interaction.id
             metadataBackup.interaction.title = metadata.interaction.title
-            let systemResponse: ChatHistoryItem[] = []
-            if (metadata.last_message) {
-                systemResponse.push({
-                    message: metadata.last_message.message,
-                    id: metadata.last_message.id,
-                    timestamp: metadata.last_message.timestamp,
-                    offset: metadata.last_message.offset,
-                    source: metadata.last_message.source as (AI)
-                })
-                metadataBackup.last_message = metadata.last_message
-            }
+
             if (this.state.editedTitle) {
                 metadataBackup.interaction.title = this.state.editedTitle
                 metadataBackup.last_message = metadata.last_message
@@ -252,21 +219,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
 
             // Only update state of current chat view if the current chat is the same as the request chat
             if (this.props.chatMetadata.interaction.id === metadataBackup.interaction.id) {
-                if (withMessage) {
-                    const messageSegment: MessageSegment = {
-                        type: "text",
-                        content: this.state.promptValue || this.state.inputValue,
-                    }
-                    this.setState(prevState => ({
-                        chatHistory: {
-                            messages: [
-                                ...(prevState.chatHistory ? prevState.chatHistory.messages : []),
-                                ...systemResponse
-                            ]
-                        },
-                        isWaitingForResponse: false
-                    }))
-                } else if (this.state.chatHistory === undefined) {
+                if (this.state.chatHistory === undefined) {
                     this.setState({
                         chatHistory: { messages: [] },
                         isWaitingForResponse: false
@@ -300,7 +253,7 @@ class ChatViewClassImpl extends React.Component<ChatViewClassImplProps, ChatView
                 console.log("save response", response.data)
             })
         } else {
-            this.createInteraction(false)
+            this.createInteraction()
         }
     }
 

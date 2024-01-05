@@ -17,15 +17,11 @@ export function Tags(props: TagProps) {
     const menuImgRefs = useRef<Array<HTMLSpanElement | null>>(Array(props.tags.length).fill(null));
 
     function updateTag(tag: Tag, newName: string) {
-        SERVER.put(`/tags/${tag.id}`, { name: newName, color: tag.color }).then(response => {
-            console.log(response.data)
-        })
+        SERVER.put(`/tags/${tag.id}`, { name: newName, color: tag.color })
     }
 
     function deleteTag(tag: Tag, index: number) {
-        SERVER.delete(`/tags/${tag.id}`).then(response => {
-            console.log(response.data)
-        }).then(_ => {
+        SERVER.delete(`/tags/${tag.id}`).then(_ => {
             props.onTagDeleted(tag.id)
         }).catch(err => {
             console.log(err)

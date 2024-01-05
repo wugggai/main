@@ -1,9 +1,9 @@
-
 from fastapi import APIRouter, Depends
 from wugserver.models.example_prompt_model import ExamplePromptModel
 from wugserver.schema.prompt import Prompt, PromptTypes
 
 router = APIRouter()
+
 
 @router.get("/example_prompts", response_model=list[Prompt])
 def get_random_prompts(

@@ -13,7 +13,7 @@ class SystemKeyUsageModel:
     ):
         self.system_key_usage_db_model = system_key_usage_db_model
 
-    def user_can_user_system_key(self, user_id: int, provider: Provider, limit: int):
+    def user_can_use_system_key(self, user_id: int, provider: Provider, limit: int):
         record = self.system_key_usage_db_model.get_user_system_key_usage(
             user_id=user_id, provider=provider
         )

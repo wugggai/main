@@ -47,8 +47,7 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
             }, () => {
                 this.setState({
                     selectedIndex: undefined,
-                }, () => console.log(this.state.selectedIndex))
-                
+                })
             })
             setTimeout(() => {
                 const chatSidebar = document.querySelector(".chat-sidebar") as HTMLDivElement
@@ -89,7 +88,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
         const userId = Cookies.load("user_id")
         if (userId !== undefined) {
             SERVER.post(`/users/${userId}/interactions`, {}).then(response => {
-                console.log(response.data)
                 this.state.chatHistoryMetadata?.unshift({
                     last_message: null,
                     interaction: response.data.interaction
@@ -98,7 +96,6 @@ class ChatSplitView extends React.Component<ChatViewProps, ChatViewState> {
                     selectedIndex: 0
                 })
             }).catch(err => {
-                console.log(err)
                 alert("Sorry, an error has occurred. Please refresh the page and try again.")
             })
         }

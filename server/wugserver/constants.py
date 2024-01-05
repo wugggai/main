@@ -37,7 +37,7 @@ ENV = current_environment()
 site_domain_by_env = {
     Environment.dev: "http://127.0.0.1:5000",
     Environment.staging: "https://wug-staging.azurewebsites.net",
-    Environment.production: "https://wug-production.azurewebsites.net",
+    Environment.production: "https://yuse.ai",
 }
 
 

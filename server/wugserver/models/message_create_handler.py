@@ -10,7 +10,7 @@ from wugserver.models.db.interaction_model import (
 )
 from wugserver.models.message_model import MessageModel
 from wugserver.models.system_key_model import SystemKeyModel
-from wugserver.models.system_key_usage_mdoel import SystemKeyUsageModel
+from wugserver.models.system_key_usage_model import SystemKeyUsageModel
 from wugserver.schema.api_key import ApiKeyCreate
 from wugserver.schema.message import MessageCreate, MessageSegment
 
@@ -30,28 +30,27 @@ def _get_correct_api_key_for_model(
                 status_code=403,
                 detail=f"no System key for {message_create_params.model}",
             )
-        if not system_key_usage_model.user_can_user_system_key(
+        if not system_key_usage_model.user_can_use_system_key(
             user_id=user_id, provider=provider, limit=system_key.limit
         ):
             raise HTTPException(
                 status_code=403,
                 detail=f"You've reached the limit of trial key for {message_create_params.model}",
             )
-        system_key_usage_model.user_can_user_system_key
-        return system_key.key
-    else:
-        api_key_record = api_key_model.get_api_key_by_provider(
-            user_id=user_id,
-            provider=provider,
+        return system_key.key, True
+
+    api_key_record = api_key_model.get_api_key_by_provider(
+        user_id=user_id,
+        provider=provider,
+    )
+
+    if api_key_record is None:
+        raise HTTPException(
+            status_code=403,
+            detail=f"no API key provided for {message_create_params.model}",
         )
 
-        if api_key_record is None:
-            raise HTTPException(
-                status_code=403,
-                detail=f"no API key provided for {message_create_params.model}",
-            )
-
-        return api_key_record.api_key
+    return api_key_record.api_key, False
 
 
 def handle_message_create_request(
@@ -83,10 +82,11 @@ def handle_message_create_request(
             status_code=404, detail=f"{message_create_params.model} is not availble"
         )
     api_key: str = ""
+    is_system_key: bool = False
     # verifies that user has provided api_key
     provider = requested_model.get_provider()
     if requested_model.requires_api_key():
-        api_key = _get_correct_api_key_for_model(
+        api_key, is_system_key = _get_correct_api_key_for_model(
             user_id=user_id,
             provider=provider,
             message_create_params=message_create_params,
@@ -127,6 +127,12 @@ def handle_message_create_request(
         source=message_create_params.model,
         message=model_res_msg,
     )
+
+    # charge the system key credit
+    if is_system_key:
+        system_key_usage_model.increment_user_system_key_usage(
+            user_id=user_id, provider=provider
+        )
 
     # set the interaction's latest update time
     set_interaction_update_time_and_commit(db=db, interaction=interaction)

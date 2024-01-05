@@ -35,9 +35,7 @@ class AIImageComponent extends React.Component<AIImageComponentProps, AIImageCom
     }
 
     handleError() {
-        console.log("handling error")
         this.setState({ src: "/assets/expired.png" })
-        console.log(this.state)
     }
 
     render() {
