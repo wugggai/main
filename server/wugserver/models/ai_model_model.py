@@ -96,7 +96,7 @@ def get_user_available_models(
     system_keys_available_for_user = [
         key
         for key in all_system_keys
-        if system_key_usage_model.user_can_user_system_key(
+        if system_key_usage_model.user_can_use_system_key(
             user_id=user_id, provider=key.provider, limit=key.limit
         )
     ]
